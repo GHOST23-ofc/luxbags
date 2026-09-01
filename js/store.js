@@ -1,18 +1,17 @@
-// ==============================================================================
-// SNEAKER WORLD MLS CALI - STATE & STORAGE MANAGER (BASTION AI)
-// Modo Claro Luxury + Rojo Torino + Protección de Costos Mayoristas & Supabase Ready
-// ==============================================================================
+// =========================================================================
+// LUXBAGS MLS COLOMBIA - STATE & LOCAL STORAGE MANAGER (BASTION AI)
+// Base de datos de bolsos, carteras, parser de WhatsApp y checkout multi-bolso
+// =========================================================================
 
 const DB_KEYS = {
-  MASTER_PRODUCTS: "sneakerworld_master_products_v8",
-  STORES: "sneakerworld_stores_v8",
-  CURRENT_STORE_ID: "sneakerworld_current_store_id_v8",
-  ORDERS: "sneakerworld_orders_v8",
-  AUTH_SESSION: "sneakerworld_auth_session_v8",
-  LINE_ROTATION_INDEX: "sneakerworld_line_rotation_v8"
+  MASTER_PRODUCTS: "luxbags_master_products_v9",
+  STORES: "luxbags_stores_v9",
+  CURRENT_STORE_ID: "luxbags_current_store_id_v9",
+  ORDERS: "luxbags_orders_v9",
+  CART_ITEMS: "luxbags_cart_items_v9"
 };
 
-class ShoesStoreManager {
+class LuxbagsStoreManager {
   constructor() {
     this.init();
   }
@@ -28,115 +27,72 @@ class ShoesStoreManager {
       localStorage.setItem(DB_KEYS.ORDERS, JSON.stringify(INITIAL_ORDERS));
     }
     if (!localStorage.getItem(DB_KEYS.CURRENT_STORE_ID)) {
-      localStorage.setItem(DB_KEYS.CURRENT_STORE_ID, "store-001");
+      localStorage.setItem(DB_KEYS.CURRENT_STORE_ID, INITIAL_STORES[0].id);
     }
   }
 
-  // Restablecer a datos de fábrica
-  resetToDefaults() {
-    localStorage.setItem(DB_KEYS.MASTER_PRODUCTS, JSON.stringify(INITIAL_MASTER_PRODUCTS));
-    localStorage.setItem(DB_KEYS.STORES, JSON.stringify(INITIAL_STORES));
-    localStorage.setItem(DB_KEYS.ORDERS, JSON.stringify(INITIAL_ORDERS));
-    localStorage.setItem(DB_KEYS.CURRENT_STORE_ID, "store-001");
-    localStorage.removeItem(DB_KEYS.AUTH_SESSION);
-    localStorage.removeItem(DB_KEYS.LINE_ROTATION_INDEX);
+  resetDemo() {
+    localStorage.removeItem(DB_KEYS.MASTER_PRODUCTS);
+    localStorage.removeItem(DB_KEYS.STORES);
+    localStorage.removeItem(DB_KEYS.CURRENT_STORE_ID);
+    localStorage.removeItem(DB_KEYS.ORDERS);
+    localStorage.removeItem(DB_KEYS.CART_ITEMS);
+    this.init();
   }
 
   // =========================================================================
-  // SISTEMA DE AUTENTICACIÓN Y ROLES (PROTECCIÓN DE COSTOS MAYORISTAS)
+  // GESTIÓN DE PRODUCTOS MAESTROS (BOLSOS Y ACCESORIOS)
   // =========================================================================
-  getAuthSession() {
-    try {
-      return JSON.parse(localStorage.getItem(DB_KEYS.AUTH_SESSION)) || { role: "public", authenticated: false };
-    } catch (e) {
-      return { role: "public", authenticated: false };
-    }
-  }
-
-  authenticate(role, pin) {
-    // PIN Bodega Central: 8820 | PIN Tienda Satélite: 1234
-    const validPins = {
-      "supplier": "8820",
-      "store-admin": "1234",
-      "directory": "8820"
-    };
-
-    if (pin === validPins[role] || pin === "admin" || pin === "bastion") {
-      const session = { role, authenticated: true, timestamp: Date.now() };
-      localStorage.setItem(DB_KEYS.AUTH_SESSION, JSON.stringify(session));
-      return { success: true };
-    }
-    return { success: false, message: "PIN de seguridad incorrecto." };
-  }
-
-  logout() {
-    localStorage.setItem(DB_KEYS.AUTH_SESSION, JSON.stringify({ role: "public", authenticated: false }));
-  }
-
-  // =========================================================================
-  // GESTIÓN DE PRODUCTOS Y MÁSCARA PÚBLICA
-  // =========================================================================
-  getMasterProducts(requireAuth = false) {
+  getMasterProducts() {
     const raw = localStorage.getItem(DB_KEYS.MASTER_PRODUCTS);
-    const products = raw ? JSON.parse(raw) : INITIAL_MASTER_PRODUCTS;
-
-    // Si es público y requiere confidencialidad, se eliminan los costos mayoristas
-    if (!requireAuth) {
-      return products;
-    }
-
-    const session = this.getAuthSession();
-    if (!session.authenticated && session.role !== "supplier") {
-      // Ocultar costos mayoristas
-      return products.map(p => {
-        const { wholesalePrice, ...safeData } = p;
-        return safeData;
-      });
-    }
-
-    return products;
+    return raw ? JSON.parse(raw) : INITIAL_MASTER_PRODUCTS;
   }
 
   addMasterProduct(productData) {
-    const products = this.getMasterProducts(false);
+    const products = this.getMasterProducts();
     const newProduct = {
-      id: "prod-snk-" + Date.now(),
-      sku: productData.sku || "NK-" + Math.floor(1000 + Math.random() * 9000),
+      id: "prod-lux-" + Date.now(),
+      sku: productData.sku || "LUX-" + Math.floor(1000 + Math.random() * 9000),
       name: productData.name,
-      category: productData.category || "Running & Tech",
-      tagline: productData.tagline || "Silueta deportiva premium importada.",
+      category: productData.category || "Totes & Handbags",
+      tagline: productData.tagline || "Bolso importado calidad superior.",
       description: productData.description || "",
-      image: productData.image || "assets/images/nike_initiator_babyblue.jpg",
-      wholesalePrice: Number(productData.wholesalePrice) || 120000,
-      suggestedRetailPrice: Number(productData.suggestedRetailPrice) || 195000,
-      sizes: productData.sizes || [37, 38, 39, 40, 41, 42],
+      image: productData.image || "assets/images/bags/tote_horse_charm_cream.jpg",
+      dimensions: productData.dimensions || "18 cm (Alto) x 22 cm (Ancho) x 8 cm (Profundidad)",
+      sizeCategory: productData.sizeCategory || "Mediano (20-28cm)",
+      wholesalePrice: Number(productData.wholesalePrice) || 68000,
+      suggestedRetailPrice: Number(productData.suggestedRetailPrice) || 125000,
       colorways: productData.colorways && productData.colorways.length > 0 
         ? productData.colorways 
-        : [{ name: "Tono Principal", image: productData.image || "assets/images/nike_initiator_babyblue.jpg", sku: productData.sku || "NK-01" }],
+        : [{ name: "Tono Principal", image: productData.image || "assets/images/bags/tote_horse_charm_cream.jpg", sku: productData.sku || "LUX-01" }],
+      specs: productData.specs || [
+        "Importado calidad superior",
+        "Un compartimento con cremallera",
+        "Cierre y bolsillo interno",
+        "Correa ajustable incluida"
+      ],
       supplierId: "sup-001",
-      supplierName: "Vanessa Castellar Shoes (Bodega Central)",
+      supplierName: "LUXBAGS Colombia (Bodega Matriz)",
       createdAt: new Date().toISOString().split("T")[0]
     };
     products.unshift(newProduct);
     localStorage.setItem(DB_KEYS.MASTER_PRODUCTS, JSON.stringify(products));
 
-    // Agregar automáticamente a todas las tiendas de la red
+    // Agregar a todas las tiendas de la red
     const stores = this.getStores();
     stores.forEach(st => {
       st.products.unshift({
         productId: newProduct.id,
         customPrice: newProduct.suggestedRetailPrice,
-        active: true,
-        availableSizes: [...newProduct.sizes]
+        active: true
       });
     });
     localStorage.setItem(DB_KEYS.STORES, JSON.stringify(stores));
-
     return newProduct;
   }
 
   // =========================================================================
-  // GESTIÓN DE TIENDAS Y VITRINAS
+  // GESTIÓN DE BOUTIQUES Y VITRINAS (WHITE-LABEL)
   // =========================================================================
   getStores() {
     const raw = localStorage.getItem(DB_KEYS.STORES);
@@ -157,45 +113,39 @@ class ShoesStoreManager {
     return stores.find(s => s.id === id) || stores[0];
   }
 
-  updateStoreProductPrice(storeId, productId, newPrice) {
+  updateStoreProfile(storeId, updatedFields) {
+    const stores = this.getStores();
+    const store = stores.find(s => s.id === storeId);
+    if (store) {
+      Object.assign(store, updatedFields);
+      localStorage.setItem(DB_KEYS.STORES, JSON.stringify(stores));
+    }
+  }
+
+  updateStorePrice(storeId, productId, newPrice) {
     const stores = this.getStores();
     const store = stores.find(s => s.id === storeId);
     if (store) {
       let p = store.products.find(item => item.productId === productId);
-      if (!p) {
-        const master = this.getMasterProducts(false);
-        const mp = master.find(m => m.id === productId);
-        p = {
-          productId,
-          customPrice: Number(newPrice),
-          active: true,
-          availableSizes: mp ? [...mp.sizes] : [37, 38, 39, 40, 41, 42]
-        };
-        store.products.push(p);
-      } else {
+      if (p) {
         p.customPrice = Number(newPrice);
+      } else {
+        store.products.push({ productId, customPrice: Number(newPrice), active: true });
       }
       localStorage.setItem(DB_KEYS.STORES, JSON.stringify(stores));
     }
   }
 
-  toggleStoreProductActive(storeId, productId) {
+  toggleProductActive(storeId, productId) {
     const stores = this.getStores();
     const store = stores.find(s => s.id === storeId);
     if (store) {
       let p = store.products.find(item => item.productId === productId);
-      if (!p) {
-        const master = this.getMasterProducts(false);
-        const mp = master.find(m => m.id === productId);
-        p = {
-          productId,
-          customPrice: mp ? mp.suggestedRetailPrice : 185000,
-          active: false, // si no estaba, al hacer toggle se desactiva
-          availableSizes: mp ? [...mp.sizes] : [37, 38, 39, 40, 41, 42]
-        };
-        store.products.push(p);
-      } else {
+      if (p) {
         p.active = !p.active;
+      } else {
+        p = { productId, customPrice: 125000, active: false };
+        store.products.push(p);
       }
       localStorage.setItem(DB_KEYS.STORES, JSON.stringify(stores));
       return p.active;
@@ -203,91 +153,56 @@ class ShoesStoreManager {
     return false;
   }
 
-  toggleStoreSize(storeId, productId, size) {
-    const stores = this.getStores();
-    const store = stores.find(s => s.id === storeId);
-    if (store) {
-      let p = store.products.find(item => item.productId === productId);
-      const master = this.getMasterProducts(false);
-      const mp = master.find(m => m.id === productId);
-
-      if (!p) {
-        p = {
-          productId,
-          customPrice: mp ? mp.suggestedRetailPrice : 185000,
-          active: true,
-          availableSizes: mp ? [...mp.sizes] : [37, 38, 39, 40, 41, 42]
-        };
-        store.products.push(p);
-      }
-
-      if (!p.availableSizes) {
-        p.availableSizes = mp ? [...mp.sizes] : [37, 38, 39, 40, 41, 42];
-      }
-
-      const numSize = Number(size);
-      if (p.availableSizes.includes(numSize)) {
-        p.availableSizes = p.availableSizes.filter(s => s !== numSize);
-      } else {
-        p.availableSizes.push(numSize);
-        p.availableSizes.sort((a, b) => a - b);
-      }
-
-      localStorage.setItem(DB_KEYS.STORES, JSON.stringify(stores));
-      return p.availableSizes.includes(numSize);
-    }
-    return false;
-  }
-
   getStorefrontProducts(store) {
-    const master = this.getMasterProducts(false);
+    const master = this.getMasterProducts();
     return master
       .filter(mp => {
         const sp = (store.products || []).find(p => p.productId === mp.id);
-        if (store.isSupplierStore) {
-          return !sp || sp.active !== false;
-        }
-        return sp && sp.active !== false && sp.availableSizes && sp.availableSizes.length > 0;
+        if (store.isSupplierStore) return !sp || sp.active !== false;
+        return sp && sp.active !== false;
       })
       .map(mp => {
         const sp = (store.products || []).find(p => p.productId === mp.id);
         return {
           ...mp,
-          storeRetailPrice: (sp && sp.customPrice) ? sp.customPrice : mp.suggestedRetailPrice,
-          storeAvailableSizes: (sp && sp.availableSizes) ? sp.availableSizes : mp.sizes
+          storeRetailPrice: (sp && sp.customPrice) ? sp.customPrice : mp.suggestedRetailPrice
         };
       });
   }
 
   // =========================================================================
-  // GESTIÓN DE PEDIDOS Y FLETES
+  // GESTIÓN DE PEDIDOS B2B Y FLETES
   // =========================================================================
   getOrders() {
     const raw = localStorage.getItem(DB_KEYS.ORDERS);
     return raw ? JSON.parse(raw) : INITIAL_ORDERS;
   }
 
-  addB2BOrder(orderData) {
+  createB2BOrder(orderData) {
     const orders = this.getOrders();
-    const dateStr = new Date().toISOString().replace("T", " ").substring(0, 16);
+    const now = new Date();
+    const dateStr = now.toISOString().slice(0, 10) + " " + now.toTimeString().slice(0, 5);
+
     const newOrder = {
       id: "ord-" + Math.floor(1000 + Math.random() * 9000),
       date: dateStr,
       storeName: orderData.storeName,
       productName: orderData.productName,
-      size: orderData.size,
-      colorway: orderData.colorway || "Estándar",
+      colorway: orderData.colorway || "Tono Estándar",
       type: "B2B Restock (Reposición)",
       units: Number(orderData.units) || 1,
       totalWholesale: Number(orderData.totalWholesale) || 0,
       status: "En Alistamiento",
-      supplierName: orderData.supplierName || "Vanessa Castellar Shoes (Bodega Central)"
+      supplierName: orderData.supplierName || "LUXBAGS Colombia (Bodega Matriz)"
     };
     orders.unshift(newOrder);
     localStorage.setItem(DB_KEYS.ORDERS, JSON.stringify(orders));
     return newOrder;
   }
 
+  // =========================================================================
+  // UTILIDADES DE FORMATO Y CONVERSIÓN
+  // =========================================================================
   formatCOP(value) {
     return new Intl.NumberFormat("es-CO", {
       style: "currency",
@@ -296,106 +211,134 @@ class ShoesStoreManager {
     }).format(value || 0);
   }
 
-  getSizeCm(size) {
-    const sizeMap = {
-      35: "22.5 cm",
-      36: "23.0 cm",
-      37: "23.8 cm",
-      38: "24.5 cm",
-      39: "25.0 cm",
-      40: "25.8 cm",
-      41: "26.5 cm",
-      42: "27.2 cm",
-      43: "28.0 cm",
-      44: "28.8 cm"
-    };
-    return sizeMap[size] || "24.5 cm";
-  }
+  // Parser Inteligente para Copiar/Pegar mensajes de WhatsApp Mayorista
+  parseWhatsAppWholesaleText(rawText) {
+    if (!rawText || rawText.trim() === "") return null;
 
-  // =========================================================================
-  // BALANCEADOR INTELIGENTE ROUND-ROBIN (10 LÍNEAS DE WHATSAPP)
-  // =========================================================================
-  getNextWhatsAppLine(store) {
-    if (!store.whatsappLines || store.whatsappLines.length === 0) {
-      return store.phone || "573505337256";
+    let wholesalePrice = 68000;
+    const priceMatch = rawText.match(/\$\s*([0-9.]+)/i);
+    if (priceMatch && priceMatch[1]) {
+      const cleanNum = parseInt(priceMatch[1].replace(/\./g, ""), 10);
+      if (!isNaN(cleanNum) && cleanNum > 10000) {
+        wholesalePrice = cleanNum;
+      }
     }
 
-    let currentIndex = parseInt(localStorage.getItem(DB_KEYS.LINE_ROTATION_INDEX) || "0", 10);
-    const line = store.whatsappLines[currentIndex % store.whatsappLines.length];
-    
-    // Rotar para el próximo cliente
-    localStorage.setItem(DB_KEYS.LINE_ROTATION_INDEX, (currentIndex + 1) % store.whatsappLines.length);
-    return line.phone;
+    const suggestedRetailPrice = Math.round((wholesalePrice * 1.8) / 1000) * 1000;
+
+    let dimensions = "18 cm (Alto) x 22 cm (Ancho) x 8 cm (Profundidad)";
+    let sizeCategory = "Mediano (20-28cm)";
+    const dimMatch = rawText.match(/medidas?\s*:?\s*([^\n\r]+)/i);
+    if (dimMatch && dimMatch[1]) {
+      dimensions = dimMatch[1].trim();
+      const firstNum = parseInt(dimensions.match(/\d+/)?.[0] || "20", 10);
+      if (firstNum < 20) sizeCategory = "Compacto (<20cm)";
+      else if (firstNum <= 28) sizeCategory = "Mediano (20-28cm)";
+      else sizeCategory = "Maxi (>28cm)";
+    }
+
+    let category = "Totes & Handbags";
+    const lower = rawText.toLowerCase();
+    if (lower.includes("crossbody") || lower.includes("bandolera") || lower.includes("flap")) category = "Crossbody & Flap";
+    else if (lower.includes("satchel") || lower.includes("padlock") || lower.includes("candado")) category = "Satchel & Estructurados";
+    else if (lower.includes("morral") || lower.includes("mochila") || lower.includes("backpack")) category = "Morrales & Mochilas";
+    else if (lower.includes("billetera") || lower.includes("wallet") || lower.includes("clutch")) category = "Billeteras & Clutches";
+
+    let colorCount = 5;
+    const colorMatch = rawText.match(/(\d+)\s*colores/i);
+    if (colorMatch && colorMatch[1]) {
+      colorCount = parseInt(colorMatch[1], 10);
+    }
+
+    const lines = rawText.split("\n").map(l => l.trim()).filter(l => l.length > 0);
+    let name = "Nuevo Bolso Importado LUXBAGS";
+    for (const line of lines) {
+      if (line.includes("NUEVO") || line.includes("BOLSO") || line.includes("COLECCIÓN") || line.includes("CARTERA")) {
+        name = line.replace(/[$0-9.🔝🤯✨🖤❤️]/g, "").trim();
+        if (name.length > 5) break;
+      }
+    }
+
+    const specs = lines.filter(l => l.startsWith("🖤") || l.startsWith("•") || l.startsWith("-") || l.startsWith("✔") || l.startsWith("✨"))
+      .map(l => l.replace(/^[🖤•\-✔✨\s]+/, "").trim());
+
+    return {
+      name: name || "Bolso Importado Colección Especial",
+      sku: "LUX-WHATS-" + Math.floor(100 + Math.random() * 900),
+      category,
+      dimensions,
+      sizeCategory,
+      wholesalePrice,
+      suggestedRetailPrice,
+      colorCount,
+      specs: specs.length > 0 ? specs : ["Importado calidad superior", "Cierre y bolsillo interno", "Correa ajustable incluida"]
+    };
   }
 
-  // Generador de Mensaje de WhatsApp para 1 solo Par
-  buildSingleProductWhatsAppUrl(store, product, colorway, size) {
-    const assignedPhone = this.getNextWhatsAppLine(store);
+  // Generador de Mensaje de WhatsApp para 1 solo Bolso
+  buildSingleProductWhatsAppUrl(store, product, colorway) {
+    const cleanPhone = (store.phone || "573155551234").replace(/[^0-9]/g, "");
     const formattedPrice = this.formatCOP(product.storeRetailPrice || product.suggestedRetailPrice);
-    const colorName = colorway ? colorway.name : "Color Principal";
-    const cm = this.getSizeCm(size);
+    const colorName = colorway ? colorway.name : "Color del Catálogo";
 
-    const text = `👋 *¡Hola ${store.name}!* Vi este modelo en su vitrina digital y quiero apartarlo:
+    const text = `👋 *¡Hola ${store.name}!* Quiero apartar este bolso de su vitrina:
 
-👟 *MODELO:* ${product.name}
-🔖 *SKU:* ${product.sku}
+👜 *MODELO:* ${product.name}
 🎨 *COLOR:* ${colorName}
-📏 *TALLA:* ${size} (Plantilla: ${cm})
+📐 *MEDIDAS:* ${product.dimensions || 'Estándar'}
 💰 *PRECIO:* ${formattedPrice}
 
-📍 *Destino en Cali:* (Indicar Barrio / Comuna)
-🛵 *Modalidad:* Despacho Hoy Contraentrega / Asegurado
+📍 *Mi Ciudad / Barrio:* (Por favor indicar aquí)
+🛵 *Modalidad:* Despacho Contraentrega / Asegurado
 
-¿Me confirman disponibilidad inmediata para despacho hoy? ¡Muchas gracias! ✨`;
+¿Me confirman disponibilidad inmediata para despacho hoy? ¡Gracias! ✨`;
 
-    return `https://wa.me/${assignedPhone}?text=${encodeURIComponent(text)}`;
+    return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`;
   }
 
-  // Generador de Mensaje de WhatsApp para Carrito Multi-Par Consolidado
+  // Generador de Mensaje de WhatsApp para Carrito Multi-Bolso Consolidado
   buildConsolidatedCartWhatsAppUrl(store, cartItems, clientData, shippingZone, dispatchMode) {
-    const assignedPhone = this.getNextWhatsAppLine(store);
-    const totalShoesPrice = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-    const shippingFee = shippingZone ? shippingZone.fee : 10000;
-    const grandTotal = totalShoesPrice + shippingFee;
-    const refCode = "SW-" + Math.floor(1000 + Math.random() * 9000);
+    const cleanPhone = (store.phone || "573155551234").replace(/[^0-9]/g, "");
+    const totalBagsPrice = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+    const shippingFee = shippingZone ? shippingZone.fee : 12000;
+    const grandTotal = totalBagsPrice + shippingFee;
+    const refCode = "LX-" + Math.floor(1000 + Math.random() * 9000);
 
     const itemsSummary = cartItems.map((item, i) => {
-      const cm = this.getSizeCm(item.size);
-      return `${i + 1}. 👟 *${item.name}*
-   • Talla: ${item.size} (${cm}) | Color: ${item.colorway}
-   • Cant: ${item.quantity} par(es) | Subtotal: ${this.formatCOP(item.price * item.quantity)}`;
+      return `${i + 1}. 👜 *${item.name}*
+   • Color: ${item.colorway} | Cant: ${item.quantity} und.
+   • Subtotal: ${this.formatCOP(item.price * item.quantity)}`;
     }).join("\n\n");
 
     const dispatchText = dispatchMode === "secured" 
-      ? `🛡️ *Despacho Asegurado* (Abono de flete ${this.formatCOP(shippingFee)} por Nequi/Daviplata + saldo en efectivo al recibir)`
-      : `🛵 *100% Contraentrega al Recibir* (Pago total en puerta al motorizado)`;
+      ? `🛡️ *Despacho Asegurado* (Abono de flete ${this.formatCOP(shippingFee)} por Nequi/Daviplata + saldo al recibir)`
+      : `🛵 *100% Contraentrega al Recibir* (Pago total en puerta)`;
 
-    const text = `🛍️ *¡NUEVO PEDIDO CONSOLIDADO SNEAKER WORLD MLS!*
-*Comanda:* #${refCode}
+    const text = `🛍️ *¡NUEVO PEDIDO CONSOLIDADO LUXBAGS!*
+*Referencia:* #${refCode}
 *Tienda:* ${store.name}
 
-👤 *DATOS DE ENTREGA:*
-• *Cliente:* ${clientData.name || 'Cliente'}
+👤 *DATOS DEL CLIENTE:*
+• *Nombre:* ${clientData.name || 'Cliente'}
 • *WhatsApp:* ${clientData.phone || 'El mismo'}
-• *Barrio / Zona:* ${shippingZone ? shippingZone.name : 'Cali'}
+• *Destino:* ${shippingZone ? shippingZone.name : 'Cali'}
 • *Dirección:* ${clientData.address || 'Pendiente por confirmar'}
 
-📦 *DETALLE DE CALZADO (${cartItems.length} ref / ${cartItems.reduce((a, b) => a + b.quantity, 0)} pares):*
+📦 *DETALLE DE BOLSOS & ACCESORIOS (${cartItems.length} ref / ${cartItems.reduce((a, b) => a + b.quantity, 0)} unidades):*
 ${itemsSummary}
 
 💵 *LIQUIDACIÓN DEL PEDIDO:*
-• Calzado: ${this.formatCOP(totalShoesPrice)}
-• Domicilio Motorizado: ${this.formatCOP(shippingFee)} (${shippingZone ? shippingZone.time : 'Hoy mismo'})
-👉 *GRAN TOTAL A COBRAR: ${this.formatCOP(grandTotal)}*
+• Bolsos: ${this.formatCOP(totalBagsPrice)}
+• Domicilio / Flete: ${this.formatCOP(shippingFee)} (${shippingZone ? shippingZone.time : '24h'})
+👉 *GRAN TOTAL: ${this.formatCOP(grandTotal)}*
 
-🚚 *MODALIDAD:*
+🚚 *MODALIDAD DE PAGO:*
 ${dispatchText}
 
-⚡ *Reserva de bodega activa (20 min):* Por favor confirmar disponibilidad para preparar en bodega de San Andresito Cali. ¡Gracias! ✨`;
+⚡ *Reserva de bodega activa:* Por favor enviar datos de transferencia o confirmación de guía. ¡Quedo atento(a)! ✨`;
 
-    return `https://wa.me/${assignedPhone}?text=${encodeURIComponent(text)}`;
+    return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`;
   }
 }
 
-// Instancia global del manejador
-const db = new ShoesStoreManager();
+const db = new LuxbagsStoreManager();

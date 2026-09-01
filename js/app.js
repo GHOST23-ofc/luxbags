@@ -1,302 +1,256 @@
-// ==============================================================================
-// SNEAKER WORLD MLS CALI - REACTIVE CLIENT APP CONTROLLER (BASTION AI)
-// Modo Claro Luxury + Rojo Torino + Auth PIN + 10 Líneas WhatsApp + Carrito Multi-Par
-// ==============================================================================
+// =========================================================================
+// LUXBAGS MLS COLOMBIA - APLICACIÓN PRINCIPAL (Bastion AI)
+// =========================================================================
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Estado Reactivo Local
+  // Estado Global de la Interfaz
   let currentView = "storefront";
   let activeBrandFilter = "all";
   let activeSizeFilter = "all";
+  let activeColorFilter = "all";
+  let activeCategoryFilter = "all";
   let searchQuery = "";
-  let categoryFilter = "all";
-  let sortOrder = "default";
-  
-  // Carrito de compras Multi-Par
-  let cart = [];
-  let cartReservationTimer = 20 * 60; // 20 minutos en segundos
+  let activeSortOrder = "default";
+
+  // Estado del Carrito Multi-Bolso
+  let cartItems = [];
+  try {
+    const savedCart = localStorage.getItem("luxbags_cart_items_v9");
+    if (savedCart) cartItems = JSON.parse(savedCart);
+  } catch (e) {
+    cartItems = [];
+  }
+
+  // Estado del Modal de Producto Activo
+  let selectedModalProduct = null;
+  let selectedModalColorway = null;
+  let selectedModalQty = 1;
+
+  // Temporizador de Reserva (20:00 min)
+  let reservationTimeLeft = 20 * 60;
   let timerInterval = null;
 
-  // Inicializar UI
-  initApp();
-
+  // =========================================================================
+  // INICIALIZACIÓN DE LA APLICACIÓN
+  // =========================================================================
   function initApp() {
-    // Manejo de parámetros de URL Multi-Tenant (?store=... &view=... &supplier=...)
-    const urlParams = new URLSearchParams(window.location.search);
-    const paramStore = urlParams.get("store");
-    const paramView = urlParams.get("view");
-    const paramSupplier = urlParams.get("supplier");
-
-    if (paramStore) {
-      db.setCurrentStoreId(paramStore);
-    }
-    if (paramSupplier) {
-      localStorage.setItem("sneakerworld_active_supplier_id", paramSupplier);
-    }
-    if (paramView && ["storefront", "store-admin", "supplier", "directory"].includes(paramView)) {
-      currentView = paramView;
-    }
-
-    renderHudStores();
-    setupNavigation();
+    setupRoleSwitcher();
+    setupStoreSelector();
     setupFilters();
-    setupAuthModal();
+    setupModals();
     setupCartDrawer();
-    setupAddProductModal();
-    setupRoiCalculator();
-    switchView(currentView);
+    setupSupplierFastImporter();
+    setupROISimulator();
+    startReservationTimer();
+
+    // Renderizar vista inicial
+    renderCurrentView();
+    updateFloatingCartBar();
   }
 
   // =========================================================================
-  // NAVEGACIÓN Y AUTENTICACIÓN POR PIN
+  // NAVEGACIÓN ENTRE ROLES (HUD TABS)
   // =========================================================================
-  function setupNavigation() {
-    const tabs = document.querySelectorAll(".role-tab-btn");
-    tabs.forEach(tab => {
-      tab.addEventListener("click", () => {
-        const targetView = tab.dataset.view;
-        
-        // Proteger vistas administrativas si no se está autenticado
-        if (targetView === "supplier" || targetView === "store-admin") {
-          const session = db.getAuthSession();
-          if (!session.authenticated || session.role !== targetView) {
-            openAuthModal(targetView);
-            return;
-          }
+  function setupRoleSwitcher() {
+    const tabButtons = document.querySelectorAll(".role-tab-btn");
+    tabButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        tabButtons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+
+        const targetView = btn.dataset.view;
+        currentView = targetView;
+
+        // Ocultar todos los paneles principales
+        document.querySelectorAll(".view-panel").forEach(panel => {
+          panel.style.display = "none";
+        });
+
+        // Mostrar el panel correspondiente
+        const activePanel = document.getElementById(`view-${targetView}`);
+        if (activePanel) {
+          activePanel.style.display = "block";
+          window.scrollTo({ top: 0, behavior: "smooth" });
         }
 
-        switchView(targetView);
+        renderCurrentView();
       });
-    });
-
-    // Selector de Tienda en el HUD
-    const hudSelect = document.getElementById("hud-store-select");
-    hudSelect.addEventListener("change", (e) => {
-      db.setCurrentStoreId(e.target.value);
-      renderCurrentView();
-      showToast("Vitrina cambiada a: " + db.getCurrentStore().name);
-    });
-
-    // Botón de Reset
-    document.getElementById("btn-reset-demo").addEventListener("click", () => {
-      if (confirm("¿Deseas restaurar los datos del catálogo y pedidos a los valores iniciales de fábrica?")) {
-        db.resetToDefaults();
-        cart = [];
-        updateFloatingCartUI();
-        initApp();
-        showToast("Catálogo restablecido con éxito.");
-      }
     });
   }
 
-  function switchView(viewName) {
-    currentView = viewName;
-    document.querySelectorAll(".role-tab-btn").forEach(btn => {
-      btn.classList.toggle("active", btn.dataset.view === viewName);
-    });
+  // =========================================================================
+  // SELECTOR DE TIENDA / VITRINA EN HUD
+  // =========================================================================
+  function setupStoreSelector() {
+    const hudStoreSelect = document.getElementById("hud-store-select");
+    const stores = db.getStores();
+    const currentStore = db.getCurrentStore();
 
-    document.querySelectorAll(".view-panel").forEach(panel => {
-      panel.style.display = panel.id === `view-${viewName}` ? "block" : "none";
-    });
+    hudStoreSelect.innerHTML = stores.map(s => {
+      return `<option value="${s.id}" ${s.id === currentStore.id ? 'selected' : ''}>${s.name} (${s.isSupplierStore ? 'Bodega' : 'Boutique'})</option>`;
+    }).join("");
 
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    renderCurrentView();
+    hudStoreSelect.onchange = (e) => {
+      db.setCurrentStoreId(e.target.value);
+      renderCurrentView();
+    };
+
+    // Botón de reset de datos de ejemplo
+    document.getElementById("btn-reset-demo")?.addEventListener("click", () => {
+      if (confirm("¿Restaurar el catálogo oficial de LUXBAGS Colombia a los valores iniciales?")) {
+        db.resetDemo();
+        cartItems = [];
+        localStorage.removeItem("luxbags_cart_items_v9");
+        setupStoreSelector();
+        renderCurrentView();
+        updateFloatingCartBar();
+        showToast("↺ Datos oficiales de LUXBAGS restaurados.");
+      }
+    });
   }
 
   function renderCurrentView() {
-    const store = db.getCurrentStore();
-    if (currentView === "storefront") renderStorefront(store);
-    else if (currentView === "store-admin") renderStoreAdmin(store);
-    else if (currentView === "supplier") renderSupplierAdmin();
-    else if (currentView === "directory") renderDirectory();
-  }
-
-  // =========================================================================
-  // MODAL DE AUTENTICACIÓN / PROTECCIÓN POR PIN
-  // =========================================================================
-  function setupAuthModal() {
-    const modal = document.getElementById("modal-auth-pin");
-    const form = document.getElementById("form-auth-pin");
-    const pinInput = document.getElementById("auth-pin-input");
-    const errorMsg = document.getElementById("auth-error-msg");
-    const btnCancel = document.getElementById("btn-cancel-auth");
-    const btnDemo = document.getElementById("btn-quick-demo-access");
-
-    btnCancel.addEventListener("click", () => modal.classList.remove("open"));
-
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const targetRole = document.getElementById("auth-target-role").value;
-      const pin = pinInput.value.trim();
-      const res = db.authenticate(targetRole, pin);
-
-      if (res.success) {
-        modal.classList.remove("open");
-        errorMsg.style.display = "none";
-        pinInput.value = "";
-        switchView(targetRole);
-        showToast(`Acceso autorizado a ${targetRole === 'supplier' ? 'Bodega Central' : 'Panel de Tienda'}`);
-      } else {
-        errorMsg.style.display = "block";
-        errorMsg.textContent = res.message || "PIN incorrecto. Prueba 8820.";
-      }
-    });
-
-    btnDemo.addEventListener("click", () => {
-      const targetRole = document.getElementById("auth-target-role").value;
-      db.authenticate(targetRole, targetRole === "supplier" ? "8820" : "1234");
-      modal.classList.remove("open");
-      errorMsg.style.display = "none";
-      pinInput.value = "";
-      switchView(targetRole);
-      showToast("Acceso Demo concedido.");
-    });
-  }
-
-  function openAuthModal(targetRole) {
-    const modal = document.getElementById("modal-auth-pin");
-    const targetInput = document.getElementById("auth-target-role");
-    const title = document.getElementById("auth-modal-title");
-    const desc = document.getElementById("auth-modal-desc");
-    const pinInput = document.getElementById("auth-pin-input");
-    const errorMsg = document.getElementById("auth-error-msg");
-
-    targetInput.value = targetRole;
-    errorMsg.style.display = "none";
-    pinInput.value = "";
-
-    if (targetRole === "supplier") {
-      title.textContent = "Acceso a Bodega Central";
-      desc.textContent = "Ingresa el PIN de seguridad de Vanessa Castellar (PIN: 8820) para gestionar costos mayoristas e inventario matriz.";
-    } else {
-      title.textContent = "Acceso a Panel de Revendedor";
-      desc.textContent = "Ingresa el PIN de tu tienda satélite (PIN: 1234) para modificar precios y margen de ganancia.";
+    const currentStore = db.getCurrentStore();
+    if (currentView === "storefront") {
+      renderStorefront(currentStore);
+    } else if (currentView === "store-admin") {
+      renderStoreAdmin(currentStore);
+    } else if (currentView === "supplier") {
+      renderSupplierView();
+    } else if (currentView === "directory") {
+      renderDirectoryView();
     }
-
-    modal.classList.add("open");
-    pinInput.focus();
-  }
-
-  function renderHudStores() {
-    const select = document.getElementById("hud-store-select");
-    const stores = db.getStores();
-    const currentId = db.getCurrentStoreId();
-
-    select.innerHTML = stores.map(s => `
-      <option value="${s.id}" ${s.id === currentId ? 'selected' : ''}>
-        ${s.name} ${s.isSupplierStore ? '(Matriz)' : '(Satélite)'}
-      </option>
-    `).join("");
   }
 
   // =========================================================================
-  // VISTA 1: VITRINA PÚBLICA (STOREFRONT)
+  // RENDER: VITRINA PÚBLICA (STOREFRONT)
   // =========================================================================
   function renderStorefront(store) {
-    // Render Header Info
-    document.getElementById("storefront-avatar").textContent = store.name.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase();
-    document.getElementById("storefront-name").innerHTML = `${store.name} <span class="badge-verified" id="storefront-badge">${store.isSupplierStore ? 'BODEGA MATRIZ VERIFICADA' : 'TIENDA AUTORIZADA'}</span>`;
-    document.getElementById("storefront-tagline").textContent = store.tagline;
-    document.getElementById("storefront-location").textContent = store.neighborhood + " | ⚡ Domicilios Hoy";
+    // 1. Header de la Tienda
+    document.getElementById("storefront-name").innerHTML = `
+      ${store.name} 
+      <span class="badge-verified" id="storefront-badge">${store.isSupplierStore ? 'Bodega Matriz Verificada' : 'Boutique Aliada Verificada'}</span>
+    `;
+    document.getElementById("storefront-tagline").textContent = store.tagline || "Bolsos, Carteras y Accesorios Importados con Envíos Contraentrega.";
+    document.getElementById("storefront-location").textContent = store.neighborhood || "Colombia (⚡ Domicilios y Envíos Hoy)";
 
-    // Enlace directo WhatsApp Header (Usa balanceador inteligente)
-    const directPhone = db.getNextWhatsAppLine(store);
-    document.getElementById("storefront-wa-direct").href = `https://wa.me/${directPhone}?text=${encodeURIComponent('👋 ¡Hola! Estoy viendo la vitrina digital de ' + store.name + ' y quiero consultar disponibilidad de calzado.')}`;
+    // 2. Botón de WhatsApp Directo en el Header
+    const waDirect = document.getElementById("storefront-wa-direct");
+    const cleanPhone = (store.phone || "573155551234").replace(/[^0-9]/g, "");
+    const greetingMsg = encodeURIComponent(`👋 ¡Hola ${store.name}! Vi su vitrina de bolsos y carteras y me gustaría recibir asesoría sobre referencias y colores disponibles.`);
+    waDirect.href = `https://wa.me/${cleanPhone}?text=${greetingMsg}`;
 
-    // Obtener productos visibles
+    // 3. Obtener Productos y Aplicar Filtros
     const products = db.getStorefrontProducts(store);
 
-    // Aplicar Filtros
-    let filtered = products.filter(p => {
-      // Filtro de Marca
+    let displayProducts = products.filter(p => {
+      // Filtro de Categoría / Drop
       if (activeBrandFilter !== "all") {
-        const brand = activeBrandFilter.toLowerCase();
-        const text = (p.name + " " + p.category).toLowerCase();
-        if (brand === "nike" && !text.includes("nike") && !text.includes("jordan")) return false;
-        if (brand === "adidas" && !text.includes("adidas") && !text.includes("samba") && !text.includes("superstar")) return false;
-        if (brand === "on" && !text.includes("on cloud") && !text.includes("cloudmonster") && !text.includes("cloud 5")) return false;
-        if (brand === "nb" && !text.includes("new balance") && !text.includes("9060")) return false;
-        if (brand === "luxury" && !text.includes("lv") && !text.includes("boss") && !text.includes("titanium")) return false;
-        if (brand === "skechers" && !text.includes("skechers") && !text.includes("trail")) return false;
+        const cat = p.category.toLowerCase();
+        const name = p.name.toLowerCase();
+        if (activeBrandFilter === "amor" && !name.includes("amor") && !name.includes("horse") && !name.includes("charm")) return false;
+        if (activeBrandFilter === "totes" && !cat.includes("tote")) return false;
+        if (activeBrandFilter === "crossbody" && !cat.includes("crossbody") && !cat.includes("flap")) return false;
+        if (activeBrandFilter === "satchel" && !cat.includes("satchel") && !cat.includes("padlock")) return false;
+        if (activeBrandFilter === "morrales" && !cat.includes("morral") && !cat.includes("mochila")) return false;
+        if (activeBrandFilter === "billeteras" && !cat.includes("billetera") && !cat.includes("clutch")) return false;
       }
 
-      // Filtro de Talla
+      // Filtro por Tamaño / Capacidad
       if (activeSizeFilter !== "all") {
-        const targetSize = parseInt(activeSizeFilter, 10);
-        if (!p.storeAvailableSizes || !p.storeAvailableSizes.includes(targetSize)) return false;
+        const sizeCat = (p.sizeCategory || "").toLowerCase();
+        if (activeSizeFilter === "compacto" && !sizeCat.includes("compacto")) return false;
+        if (activeSizeFilter === "mediano" && !sizeCat.includes("mediano")) return false;
+        if (activeSizeFilter === "maxi" && !sizeCat.includes("maxi")) return false;
       }
 
-      // Filtro de Categoría
-      if (categoryFilter !== "all" && p.category !== categoryFilter) {
+      // Filtro por Colorway
+      if (activeColorFilter !== "all") {
+        const colors = (p.colorways || []).map(c => c.name.toLowerCase()).join(" ");
+        if (activeColorFilter === "negro" && !colors.includes("negro") && !colors.includes("noir") && !colors.includes("black")) return false;
+        if (activeColorFilter === "crema" && !colors.includes("crema") && !colors.includes("hueso") && !colors.includes("bicolor") && !colors.includes("blanco") && !colors.includes("beige")) return false;
+        if (activeColorFilter === "camel" && !colors.includes("camel") && !colors.includes("miel")) return false;
+        if (activeColorFilter === "rosa" && !colors.includes("rosa") && !colors.includes("blush")) return false;
+        if (activeColorFilter === "oliva" && !colors.includes("oliva") && !colors.includes("verde")) return false;
+        if (activeColorFilter === "rojo" && !colors.includes("rojo") && !colors.includes("red") && !colors.includes("scarlet")) return false;
+        if (activeColorFilter === "chocolate" && !colors.includes("chocolate") && !colors.includes("café") && !colors.includes("marrón")) return false;
+      }
+
+      // Filtro de Categoría Dropdown
+      if (activeCategoryFilter !== "all" && p.category !== activeCategoryFilter) {
         return false;
       }
 
-      // Filtro de Búsqueda de Texto
+      // Filtro de Búsqueda por Texto
       if (searchQuery.trim() !== "") {
         const q = searchQuery.toLowerCase();
-        const match = p.name.toLowerCase().includes(q) ||
-                      p.sku.toLowerCase().includes(q) ||
-                      p.category.toLowerCase().includes(q) ||
-                      p.tagline.toLowerCase().includes(q);
-        if (!match) return false;
+        const matchesName = p.name.toLowerCase().includes(q);
+        const matchesSku = p.sku.toLowerCase().includes(q);
+        const matchesCat = p.category.toLowerCase().includes(q);
+        const matchesDesc = (p.description || "").toLowerCase().includes(q);
+        if (!matchesName && !matchesSku && !matchesCat && !matchesDesc) return false;
       }
 
       return true;
     });
 
     // Ordenamiento
-    if (sortOrder === "price-asc") filtered.sort((a, b) => a.storeRetailPrice - b.storeRetailPrice);
-    else if (sortOrder === "price-desc") filtered.sort((a, b) => b.storeRetailPrice - a.storeRetailPrice);
-    else if (sortOrder === "name") filtered.sort((a, b) => a.name.localeCompare(b.name));
+    if (activeSortOrder === "price-asc") {
+      displayProducts.sort((a, b) => a.storeRetailPrice - b.storeRetailPrice);
+    } else if (activeSortOrder === "price-desc") {
+      displayProducts.sort((a, b) => b.storeRetailPrice - a.storeRetailPrice);
+    } else if (activeSortOrder === "name-asc") {
+      displayProducts.sort((a, b) => a.name.localeCompare(b.name));
+    }
 
-    // Contador
-    document.getElementById("storefront-count-badge").textContent = `${filtered.length} modelos disponibles`;
+    // Actualizar badge de conteo
+    document.getElementById("storefront-count-badge").textContent = `${displayProducts.length} referencias disponibles`;
 
-    // Render Grid
+    // Renderizar Grid de Tarjetas
     const grid = document.getElementById("storefront-products-grid");
-    if (filtered.length === 0) {
+    if (displayProducts.length === 0) {
       grid.innerHTML = `
-        <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; background: var(--bg-surface); border-radius: var(--radius-lg); border: 1px solid var(--border-subtle);">
-          <div style="font-size: 40px; margin-bottom: 12px;">👟</div>
-          <h3 style="font-size: 18px; font-weight: 800; color: var(--text-primary);">No se encontraron modelos con estos filtros</h3>
-          <p style="color: var(--text-secondary); font-size: 13px; margin-top: 6px;">Prueba seleccionando "Todas" las tallas o limpiando la barra de búsqueda.</p>
+        <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; background: var(--bg-surface); border-radius: var(--radius-lg); border: 1px dashed var(--border-subtle);">
+          <div style="font-size: 42px; margin-bottom: 12px;">👜</div>
+          <h3 style="font-size: 18px; font-weight: 800; color: #ffffff;">No encontramos bolsos con los filtros seleccionados</h3>
+          <p style="font-size: 13px; color: var(--text-secondary); margin-top: 6px;">Prueba seleccionando otro color, tamaño o limpiando el buscador.</p>
         </div>
       `;
       return;
     }
 
-    grid.innerHTML = filtered.map(p => {
+    grid.innerHTML = displayProducts.map(p => {
       const formattedPrice = db.formatCOP(p.storeRetailPrice);
       const colorCount = p.colorways ? p.colorways.length : 1;
-
-      const sizeBadges = (p.storeAvailableSizes || []).map(sz => {
-        const isSelected = activeSizeFilter !== "all" && parseInt(activeSizeFilter, 10) === sz;
-        return `<span class="size-mini-badge ${isSelected ? 'highlight' : ''}">${sz}</span>`;
-      }).join("");
+      const colorwayBadge = colorCount > 1 
+        ? `<span class="category-tag" style="background: rgba(227, 194, 116, 0.15); border-color: rgba(227, 194, 116, 0.4); color: var(--primary-gold);">🎨 ${colorCount} Colores</span>`
+        : `<span class="category-tag" style="background: rgba(56, 189, 248, 0.15); color: var(--accent-blue);">✨ Edición Exclusiva</span>`;
 
       return `
-        <div class="product-card" data-product-id="${p.id}">
+        <div class="product-card" data-product-id="${p.id}" style="cursor: pointer;">
           <div class="product-image-box">
             <img src="${p.image}" alt="${p.name}" class="product-image" loading="lazy">
             <div class="product-badges">
               <span class="category-tag">${p.category}</span>
-              <span class="sku-tag">${colorCount > 1 ? `🎨 ${colorCount} Colores` : p.sku}</span>
+              ${colorwayBadge}
             </div>
           </div>
           <div class="product-body">
             <h3 class="product-name">${p.name}</h3>
-            <p class="product-desc">${p.tagline}</p>
+            <p class="product-desc">${p.description}</p>
             
-            <div style="margin-bottom: 6px; font-size: 11px; font-weight: 700; color: var(--text-muted);">Tallas en stock:</div>
-            <div class="product-sizes-chips">${sizeBadges}</div>
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--primary-gold); margin-bottom: 14px; background: rgba(227, 194, 116, 0.08); padding: 4px 8px; border-radius: var(--radius-sm); border: 1px solid rgba(227, 194, 116, 0.2);">
+              <span>📐</span>
+              <span><strong>Medidas:</strong> ${p.dimensions || 'Estándar'}</span>
+            </div>
 
             <div class="product-footer">
               <div class="price-box">
-                <span class="price-label">Precio Tienda</span>
+                <span class="price-label">Precio al Público</span>
                 <span class="price-val">${formattedPrice}</span>
               </div>
               <button type="button" class="btn-card-wa btn-open-product-modal" data-product-id="${p.id}">
-                <span>💬 Pedir</span>
+                <span>🛍️ Pedir / Colores</span>
               </button>
             </div>
           </div>
@@ -304,21 +258,335 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
     }).join("");
 
-    // Abrir Modal de Producto al hacer clic
+    // Event listeners para abrir modal de producto al hacer clic en tarjeta o botón
     grid.querySelectorAll(".product-card").forEach(card => {
       card.addEventListener("click", () => {
         const prodId = card.dataset.productId;
-        const prod = products.find(p => p.id === prodId);
+        const prod = displayProducts.find(p => p.id === prodId);
         if (prod) openProductModal(store, prod);
       });
     });
   }
 
   // =========================================================================
-  // FILTROS Y BÚSQUEDA EN TIEMPO REAL
+  // MODAL DE DETALLE DE BOLSO & SELECTOR DE COLORWAYS
+  // =========================================================================
+  function openProductModal(store, product) {
+    selectedModalProduct = product;
+    selectedModalColorway = (product.colorways && product.colorways.length > 0) ? product.colorways[0] : null;
+    selectedModalQty = 1;
+
+    document.getElementById("modal-prod-title").textContent = product.name;
+    document.getElementById("modal-prod-name").textContent = product.name;
+    document.getElementById("modal-prod-cat").textContent = product.category;
+    document.getElementById("modal-prod-sku").textContent = `SKU: ${product.sku}`;
+    document.getElementById("modal-prod-desc").textContent = product.description;
+    document.getElementById("modal-prod-dim").textContent = product.dimensions || "Estándar de Bodega";
+    document.getElementById("modal-prod-price").textContent = db.formatCOP(product.storeRetailPrice);
+    document.getElementById("modal-prod-img").src = selectedModalColorway ? selectedModalColorway.image : product.image;
+    document.getElementById("modal-qty-val").textContent = selectedModalQty;
+
+    // Renderizar Selector de Colorways
+    const colorwaySelector = document.getElementById("modal-colorway-selector");
+    if (product.colorways && product.colorways.length > 0) {
+      colorwaySelector.innerHTML = product.colorways.map((cw, idx) => {
+        const isActive = idx === 0;
+        return `
+          <button type="button" class="colorway-badge-chip ${isActive ? 'active' : ''}" data-color-idx="${idx}">
+            <span class="colorway-dot"></span>
+            <span>${cw.name}</span>
+          </button>
+        `;
+      }).join("");
+
+      colorwaySelector.querySelectorAll(".colorway-badge-chip").forEach(chip => {
+        chip.addEventListener("click", () => {
+          colorwaySelector.querySelectorAll(".colorway-badge-chip").forEach(c => c.classList.remove("active"));
+          chip.classList.add("active");
+          const idx = parseInt(chip.dataset.colorIdx, 10);
+          selectedModalColorway = product.colorways[idx];
+
+          // Actualizar imagen con suave transición
+          const modalImg = document.getElementById("modal-prod-img");
+          modalImg.style.opacity = "0.4";
+          setTimeout(() => {
+            modalImg.src = selectedModalColorway.image;
+            modalImg.style.opacity = "1";
+          }, 150);
+
+          // Actualizar enlace de WhatsApp individual
+          updateModalDirectWhatsAppUrl(store, product, selectedModalColorway);
+        });
+      });
+    } else {
+      colorwaySelector.innerHTML = `<span style="font-size: 12px; color: var(--text-muted);">Color Único de Referencia</span>`;
+    }
+
+    updateModalDirectWhatsAppUrl(store, product, selectedModalColorway);
+
+    // Abrir Modal
+    document.getElementById("modal-product-detail").classList.add("open");
+  }
+
+  function updateModalDirectWhatsAppUrl(store, product, colorway) {
+    const btnDirectWa = document.getElementById("modal-btn-wa-order");
+    btnDirectWa.href = db.buildSingleProductWhatsAppUrl(store, product, colorway);
+  }
+
+  // =========================================================================
+  // CARRITO MULTI-BOLSO CONSOLIDADO
+  // =========================================================================
+  function setupCartDrawer() {
+    // Abrir drawer desde barra flotante
+    document.getElementById("floating-cart-bar")?.addEventListener("click", () => {
+      openCartDrawer();
+    });
+
+    // Selector de cantidad en modal de producto
+    document.getElementById("modal-qty-minus")?.addEventListener("click", () => {
+      if (selectedModalQty > 1) {
+        selectedModalQty--;
+        document.getElementById("modal-qty-val").textContent = selectedModalQty;
+      }
+    });
+
+    document.getElementById("modal-qty-plus")?.addEventListener("click", () => {
+      if (selectedModalQty < 20) {
+        selectedModalQty++;
+        document.getElementById("modal-qty-val").textContent = selectedModalQty;
+      }
+    });
+
+    // Agregar al Carrito desde modal de producto
+    document.getElementById("modal-btn-add-cart")?.addEventListener("click", () => {
+      if (!selectedModalProduct) return;
+
+      const colorName = selectedModalColorway ? selectedModalColorway.name : "Color Original";
+      const colorImg = selectedModalColorway ? selectedModalColorway.image : selectedModalProduct.image;
+
+      // Verificar si ya existe en el carrito
+      const existingItem = cartItems.find(item => 
+        item.productId === selectedModalProduct.id && item.colorway === colorName
+      );
+
+      if (existingItem) {
+        existingItem.quantity += selectedModalQty;
+      } else {
+        cartItems.push({
+          id: "item-" + Date.now() + "-" + Math.random().toString(36).substr(2, 4),
+          productId: selectedModalProduct.id,
+          name: selectedModalProduct.name,
+          colorway: colorName,
+          price: selectedModalProduct.storeRetailPrice,
+          image: colorImg,
+          quantity: selectedModalQty,
+          dimensions: selectedModalProduct.dimensions || ""
+        });
+      }
+
+      saveCart();
+      updateFloatingCartBar();
+      showToast(`🛍️ Se agregó ${selectedModalQty} bolso(s) a tu pedido.`);
+
+      // Cerrar modal de producto
+      document.getElementById("modal-product-detail").classList.remove("open");
+    });
+
+    // Selector de zonas de despacho en el carrito
+    const neighborhoodSelect = document.getElementById("cart-neighborhood-select");
+    if (neighborhoodSelect) {
+      neighborhoodSelect.innerHTML = COLOMBIAN_SHIPPING_ZONES.map((zone, idx) => {
+        return `<option value="${idx}">${zone.name} — ${db.formatCOP(zone.fee)} (${zone.time})</option>`;
+      }).join("");
+
+      neighborhoodSelect.addEventListener("change", () => {
+        updateCartSummary();
+      });
+    }
+
+    // Modalidad de despacho (Radio buttons)
+    document.querySelectorAll("input[name='cart-dispatch-mode']").forEach(radio => {
+      radio.addEventListener("change", (e) => {
+        document.querySelectorAll(".dispatch-radio-card").forEach(c => c.classList.remove("selected"));
+        e.target.closest(".dispatch-radio-card")?.classList.add("selected");
+      });
+    });
+
+    // Botón de Enviar Pedido Completo a WhatsApp
+    document.getElementById("cart-btn-send-whatsapp")?.addEventListener("click", () => {
+      if (cartItems.length === 0) {
+        alert("Tu carrito está vacío. Agrega al menos un bolso antes de continuar.");
+        return;
+      }
+
+      const clientName = document.getElementById("cart-client-name")?.value.trim() || "";
+      const clientPhone = document.getElementById("cart-client-phone")?.value.trim() || "";
+      const clientAddress = document.getElementById("cart-client-address")?.value.trim() || "";
+
+      if (clientName === "") {
+        alert("Por favor ingresa tu nombre completo para el despacho.");
+        document.getElementById("cart-client-name")?.focus();
+        return;
+      }
+
+      const zoneIdx = parseInt(document.getElementById("cart-neighborhood-select")?.value || "0", 10);
+      const selectedZone = COLOMBIAN_SHIPPING_ZONES[zoneIdx] || COLOMBIAN_SHIPPING_ZONES[0];
+      const dispatchMode = document.querySelector("input[name='cart-dispatch-mode']:checked")?.value || "secured";
+      const currentStore = db.getCurrentStore();
+
+      const waUrl = db.buildConsolidatedCartWhatsAppUrl(
+        currentStore,
+        cartItems,
+        { name: clientName, phone: clientPhone, address: clientAddress },
+        selectedZone,
+        dispatchMode
+      );
+
+      // Abrir WhatsApp en nueva pestaña
+      window.open(waUrl, "_blank");
+
+      // Limpiar carrito tras generar pedido
+      cartItems = [];
+      saveCart();
+      updateFloatingCartBar();
+      document.getElementById("modal-cart-drawer")?.classList.remove("open");
+      showToast("🚀 ¡Pedido consolidado enviado a la asesora de WhatsApp!");
+    });
+  }
+
+  function openCartDrawer() {
+    renderCartDrawerItems();
+    updateCartSummary();
+    document.getElementById("modal-cart-drawer")?.classList.add("open");
+  }
+
+  function renderCartDrawerItems() {
+    const container = document.getElementById("cart-drawer-items");
+    document.getElementById("cart-drawer-count").textContent = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+
+    if (cartItems.length === 0) {
+      container.innerHTML = `
+        <div style="text-align: center; padding: 30px 10px; color: var(--text-muted);">
+          <div style="font-size: 32px; margin-bottom: 8px;">🛍️</div>
+          <div>No tienes bolsos en tu pedido.</div>
+          <div style="font-size: 12px; margin-top: 4px;">Explora la vitrina y agrega tus modelos favoritos.</div>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = cartItems.map((item, idx) => {
+      return `
+        <div class="cart-item-row" data-item-id="${item.id}">
+          <img src="${item.image}" alt="${item.name}" class="cart-item-thumb">
+          <div class="cart-item-info">
+            <div class="cart-item-title">${item.name}</div>
+            <div class="cart-item-meta">Color: <strong>${item.colorway}</strong></div>
+            <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
+              <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;">
+                <button type="button" class="btn-qty-cart" data-action="minus" data-idx="${idx}" style="background: none; border: none; color: #fff; cursor: pointer; font-weight: 800;">-</button>
+                <span style="font-size: 12px; font-weight: 800; min-width: 14px; text-align: center;">${item.quantity}</span>
+                <button type="button" class="btn-qty-cart" data-action="plus" data-idx="${idx}" style="background: none; border: none; color: #fff; cursor: pointer; font-weight: 800;">+</button>
+              </div>
+              <span class="cart-item-price">${db.formatCOP(item.price * item.quantity)}</span>
+            </div>
+          </div>
+          <button type="button" class="cart-item-remove" data-idx="${idx}" title="Eliminar bolso">&times;</button>
+        </div>
+      `;
+    }).join("");
+
+    // Event listeners para modificar cantidad o eliminar
+    container.querySelectorAll(".btn-qty-cart").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const idx = parseInt(btn.dataset.idx, 10);
+        const action = btn.dataset.action;
+        if (action === "minus") {
+          if (cartItems[idx].quantity > 1) {
+            cartItems[idx].quantity--;
+          } else {
+            cartItems.splice(idx, 1);
+          }
+        } else if (action === "plus") {
+          cartItems[idx].quantity++;
+        }
+        saveCart();
+        renderCartDrawerItems();
+        updateCartSummary();
+        updateFloatingCartBar();
+      });
+    });
+
+    container.querySelectorAll(".cart-item-remove").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const idx = parseInt(btn.dataset.idx, 10);
+        cartItems.splice(idx, 1);
+        saveCart();
+        renderCartDrawerItems();
+        updateCartSummary();
+        updateFloatingCartBar();
+      });
+    });
+  }
+
+  function updateCartSummary() {
+    const totalUnits = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+    const totalBags = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+    
+    const zoneIdx = parseInt(document.getElementById("cart-neighborhood-select")?.value || "0", 10);
+    const selectedZone = COLOMBIAN_SHIPPING_ZONES[zoneIdx] || COLOMBIAN_SHIPPING_ZONES[0];
+    const shippingFee = cartItems.length > 0 ? selectedZone.fee : 0;
+    const grandTotal = totalBags + shippingFee;
+
+    document.getElementById("cart-summary-qty").textContent = totalUnits;
+    document.getElementById("cart-summary-shoes").textContent = db.formatCOP(totalBags);
+    document.getElementById("cart-summary-shipping").textContent = db.formatCOP(shippingFee);
+    document.getElementById("cart-summary-total").textContent = db.formatCOP(grandTotal);
+    document.getElementById("cart-flete-preview").textContent = db.formatCOP(shippingFee);
+  }
+
+  function updateFloatingCartBar() {
+    const totalUnits = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+    const totalBags = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+    const floatingBar = document.getElementById("floating-cart-bar");
+
+    if (totalUnits > 0) {
+      document.getElementById("floating-cart-count").textContent = totalUnits;
+      document.getElementById("floating-cart-total").textContent = db.formatCOP(totalBags);
+      floatingBar?.classList.add("visible");
+    } else {
+      floatingBar?.classList.remove("visible");
+    }
+  }
+
+  function saveCart() {
+    localStorage.setItem("luxbags_cart_items_v9", JSON.stringify(cartItems));
+  }
+
+  // =========================================================================
+  // TEMPORIZADOR DE RESERVA DE BODEGA (20:00 MIN)
+  // =========================================================================
+  function startReservationTimer() {
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      if (reservationTimeLeft > 0) {
+        reservationTimeLeft--;
+        const mins = Math.floor(reservationTimeLeft / 60);
+        const secs = reservationTimeLeft % 60;
+        const display = `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+        const timerEl = document.getElementById("cart-timer-countdown");
+        if (timerEl) timerEl.textContent = display;
+      }
+    }, 1000);
+  }
+
+  // =========================================================================
+  // CONFIGURACIÓN DE FILTROS EN TIEMPO REAL
   // =========================================================================
   function setupFilters() {
-    // Chips de Marcas
+    // Chips de Categoría / Drop
     document.querySelectorAll(".brand-chip-btn").forEach(btn => {
       btn.addEventListener("click", () => {
         document.querySelectorAll(".brand-chip-btn").forEach(b => b.classList.remove("active"));
@@ -328,388 +596,77 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
-    // Pills de Tallas Físicas
-    document.querySelectorAll(".size-pill-btn").forEach(btn => {
+    // Pills de Tamaño / Capacidad
+    document.querySelectorAll("#storefront-size-pills .size-pill-btn").forEach(btn => {
       btn.addEventListener("click", () => {
-        document.querySelectorAll(".size-pill-btn").forEach(b => b.classList.remove("active"));
+        document.querySelectorAll("#storefront-size-pills .size-pill-btn").forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
         activeSizeFilter = btn.dataset.size;
         renderStorefront(db.getCurrentStore());
       });
     });
 
-    // Input de Búsqueda
-    const searchInput = document.getElementById("storefront-search-input");
-    searchInput.addEventListener("input", (e) => {
+    // Pills de Colorways
+    document.querySelectorAll("#storefront-color-pills .size-pill-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll("#storefront-color-pills .size-pill-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        activeColorFilter = btn.dataset.color;
+        renderStorefront(db.getCurrentStore());
+      });
+    });
+
+    // Buscador por Texto
+    document.getElementById("storefront-search-input")?.addEventListener("input", (e) => {
       searchQuery = e.target.value;
       renderStorefront(db.getCurrentStore());
     });
 
-    // Selectores
-    document.getElementById("storefront-cat-select").addEventListener("change", (e) => {
-      categoryFilter = e.target.value;
+    // Selectores Dropdown
+    document.getElementById("storefront-category-select")?.addEventListener("change", (e) => {
+      activeCategoryFilter = e.target.value;
       renderStorefront(db.getCurrentStore());
     });
 
-    document.getElementById("storefront-sort-select").addEventListener("change", (e) => {
-      sortOrder = e.target.value;
+    document.getElementById("storefront-sort-select")?.addEventListener("change", (e) => {
+      activeSortOrder = e.target.value;
       renderStorefront(db.getCurrentStore());
     });
   }
 
   // =========================================================================
-  // MODAL DE DETALLE DE PRODUCTO Y AGREGAR AL CARRITO
-  // =========================================================================
-  function openProductModal(store, product) {
-    const modal = document.getElementById("modal-product-detail");
-    const title = document.getElementById("modal-product-title");
-    const body = document.getElementById("modal-product-body");
-
-    title.textContent = product.name;
-
-    let selectedColorway = product.colorways && product.colorways.length > 0 ? product.colorways[0] : null;
-    let selectedSize = product.storeAvailableSizes && product.storeAvailableSizes.length > 0 ? product.storeAvailableSizes[0] : 38;
-
-    function renderModalContent() {
-      const activeImg = selectedColorway ? selectedColorway.image : product.image;
-      const formattedPrice = db.formatCOP(product.storeRetailPrice);
-      const cm = db.getSizeCm(selectedSize);
-
-      const colorChips = (product.colorways || []).map((cw, idx) => `
-        <button type="button" class="colorway-badge-chip ${selectedColorway && selectedColorway.sku === cw.sku ? 'active' : ''}" data-index="${idx}">
-          <span class="colorway-dot"></span>
-          <span>${cw.name}</span>
-        </button>
-      `).join("");
-
-      const sizePills = (product.storeAvailableSizes || []).map(sz => `
-        <button type="button" class="size-pill-btn ${selectedSize === sz ? 'active' : ''}" data-size="${sz}">
-          ${sz} (${db.getSizeCm(sz)})
-        </button>
-      `).join("");
-
-      body.innerHTML = `
-        <div style="display: flex; gap: 20px; margin-bottom: 20px; flex-wrap: wrap;">
-          <div style="flex: 1; min-width: 220px; height: 220px; border-radius: var(--radius-md); overflow: hidden; background: #f1f5f9; border: 1px solid var(--border-subtle);">
-            <img src="${activeImg}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover;">
-          </div>
-          <div style="flex: 1.2; min-width: 240px; display: flex; flex-direction: column; justify-content: center;">
-            <div style="font-size: 11px; font-weight: 800; color: var(--primary-red); text-transform: uppercase;">${product.category} • SKU: ${product.sku}</div>
-            <h4 style="font-size: 18px; font-weight: 900; color: var(--text-primary); margin: 4px 0 8px;">${product.name}</h4>
-            <div style="font-size: 22px; font-weight: 900; color: var(--primary-red); margin-bottom: 8px;">${formattedPrice}</div>
-            <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.4;">${product.description || product.tagline}</p>
-          </div>
-        </div>
-
-        ${product.colorways && product.colorways.length > 1 ? `
-          <div class="form-group">
-            <label class="form-label">Colorway / Edición:</label>
-            <div class="colorway-chips-row">${colorChips}</div>
-          </div>
-        ` : ''}
-
-        <div class="form-group">
-          <label class="form-label">Selecciona tu Talla en cm (Plantilla):</label>
-          <div class="size-pills-row" style="flex-wrap: wrap;">${sizePills}</div>
-        </div>
-
-        <div style="display: flex; gap: 10px; margin-top: 24px;">
-          <button type="button" class="btn-secondary" id="btn-add-to-cart" style="flex: 1; justify-content: center;">
-            🛍️ Agregar a la Bolsa
-          </button>
-          <a href="#" id="btn-modal-wa-direct" target="_blank" rel="noopener" class="btn-primary" style="flex: 1.2; justify-content: center; background: #25d366;">
-            💬 Pedir 1 Par por WhatsApp
-          </a>
-        </div>
-      `;
-
-      // Eventos de selección de color
-      body.querySelectorAll(".colorway-badge-chip").forEach(btn => {
-        btn.addEventListener("click", () => {
-          const idx = parseInt(btn.dataset.index, 10);
-          selectedColorway = product.colorways[idx];
-          renderModalContent();
-        });
-      });
-
-      // Eventos de selección de talla
-      body.querySelectorAll(".size-pill-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-          selectedSize = parseInt(btn.dataset.size, 10);
-          renderModalContent();
-        });
-      });
-
-      // Agregar al carrito
-      body.querySelector("#btn-add-to-cart").addEventListener("click", () => {
-        addToCart(product, selectedColorway, selectedSize);
-        modal.classList.remove("open");
-      });
-
-      // WhatsApp directo
-      const directWaUrl = db.buildSingleProductWhatsAppUrl(store, product, selectedColorway, selectedSize);
-      body.querySelector("#btn-modal-wa-direct").href = directWaUrl;
-    }
-
-    renderModalContent();
-    modal.classList.add("open");
-
-    document.getElementById("btn-close-product-modal").onclick = () => modal.classList.remove("open");
-  }
-
-  // =========================================================================
-  // CARRITO MULTI-PAR Y BOLSA DE PEDIDOS
-  // =========================================================================
-  function addToCart(product, colorway, size) {
-    const colorName = colorway ? colorway.name : "Color Principal";
-    const img = colorway ? colorway.image : product.image;
-    const cartItemId = `${product.id}-${size}-${colorName}`;
-
-    const existing = cart.find(item => item.cartItemId === cartItemId);
-    if (existing) {
-      existing.quantity += 1;
-    } else {
-      cart.push({
-        cartItemId,
-        productId: product.id,
-        name: product.name,
-        price: product.storeRetailPrice,
-        size,
-        colorway: colorName,
-        image: img,
-        quantity: 1
-      });
-    }
-
-    updateFloatingCartUI();
-    showToast(`👟 ${product.name} (Talla ${size}) agregado a la bolsa.`);
-    startCartTimer();
-  }
-
-  function updateFloatingCartUI() {
-    const bar = document.getElementById("floating-cart-bar");
-    const countEl = document.getElementById("floating-cart-count");
-    const totalEl = document.getElementById("floating-cart-total");
-
-    const totalCount = cart.reduce((acc, item) => acc + item.quantity, 0);
-    const totalPrice = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-
-    if (totalCount > 0) {
-      countEl.textContent = `${totalCount} Par${totalCount > 1 ? 'es' : ''} en Bolsa`;
-      totalEl.textContent = db.formatCOP(totalPrice);
-      bar.classList.add("visible");
-    } else {
-      bar.classList.remove("visible");
-    }
-  }
-
-  function startCartTimer() {
-    if (timerInterval) clearInterval(timerInterval);
-    cartReservationTimer = 20 * 60; // 20 min
-
-    timerInterval = setInterval(() => {
-      cartReservationTimer--;
-      if (cartReservationTimer <= 0) {
-        clearInterval(timerInterval);
-        cartReservationTimer = 0;
-      }
-      const mins = Math.floor(cartReservationTimer / 60);
-      const secs = cartReservationTimer % 60;
-      const display = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-      const timerEl = document.getElementById("cart-timer-countdown");
-      if (timerEl) timerEl.textContent = display;
-    }, 1000);
-  }
-
-  function setupCartDrawer() {
-    const bar = document.getElementById("floating-cart-bar");
-    const drawer = document.getElementById("modal-cart-drawer");
-    const closeBtn = document.getElementById("btn-close-cart-drawer");
-    const shippingSelect = document.getElementById("cart-shipping-select");
-
-    // Población de Barrios de Cali
-    shippingSelect.innerHTML = CALI_NEIGHBORHOODS.map((z, i) => `
-      <option value="${i}">
-        ${z.name} — ${db.formatCOP(z.fee)} (${z.time})
-      </option>
-    `).join("");
-
-    bar.addEventListener("click", () => {
-      renderCartDrawerContent();
-      drawer.classList.add("open");
-    });
-
-    closeBtn.addEventListener("click", () => drawer.classList.remove("open"));
-
-    shippingSelect.addEventListener("change", () => renderCartDrawerContent());
-
-    // Modalidad de Despacho
-    drawer.querySelectorAll(".dispatch-radio-card").forEach(card => {
-      card.addEventListener("click", () => {
-        drawer.querySelectorAll(".dispatch-radio-card").forEach(c => c.classList.remove("selected"));
-        card.classList.add("selected");
-        card.querySelector("input").checked = true;
-      });
-    });
-
-    // Enviar por WhatsApp
-    document.getElementById("btn-send-cart-whatsapp").addEventListener("click", () => {
-      if (cart.length === 0) {
-        alert("Tu bolsa está vacía.");
-        return;
-      }
-
-      const store = db.getCurrentStore();
-      const zoneIdx = parseInt(shippingSelect.value, 10);
-      const shippingZone = CALI_NEIGHBORHOODS[zoneIdx];
-      const clientName = document.getElementById("cart-client-name").value.trim();
-      const clientAddress = document.getElementById("cart-client-address").value.trim();
-      const dispatchMode = drawer.querySelector("input[name='dispatch-mode']:checked").value;
-
-      const waUrl = db.buildConsolidatedCartWhatsAppUrl(
-        store,
-        cart,
-        { name: clientName, address: clientAddress },
-        shippingZone,
-        dispatchMode
-      );
-
-      // Registrar pedido B2B en la bodega
-      cart.forEach(item => {
-        db.addB2BOrder({
-          storeName: store.name,
-          productName: item.name,
-          size: item.size,
-          colorway: item.colorway,
-          units: item.quantity,
-          totalWholesale: item.price * item.quantity * 0.65 // aproximación mayorista
-        });
-      });
-
-      window.open(waUrl, "_blank");
-      drawer.classList.remove("open");
-      cart = [];
-      updateFloatingCartUI();
-      showToast("¡Comanda generada! Abriendo WhatsApp de la asesora...");
-    });
-  }
-
-  function renderCartDrawerContent() {
-    const list = document.getElementById("cart-items-list");
-    const countBadge = document.getElementById("cart-drawer-count");
-    const subtotalEl = document.getElementById("cart-summary-subtotal");
-    const shippingEl = document.getElementById("cart-summary-shipping");
-    const grandTotalEl = document.getElementById("cart-summary-grandtotal");
-    const shippingSelect = document.getElementById("cart-shipping-select");
-
-    const totalCount = cart.reduce((acc, item) => acc + item.quantity, 0);
-    const totalPrice = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-    const zoneIdx = parseInt(shippingSelect.value || "0", 10);
-    const shippingZone = CALI_NEIGHBORHOODS[zoneIdx] || CALI_NEIGHBORHOODS[0];
-    const shippingFee = shippingZone.fee;
-    const grandTotal = totalPrice + shippingFee;
-
-    countBadge.textContent = `${totalCount} ${totalCount === 1 ? 'par' : 'pares'}`;
-    subtotalEl.textContent = db.formatCOP(totalPrice);
-    shippingEl.textContent = db.formatCOP(shippingFee);
-    grandTotalEl.textContent = db.formatCOP(grandTotal);
-
-    if (cart.length === 0) {
-      list.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 30px;">Tu bolsa de compras está vacía.</div>`;
-      return;
-    }
-
-    list.innerHTML = cart.map(item => `
-      <div class="cart-item-row">
-        <img src="${item.image}" alt="${item.name}" class="cart-item-thumb">
-        <div class="cart-item-info">
-          <div class="cart-item-title">${item.name}</div>
-          <div class="cart-item-meta">Talla: <strong>${item.size}</strong> (${db.getSizeCm(item.size)}) • ${item.colorway}</div>
-          <div class="cart-item-price">${db.formatCOP(item.price * item.quantity)}</div>
-        </div>
-        <div style="display: flex; align-items: center; gap: 6px;">
-          <button class="btn-action-sm btn-qty-minus" data-id="${item.cartItemId}" style="padding: 2px 8px;">-</button>
-          <span style="font-size: 12px; font-weight: 800; min-width: 16px; text-align: center;">${item.quantity}</span>
-          <button class="btn-action-sm btn-qty-plus" data-id="${item.cartItemId}" style="padding: 2px 8px;">+</button>
-          <button class="cart-item-remove btn-remove-item" data-id="${item.cartItemId}" title="Eliminar">&times;</button>
-        </div>
-      </div>
-    `).join("");
-
-    list.querySelectorAll(".btn-qty-plus").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const item = cart.find(i => i.cartItemId === btn.dataset.id);
-        if (item) {
-          item.quantity++;
-          updateFloatingCartUI();
-          renderCartDrawerContent();
-        }
-      });
-    });
-
-    list.querySelectorAll(".btn-qty-minus").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const item = cart.find(i => i.cartItemId === btn.dataset.id);
-        if (item) {
-          item.quantity--;
-          if (item.quantity <= 0) cart = cart.filter(i => i.cartItemId !== btn.dataset.id);
-          updateFloatingCartUI();
-          renderCartDrawerContent();
-        }
-      });
-    });
-
-    list.querySelectorAll(".btn-remove-item").forEach(btn => {
-      btn.addEventListener("click", () => {
-        cart = cart.filter(i => i.cartItemId !== btn.dataset.id);
-        updateFloatingCartUI();
-        renderCartDrawerContent();
-      });
-    });
-  }
-
-  // =========================================================================
-  // VISTA 2: PANEL DE LA TIENDA SATÉLITE (ADMINISTRACIÓN MARCA BLANCA)
+  // RENDER: PANEL DE LA BOUTIQUE (STORE ADMIN)
   // =========================================================================
   function renderStoreAdmin(store) {
-    document.getElementById("admin-store-title").textContent = `Gestión de Precios — ${store.name}`;
-    document.getElementById("stat-phone-preview").textContent = `+${store.phone}`;
+    document.getElementById("admin-store-title").textContent = `Panel de Control — ${store.name}`;
+    document.getElementById("stat-phone-preview").textContent = store.phone || "---";
 
-    const masterProds = db.getMasterProducts(true);
-    const activeCount = store.products.filter(p => p.active).length;
+    const masterProducts = db.getMasterProducts();
+    const storeProducts = store.products || [];
+
+    const activeCount = storeProducts.filter(p => p.active).length;
     document.getElementById("stat-active-prods").textContent = activeCount;
 
-    // Calcular Margen Promedio
+    // Calcular margen promedio
     let totalMargin = 0;
-    let marginCount = 0;
-    masterProds.forEach(mp => {
-      const sp = store.products.find(p => p.productId === mp.id);
-      if (sp && sp.active) {
-        const price = sp.customPrice || mp.suggestedRetailPrice;
-        totalMargin += (price - mp.wholesalePrice);
-        marginCount++;
-      }
+    let countedProds = 0;
+    masterProducts.forEach(mp => {
+      const sp = storeProducts.find(p => p.productId === mp.id);
+      const retail = sp ? sp.customPrice : mp.suggestedRetailPrice;
+      const margin = retail - mp.wholesalePrice;
+      totalMargin += margin;
+      countedProds++;
     });
-    const avgMargin = marginCount > 0 ? totalMargin / marginCount : 0;
+    const avgMargin = countedProds > 0 ? Math.round(totalMargin / countedProds) : 55000;
     document.getElementById("stat-avg-margin").textContent = db.formatCOP(avgMargin);
 
-    // Render Tabla
+    // Tabla de Productos para la Tienda
     const tbody = document.getElementById("store-admin-products-table");
-    tbody.innerHTML = masterProds.map(mp => {
-      const sp = store.products.find(p => p.productId === mp.id) || {
-        active: false,
-        customPrice: mp.suggestedRetailPrice,
-        availableSizes: [...mp.sizes]
-      };
-
-      const retailPrice = sp.customPrice || mp.suggestedRetailPrice;
+    tbody.innerHTML = masterProducts.map(mp => {
+      const sp = storeProducts.find(p => p.productId === mp.id);
+      const isChecked = sp ? sp.active : true;
+      const retailPrice = sp ? sp.customPrice : mp.suggestedRetailPrice;
       const margin = retailPrice - mp.wholesalePrice;
-      const marginClass = margin >= 60000 ? "margin-high" : "margin-normal";
-
-      const sizeBadges = (mp.sizes || []).map(sz => {
-        const isAvail = sp.availableSizes && sp.availableSizes.includes(sz);
-        return `<span class="table-size-tag ${isAvail ? 'active' : 'inactive'}" data-prod="${mp.id}" data-size="${sz}">${sz}</span>`;
-      }).join("");
 
       return `
         <tr>
@@ -718,175 +675,316 @@ document.addEventListener("DOMContentLoaded", () => {
               <img src="${mp.image}" alt="${mp.name}" class="td-product-thumb">
               <div>
                 <div class="td-product-name">${mp.name}</div>
-                <div class="td-product-sku">${mp.sku} • ${mp.category}</div>
+                <div class="td-product-sku">SKU: ${mp.sku} • ${mp.category}</div>
               </div>
             </div>
           </td>
-          <td style="font-weight: 700; color: var(--text-primary);">${db.formatCOP(mp.wholesalePrice)}</td>
+          <td><strong style="color: #ffffff;">${db.formatCOP(mp.wholesalePrice)}</strong></td>
           <td>
-            <input type="number" class="table-input-price input-store-price" data-prod="${mp.id}" value="${retailPrice}" step="5000">
+            <input type="number" class="table-input-price input-store-price" 
+              data-product-id="${mp.id}" 
+              value="${retailPrice}" 
+              step="1000">
           </td>
           <td>
-            <span class="margin-badge ${marginClass}">+${db.formatCOP(margin)}</span>
+            <span class="margin-badge ${margin >= 50000 ? 'margin-high' : 'margin-normal'}">
+              +${db.formatCOP(margin)}
+            </span>
           </td>
-          <td>
-            <div class="table-sizes-list">${sizeBadges}</div>
-          </td>
+          <td style="font-size: 11px; color: var(--text-muted);">${mp.dimensions || 'Estándar'}</td>
           <td>
             <label class="switch-toggle">
-              <input type="checkbox" class="toggle-store-active" data-prod="${mp.id}" ${sp.active ? 'checked' : ''}>
+              <input type="checkbox" class="toggle-product-active" data-product-id="${mp.id}" ${isChecked ? 'checked' : ''}>
               <span class="slider-round"></span>
             </label>
+          </td>
+          <td>
+            <button type="button" class="btn-action-sm btn-open-restock-modal" data-product-id="${mp.id}">
+              📦 Pedir Reposición
+            </button>
           </td>
         </tr>
       `;
     }).join("");
 
-    // Guardar cambios de precios
-    document.getElementById("btn-save-store-prices").onclick = () => {
-      tbody.querySelectorAll(".input-store-price").forEach(input => {
-        const prodId = input.dataset.prod;
-        const newPrice = Number(input.value);
-        db.updateStoreProductPrice(store.id, prodId, newPrice);
-      });
-      showToast("¡Precios y márgenes de ganancia guardados con éxito!");
-      renderStoreAdmin(db.getCurrentStore());
-    };
-
-    // Toggle de activación
-    tbody.querySelectorAll(".toggle-store-active").forEach(chk => {
-      chk.addEventListener("change", () => {
-        db.toggleStoreProductActive(store.id, chk.dataset.prod);
+    // Event listeners para editar precio
+    tbody.querySelectorAll(".input-store-price").forEach(input => {
+      input.addEventListener("change", (e) => {
+        const prodId = e.target.dataset.productId;
+        const newPrice = e.target.value;
+        db.updateStorePrice(store.id, prodId, newPrice);
+        showToast("✓ Precio de venta actualizado en tu vitrina.");
         renderStoreAdmin(db.getCurrentStore());
+      });
+    });
+
+    // Event listeners para activar/desactivar en vitrina
+    tbody.querySelectorAll(".toggle-product-active").forEach(toggle => {
+      toggle.addEventListener("change", (e) => {
+        const prodId = e.target.dataset.productId;
+        const active = db.toggleProductActive(store.id, prodId);
+        showToast(active ? "✓ Bolso activado en vitrina pública." : "⏸ Bolso pausado de tu vitrina.");
+        renderStoreAdmin(db.getCurrentStore());
+      });
+    });
+
+    // Event listeners para reposición B2B
+    tbody.querySelectorAll(".btn-open-restock-modal").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const prodId = btn.dataset.productId;
+        const prod = masterProducts.find(p => p.id === prodId);
+        if (prod) openRestockModal(store, prod);
       });
     });
   }
 
   // =========================================================================
-  // VISTA 3: PANEL BODEGA CENTRAL (VANESSA CASTELLAR SHOES)
+  // RENDER: PANEL DEL PROVEEDOR / BODEGA MATRIZ (SUPPLIER)
   // =========================================================================
-  function renderSupplierAdmin() {
-    const products = db.getMasterProducts(true);
+  function renderSupplierView() {
+    const masterProducts = db.getMasterProducts();
+    const stores = db.getStores();
     const orders = db.getOrders();
 
-    document.getElementById("stat-supplier-total-prods").textContent = products.length;
+    document.getElementById("supplier-stat-refs").textContent = masterProducts.length;
+    document.getElementById("supplier-stat-stores").textContent = stores.length;
 
-    // Tabla de Pedidos B2B
-    const tbody = document.getElementById("supplier-orders-table");
-    tbody.innerHTML = orders.map(ord => `
-      <tr>
-        <td style="font-family: monospace; font-weight: 700; color: var(--primary-red);">#${ord.id}</td>
-        <td>${ord.date}</td>
-        <td style="font-weight: 700; color: var(--text-primary);">${ord.storeName}</td>
-        <td>${ord.productName}</td>
-        <td><span class="table-size-tag active">${ord.size}</span></td>
-        <td style="font-weight: 800;">${ord.units} pares</td>
-        <td style="font-weight: 800; color: var(--primary-red);">${db.formatCOP(ord.totalWholesale)}</td>
-        <td><span class="badge-verified">${ord.status}</span></td>
-      </tr>
-    `).join("");
+    const tbody = document.getElementById("supplier-products-table");
+    tbody.innerHTML = masterProducts.map(mp => {
+      const colorCount = mp.colorways ? mp.colorways.length : 1;
+      return `
+        <tr>
+          <td>
+            <div class="td-product-cell">
+              <img src="${mp.image}" alt="${mp.name}" class="td-product-thumb">
+              <div>
+                <div class="td-product-name">${mp.name}</div>
+                <div class="td-product-sku">${mp.tagline}</div>
+              </div>
+            </div>
+          </td>
+          <td><code>${mp.sku}</code></td>
+          <td><span class="category-tag">${mp.category}</span></td>
+          <td><strong style="color: var(--primary-gold);">${db.formatCOP(mp.wholesalePrice)}</strong></td>
+          <td><strong style="color: #ffffff;">${db.formatCOP(mp.suggestedRetailPrice)}</strong></td>
+          <td style="font-size: 11px; color: var(--text-secondary);">${mp.dimensions || 'Estándar'}</td>
+          <td><span style="font-size: 12px; color: var(--accent-blue); font-weight: 700;">🎨 ${colorCount} Tonos</span></td>
+        </tr>
+      `;
+    }).join("");
   }
 
-  function setupAddProductModal() {
-    const btnOpen = document.getElementById("btn-open-add-product");
-    const modal = document.getElementById("modal-add-product");
-    const btnClose = document.getElementById("btn-close-add-modal");
-    const btnCancel = document.getElementById("btn-cancel-add-product");
-    const form = document.getElementById("form-add-product");
+  // Importador Rápido de Texto de WhatsApp
+  function setupSupplierFastImporter() {
+    document.getElementById("btn-parse-wa-text")?.addEventListener("click", () => {
+      const textarea = document.getElementById("wa-import-textarea");
+      const text = textarea?.value.trim() || "";
 
-    btnOpen.onclick = () => modal.classList.add("open");
-    btnClose.onclick = () => modal.classList.remove("open");
-    btnCancel.onclick = () => modal.classList.remove("open");
+      if (text === "") {
+        alert("Por favor pega el texto del grupo de WhatsApp mayorista.");
+        return;
+      }
 
-    form.onsubmit = (e) => {
-      e.preventDefault();
-      const name = document.getElementById("add-prod-name").value.trim();
-      const cat = document.getElementById("add-prod-cat").value;
-      const wholesale = document.getElementById("add-prod-wholesale").value;
-      const retail = document.getElementById("add-prod-retail").value;
-      const sizesStr = document.getElementById("add-prod-sizes").value;
-      const desc = document.getElementById("add-prod-desc").value.trim();
-
-      const sizes = sizesStr.split(",").map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n));
-
-      db.addMasterProduct({
-        name,
-        category: cat,
-        wholesalePrice: wholesale,
-        suggestedRetailPrice: retail,
-        sizes,
-        description: desc
-      });
-
-      modal.classList.remove("open");
-      form.reset();
-      showToast(`¡Nueva referencia ${name} publicada a toda la red!`);
-      renderSupplierAdmin();
-    };
+      const parsed = db.parseWhatsAppWholesaleText(text);
+      if (parsed) {
+        db.addMasterProduct(parsed);
+        textarea.value = "";
+        showToast("✨ ¡Bolso detectado y publicado exitosamente al catálogo maestro!");
+        renderSupplierView();
+      }
+    });
   }
 
   // =========================================================================
-  // VISTA 4: DIRECTORIO DE TIENDAS Y SIMULADOR ROI
+  // RENDER: DIRECTORIO & SIMULADOR ROI DE GANANCIAS
   // =========================================================================
-  function renderDirectory() {
+  function renderDirectoryView() {
     const stores = db.getStores();
     const grid = document.getElementById("directory-stores-grid");
 
-    grid.innerHTML = stores.map(s => {
-      const activeCount = s.products.filter(p => p.active).length;
+    grid.innerHTML = stores.map(st => {
+      const prodsCount = (st.products || []).filter(p => p.active).length;
       return `
         <div class="store-directory-card">
           <div class="store-card-header">
-            <div class="store-card-avatar">${s.name.split(" ").map(w => w[0]).slice(0, 2).join("")}</div>
+            <div class="store-card-avatar">👜</div>
             <div>
-              <div class="store-card-title">${s.name}</div>
-              <div class="store-card-location">${s.neighborhood}</div>
+              <div class="store-card-title">${st.name}</div>
+              <div class="store-card-location">📍 ${st.neighborhood}</div>
             </div>
           </div>
-          <div class="store-card-body">${s.tagline}</div>
+          <p class="store-card-body">${st.tagline}</p>
           <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 12px; border-top: 1px solid var(--border-subtle);">
-            <span style="font-size: 11px; font-weight: 700; color: var(--primary-red);">${activeCount} Modelos Sincronizados</span>
-            <button class="btn-primary btn-switch-store-dir" data-id="${s.id}" style="font-size: 11px; padding: 6px 14px;">
-              Ver Vitrina
+            <span style="font-size: 12px; color: var(--primary-gold); font-weight: 700;">${prodsCount} Bolsos Activos</span>
+            <button type="button" class="btn-action-sm btn-switch-to-store" data-store-id="${st.id}">
+              Visitar Vitrina →
             </button>
           </div>
         </div>
       `;
     }).join("");
 
-    grid.querySelectorAll(".btn-switch-store-dir").forEach(btn => {
+    grid.querySelectorAll(".btn-switch-to-store").forEach(btn => {
       btn.addEventListener("click", () => {
-        db.setCurrentStoreId(btn.dataset.id);
-        renderHudStores();
-        switchView("storefront");
+        const storeId = btn.dataset.storeId;
+        db.setCurrentStoreId(storeId);
+        setupStoreSelector();
+        document.getElementById("tab-storefront")?.click();
       });
     });
   }
 
-  function setupRoiCalculator() {
-    const resellersSlider = document.getElementById("roi-resellers-slider");
-    const pairsSlider = document.getElementById("roi-pairs-slider");
-    const resellersVal = document.getElementById("roi-resellers-val");
-    const pairsVal = document.getElementById("roi-pairs-val");
-    const profitDisplay = document.getElementById("roi-profit-display");
+  function setupROISimulator() {
+    const sliderPairs = document.getElementById("roi-slider-pairs");
+    const sliderMargin = document.getElementById("roi-slider-margin");
+    const labelPairs = document.getElementById("roi-pairs-label");
+    const labelMargin = document.getElementById("roi-margin-label");
+    const labelTotal = document.getElementById("roi-total-profit");
 
-    function calculateRoi() {
-      const resellers = parseInt(resellersSlider.value, 10);
-      const pairs = parseInt(pairsSlider.value, 10);
-      resellersVal.textContent = resellers;
-      pairsVal.textContent = pairs;
+    function updateROI() {
+      const pairs = parseInt(sliderPairs?.value || "45", 10);
+      const margin = parseInt(sliderMargin?.value || "57000", 10);
+      const total = pairs * margin;
 
-      // Ganancia Bodega: $25.000 COP por par vendido + $150.000 COP mensualidad SaaS por revendedor
-      const pairProfits = resellers * pairs * 25000;
-      const saasProfits = resellers * 150000;
-      const totalMonthly = pairProfits + saasProfits;
-
-      profitDisplay.textContent = db.formatCOP(totalMonthly) + " COP";
+      if (labelPairs) labelPairs.textContent = `${pairs} bolsos`;
+      if (labelMargin) labelMargin.textContent = db.formatCOP(margin);
+      if (labelTotal) labelTotal.textContent = `${db.formatCOP(total)} COP`;
     }
 
-    resellersSlider.addEventListener("input", calculateRoi);
-    pairsSlider.addEventListener("input", calculateRoi);
-    calculateRoi();
+    sliderPairs?.addEventListener("input", updateROI);
+    sliderMargin?.addEventListener("input", updateROI);
+  }
+
+  // =========================================================================
+  // GESTIÓN DE MODALES
+  // =========================================================================
+  function setupModals() {
+    // Cerrar modales con botones de clase data-close
+    document.querySelectorAll("[data-close]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const modalId = btn.dataset.close;
+        document.getElementById(modalId)?.classList.remove("open");
+      });
+    });
+
+    // Cerrar al hacer clic en el backdrop
+    document.querySelectorAll(".modal-backdrop").forEach(backdrop => {
+      backdrop.addEventListener("click", (e) => {
+        if (e.target === backdrop) {
+          backdrop.classList.remove("open");
+        }
+      });
+    });
+
+    // Abrir Modal de Carga Manual (Proveedor)
+    document.getElementById("btn-open-new-product-modal")?.addEventListener("click", () => {
+      document.getElementById("modal-new-product")?.classList.add("open");
+    });
+
+    // Formulario de Carga Manual de Producto
+    document.getElementById("form-new-master-product")?.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = document.getElementById("new-prod-name").value.trim();
+      const sku = document.getElementById("new-prod-sku").value.trim();
+      const category = document.getElementById("new-prod-category").value;
+      const image = document.getElementById("new-prod-image").value;
+      const wholesale = document.getElementById("new-prod-wholesale").value;
+      const suggested = document.getElementById("new-prod-suggested").value;
+      const dimensions = document.getElementById("new-prod-dim").value.trim();
+      const desc = document.getElementById("new-prod-desc").value.trim();
+
+      db.addMasterProduct({
+        name,
+        sku,
+        category,
+        image,
+        wholesalePrice: wholesale,
+        suggestedRetailPrice: suggested,
+        dimensions,
+        description: desc
+      });
+
+      document.getElementById("modal-new-product")?.classList.remove("open");
+      document.getElementById("form-new-master-product")?.reset();
+      showToast("✓ Nueva referencia agregada a toda la red LUXBAGS.");
+      renderSupplierView();
+    });
+
+    // Modal de Configuración de Boutique
+    document.getElementById("btn-open-store-settings")?.addEventListener("click", () => {
+      const store = db.getCurrentStore();
+      document.getElementById("setting-store-name").value = store.name || "";
+      document.getElementById("setting-store-tagline").value = store.tagline || "";
+      document.getElementById("setting-store-phone").value = store.phone || "";
+      document.getElementById("setting-store-location").value = store.neighborhood || "";
+      document.getElementById("modal-store-settings")?.classList.add("open");
+    });
+
+    document.getElementById("form-store-settings")?.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const store = db.getCurrentStore();
+      const name = document.getElementById("setting-store-name").value.trim();
+      const tagline = document.getElementById("setting-store-tagline").value.trim();
+      const phone = document.getElementById("setting-store-phone").value.trim();
+      const neighborhood = document.getElementById("setting-store-location").value.trim();
+
+      db.updateStoreProfile(store.id, { name, tagline, phone, neighborhood });
+      document.getElementById("modal-store-settings")?.classList.remove("open");
+      showToast("✓ Configuración de tu boutique actualizada.");
+      setupStoreSelector();
+      renderCurrentView();
+    });
+
+    // Formulario de Reposición B2B
+    document.getElementById("form-restock-order")?.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const prodId = document.getElementById("restock-prod-id").value;
+      const master = db.getMasterProducts();
+      const prod = master.find(p => p.id === prodId);
+      const currentStore = db.getCurrentStore();
+      const units = parseInt(document.getElementById("restock-units-input").value, 10);
+      const colorway = document.getElementById("restock-size-select").value;
+
+      if (prod) {
+        db.createB2BOrder({
+          storeName: currentStore.name,
+          productName: prod.name,
+          colorway,
+          units,
+          totalWholesale: prod.wholesalePrice * units,
+          supplierName: prod.supplierName
+        });
+
+        document.getElementById("modal-restock")?.classList.remove("open");
+        showToast("🚀 Orden de reposición enviada a la bodega central.");
+      }
+    });
+  }
+
+  function openRestockModal(store, product) {
+    document.getElementById("restock-prod-id").value = product.id;
+    document.getElementById("restock-prod-title").textContent = product.name;
+    document.getElementById("restock-supplier-name").textContent = product.supplierName || "Bodega Matriz LUXBAGS";
+    document.getElementById("restock-wholesale-price").textContent = `Costo Mayorista: ${db.formatCOP(product.wholesalePrice)}`;
+
+    const sizeSelect = document.getElementById("restock-size-select");
+    if (product.colorways && product.colorways.length > 0) {
+      sizeSelect.innerHTML = product.colorways.map(cw => `<option value="${cw.name}">${cw.name}</option>`).join("");
+    } else {
+      sizeSelect.innerHTML = `<option value="Tono Estándar">Tono Estándar de Bodega</option>`;
+    }
+
+    const unitsInput = document.getElementById("restock-units-input");
+    const totalCalc = document.getElementById("restock-total-calc");
+    unitsInput.value = 6;
+    totalCalc.textContent = db.formatCOP(product.wholesalePrice * 6);
+
+    unitsInput.oninput = () => {
+      const u = parseInt(unitsInput.value || "1", 10);
+      totalCalc.textContent = db.formatCOP(product.wholesalePrice * u);
+    };
+
+    document.getElementById("modal-restock")?.classList.add("open");
   }
 
   // =========================================================================
@@ -894,6 +992,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // =========================================================================
   function showToast(message) {
     const container = document.getElementById("toast-container");
+    if (!container) return;
+
     const toast = document.createElement("div");
     toast.className = "toast";
     toast.innerHTML = `<span>✨</span><span>${message}</span>`;
@@ -902,8 +1002,10 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
       toast.style.opacity = "0";
       toast.style.transform = "translateX(100%)";
-      toast.style.transition = "all 0.3s ease";
       setTimeout(() => toast.remove(), 300);
-    }, 3500);
+    }, 3200);
   }
+
+  // Arrancar la app
+  initApp();
 });
