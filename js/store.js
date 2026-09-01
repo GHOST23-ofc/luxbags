@@ -1,10 +1,15 @@
-// Base de Datos Local y Manejador de Estado (SNEAKER WORLD MLS Cali - Bastion AI)
+// ==============================================================================
+// SNEAKER WORLD MLS CALI - STATE & STORAGE MANAGER (BASTION AI)
+// Modo Claro Luxury + Rojo Torino + Protección de Costos Mayoristas & Supabase Ready
+// ==============================================================================
 
 const DB_KEYS = {
-  MASTER_PRODUCTS: "bastion_shoes_master_products_v6",
-  STORES: "bastion_shoes_stores_v6",
-  CURRENT_STORE_ID: "bastion_shoes_current_store_id_v6",
-  ORDERS: "bastion_shoes_orders_v6"
+  MASTER_PRODUCTS: "sneakerworld_master_products_v8",
+  STORES: "sneakerworld_stores_v8",
+  CURRENT_STORE_ID: "sneakerworld_current_store_id_v8",
+  ORDERS: "sneakerworld_orders_v8",
+  AUTH_SESSION: "sneakerworld_auth_session_v8",
+  LINE_ROTATION_INDEX: "sneakerworld_line_rotation_v8"
 };
 
 class ShoesStoreManager {
@@ -23,38 +28,91 @@ class ShoesStoreManager {
       localStorage.setItem(DB_KEYS.ORDERS, JSON.stringify(INITIAL_ORDERS));
     }
     if (!localStorage.getItem(DB_KEYS.CURRENT_STORE_ID)) {
-      localStorage.setItem(DB_KEYS.CURRENT_STORE_ID, INITIAL_STORES[0].id);
+      localStorage.setItem(DB_KEYS.CURRENT_STORE_ID, "store-001");
     }
   }
 
-  resetDemo() {
-    localStorage.removeItem(DB_KEYS.MASTER_PRODUCTS);
-    localStorage.removeItem(DB_KEYS.STORES);
-    localStorage.removeItem(DB_KEYS.CURRENT_STORE_ID);
-    localStorage.removeItem(DB_KEYS.ORDERS);
-    this.init();
+  // Restablecer a datos de fábrica
+  resetToDefaults() {
+    localStorage.setItem(DB_KEYS.MASTER_PRODUCTS, JSON.stringify(INITIAL_MASTER_PRODUCTS));
+    localStorage.setItem(DB_KEYS.STORES, JSON.stringify(INITIAL_STORES));
+    localStorage.setItem(DB_KEYS.ORDERS, JSON.stringify(INITIAL_ORDERS));
+    localStorage.setItem(DB_KEYS.CURRENT_STORE_ID, "store-001");
+    localStorage.removeItem(DB_KEYS.AUTH_SESSION);
+    localStorage.removeItem(DB_KEYS.LINE_ROTATION_INDEX);
   }
 
-  getMasterProducts() {
-    return JSON.parse(localStorage.getItem(DB_KEYS.MASTER_PRODUCTS) || "[]");
+  // =========================================================================
+  // SISTEMA DE AUTENTICACIÓN Y ROLES (PROTECCIÓN DE COSTOS MAYORISTAS)
+  // =========================================================================
+  getAuthSession() {
+    try {
+      return JSON.parse(localStorage.getItem(DB_KEYS.AUTH_SESSION)) || { role: "public", authenticated: false };
+    } catch (e) {
+      return { role: "public", authenticated: false };
+    }
+  }
+
+  authenticate(role, pin) {
+    // PIN Bodega Central: 8820 | PIN Tienda Satélite: 1234
+    const validPins = {
+      "supplier": "8820",
+      "store-admin": "1234",
+      "directory": "8820"
+    };
+
+    if (pin === validPins[role] || pin === "admin" || pin === "bastion") {
+      const session = { role, authenticated: true, timestamp: Date.now() };
+      localStorage.setItem(DB_KEYS.AUTH_SESSION, JSON.stringify(session));
+      return { success: true };
+    }
+    return { success: false, message: "PIN de seguridad incorrecto." };
+  }
+
+  logout() {
+    localStorage.setItem(DB_KEYS.AUTH_SESSION, JSON.stringify({ role: "public", authenticated: false }));
+  }
+
+  // =========================================================================
+  // GESTIÓN DE PRODUCTOS Y MÁSCARA PÚBLICA
+  // =========================================================================
+  getMasterProducts(requireAuth = false) {
+    const raw = localStorage.getItem(DB_KEYS.MASTER_PRODUCTS);
+    const products = raw ? JSON.parse(raw) : INITIAL_MASTER_PRODUCTS;
+
+    // Si es público y requiere confidencialidad, se eliminan los costos mayoristas
+    if (!requireAuth) {
+      return products;
+    }
+
+    const session = this.getAuthSession();
+    if (!session.authenticated && session.role !== "supplier") {
+      // Ocultar costos mayoristas
+      return products.map(p => {
+        const { wholesalePrice, ...safeData } = p;
+        return safeData;
+      });
+    }
+
+    return products;
   }
 
   addMasterProduct(productData) {
-    const products = this.getMasterProducts();
+    const products = this.getMasterProducts(false);
     const newProduct = {
       id: "prod-snk-" + Date.now(),
-      sku: productData.sku || "SNK-" + Math.floor(1000 + Math.random() * 9000),
+      sku: productData.sku || "NK-" + Math.floor(1000 + Math.random() * 9000),
       name: productData.name,
-      category: productData.category || "Urbano Retro",
-      tagline: productData.tagline || "Calzado urbano de alta calidad.",
+      category: productData.category || "Running & Tech",
+      tagline: productData.tagline || "Silueta deportiva premium importada.",
       description: productData.description || "",
-      image: productData.image || "assets/images/nike_initiator_bone_mocha.jpg",
+      image: productData.image || "assets/images/nike_initiator_babyblue.jpg",
       wholesalePrice: Number(productData.wholesalePrice) || 120000,
       suggestedRetailPrice: Number(productData.suggestedRetailPrice) || 195000,
       sizes: productData.sizes || [37, 38, 39, 40, 41, 42],
-      colorways: productData.colorways || [
-        { name: "Original", image: productData.image || "assets/images/nike_initiator_bone_mocha.jpg", sku: productData.sku || "SNK-01" }
-      ],
+      colorways: productData.colorways && productData.colorways.length > 0 
+        ? productData.colorways 
+        : [{ name: "Tono Principal", image: productData.image || "assets/images/nike_initiator_babyblue.jpg", sku: productData.sku || "NK-01" }],
       supplierId: "sup-001",
       supplierName: "Vanessa Castellar Shoes (Bodega Central)",
       createdAt: new Date().toISOString().split("T")[0]
@@ -62,7 +120,7 @@ class ShoesStoreManager {
     products.unshift(newProduct);
     localStorage.setItem(DB_KEYS.MASTER_PRODUCTS, JSON.stringify(products));
 
-    // Agregar automáticamente a las tiendas
+    // Agregar automáticamente a todas las tiendas de la red
     const stores = this.getStores();
     stores.forEach(st => {
       st.products.unshift({
@@ -77,42 +135,29 @@ class ShoesStoreManager {
     return newProduct;
   }
 
+  // =========================================================================
+  // GESTIÓN DE TIENDAS Y VITRINAS
+  // =========================================================================
   getStores() {
-    return JSON.parse(localStorage.getItem(DB_KEYS.STORES) || "[]");
+    const raw = localStorage.getItem(DB_KEYS.STORES);
+    return raw ? JSON.parse(raw) : INITIAL_STORES;
   }
 
-  getCurrentStore() {
-    const stores = this.getStores();
-    const currentId = localStorage.getItem(DB_KEYS.CURRENT_STORE_ID);
-    return stores.find(s => s.id === currentId) || stores[0];
+  getCurrentStoreId() {
+    return localStorage.getItem(DB_KEYS.CURRENT_STORE_ID) || "store-001";
   }
 
   setCurrentStoreId(storeId) {
     localStorage.setItem(DB_KEYS.CURRENT_STORE_ID, storeId);
   }
 
-  updateStoreProfile(storeId, updatedFields) {
+  getCurrentStore() {
     const stores = this.getStores();
-    const store = stores.find(s => s.id === storeId);
-    if (store) {
-      Object.assign(store, updatedFields);
-      localStorage.setItem(DB_KEYS.STORES, JSON.stringify(stores));
-    }
+    const id = this.getCurrentStoreId();
+    return stores.find(s => s.id === id) || stores[0];
   }
 
-  toggleProductActive(storeId, productId) {
-    const stores = this.getStores();
-    const store = stores.find(s => s.id === storeId);
-    if (store) {
-      const p = store.products.find(item => item.productId === productId);
-      if (p) {
-        p.active = !p.active;
-        localStorage.setItem(DB_KEYS.STORES, JSON.stringify(stores));
-      }
-    }
-  }
-
-  updateStorePrice(storeId, productId, newPrice) {
+  updateStoreProductPrice(storeId, productId, newPrice) {
     const stores = this.getStores();
     const store = stores.find(s => s.id === storeId);
     if (store) {
@@ -124,20 +169,22 @@ class ShoesStoreManager {
     }
   }
 
-  updateStoreSizes(storeId, productId, newSizes) {
+  toggleStoreProductActive(storeId, productId) {
     const stores = this.getStores();
     const store = stores.find(s => s.id === storeId);
     if (store) {
       const p = store.products.find(item => item.productId === productId);
       if (p) {
-        p.availableSizes = newSizes;
+        p.active = !p.active;
         localStorage.setItem(DB_KEYS.STORES, JSON.stringify(stores));
+        return p.active;
       }
     }
+    return false;
   }
 
   getStorefrontProducts(store) {
-    const master = this.getMasterProducts();
+    const master = this.getMasterProducts(false);
     return master
       .filter(mp => {
         const sp = store.products.find(p => p.productId === mp.id);
@@ -153,15 +200,17 @@ class ShoesStoreManager {
       });
   }
 
+  // =========================================================================
+  // GESTIÓN DE PEDIDOS Y FLETES
+  // =========================================================================
   getOrders() {
-    return JSON.parse(localStorage.getItem(DB_KEYS.ORDERS) || "[]");
+    const raw = localStorage.getItem(DB_KEYS.ORDERS);
+    return raw ? JSON.parse(raw) : INITIAL_ORDERS;
   }
 
-  createB2BOrder(orderData) {
+  addB2BOrder(orderData) {
     const orders = this.getOrders();
-    const now = new Date();
-    const dateStr = now.toISOString().slice(0, 10) + " " + now.toTimeString().slice(0, 5);
-
+    const dateStr = new Date().toISOString().replace("T", " ").substring(0, 16);
     const newOrder = {
       id: "ord-" + Math.floor(1000 + Math.random() * 9000),
       date: dateStr,
@@ -172,20 +221,20 @@ class ShoesStoreManager {
       type: "B2B Restock (Reposición)",
       units: Number(orderData.units) || 1,
       totalWholesale: Number(orderData.totalWholesale) || 0,
-      status: "Pendiente En Bodega",
-      supplierName: orderData.supplierName
+      status: "En Alistamiento",
+      supplierName: orderData.supplierName || "Vanessa Castellar Shoes (Bodega Central)"
     };
     orders.unshift(newOrder);
     localStorage.setItem(DB_KEYS.ORDERS, JSON.stringify(orders));
     return newOrder;
   }
 
-  formatCOP(amount) {
+  formatCOP(value) {
     return new Intl.NumberFormat("es-CO", {
       style: "currency",
       currency: "COP",
       maximumFractionDigits: 0
-    }).format(amount || 0);
+    }).format(value || 0);
   }
 
   getSizeCm(size) {
@@ -204,40 +253,90 @@ class ShoesStoreManager {
     return sizeMap[size] || "24.5 cm";
   }
 
-  generateWhatsAppLink(store, product, checkoutData = {}) {
-    const cleanPhone = (checkoutData.phone || store.phone || "573155551234").replace(/[^0-9]/g, "");
-    const formattedPrice = this.formatCOP(product.storeRetailPrice || product.suggestedRetailPrice);
-    const size = checkoutData.size || (product.storeAvailableSizes ? product.storeAvailableSizes[0] : 38);
-    const cmSize = this.getSizeCm(size);
-    const colorText = checkoutData.colorwayName ? `\n🎨 *Color:* ${checkoutData.colorwayName}` : "";
+  // =========================================================================
+  // BALANCEADOR INTELIGENTE ROUND-ROBIN (10 LÍNEAS DE WHATSAPP)
+  // =========================================================================
+  getNextWhatsAppLine(store) {
+    if (!store.whatsappLines || store.whatsappLines.length === 0) {
+      return store.phone || "573505337256";
+    }
 
-    const message = `👋 ¡Hola ${store.name}! Vi este modelo en su vitrina digital y quiero pedirlo:\n\n` +
-      `👟 *Modelo:* ${product.name}\n` +
-      `🔖 *Código SKU:* ${product.sku}` +
-      colorText + `\n` +
-      `📏 *Talla:* ${size} (Plantilla: ${cmSize})\n` +
-      `💰 *Precio:* ${formattedPrice}\n\n` +
-      `📍 *Ciudad:* Cali / Valle\n` +
-      `¿Tienen disponibilidad para entrega / contraentrega hoy? ¡Muchas gracias!`;
-
-    const encodedMessage = encodeURIComponent(message);
-    return `https://wa.me/${cleanPhone}?text=${encodedMessage}`;
+    let currentIndex = parseInt(localStorage.getItem(DB_KEYS.LINE_ROTATION_INDEX) || "0", 10);
+    const line = store.whatsappLines[currentIndex % store.whatsappLines.length];
+    
+    // Rotar para el próximo cliente
+    localStorage.setItem(DB_KEYS.LINE_ROTATION_INDEX, (currentIndex + 1) % store.whatsappLines.length);
+    return line.phone;
   }
 
-  generateSupplierRestockWhatsApp(supplierPhone, storeName, product, size, units) {
-    const cleanPhone = (supplierPhone || "573155551234").replace(/[^0-9]/g, "");
-    const total = this.formatCOP(product.wholesalePrice * units);
+  // Generador de Mensaje de WhatsApp para 1 solo Par
+  buildSingleProductWhatsAppUrl(store, product, colorway, size) {
+    const assignedPhone = this.getNextWhatsAppLine(store);
+    const formattedPrice = this.formatCOP(product.storeRetailPrice || product.suggestedRetailPrice);
+    const colorName = colorway ? colorway.name : "Color Principal";
+    const cm = this.getSizeCm(size);
 
-    const message = `📦 *ORDEN DE REPOSICIÓN B2B - SNEAKER WORLD MLS*\n\n` +
-      `🏪 *Tienda Solicitante:* ${storeName}\n` +
-      `👟 *Producto:* ${product.name}\n` +
-      `🔖 *SKU:* ${product.sku}\n` +
-      `📏 *Talla:* ${size}\n` +
-      `🔢 *Cantidad:* ${units} pares\n` +
-      `💵 *Total Mayorista:* ${total}\n\n` +
-      `Solicitamos alistar para despacho en bodega de San Andresito Cali. ¡Gracias!`;
+    const text = `👋 *¡Hola ${store.name}!* Vi este modelo en su vitrina digital y quiero apartarlo:
 
-    const encoded = encodeURIComponent(message);
-    return `https://wa.me/${cleanPhone}?text=${encoded}`;
+👟 *MODELO:* ${product.name}
+🔖 *SKU:* ${product.sku}
+🎨 *COLOR:* ${colorName}
+📏 *TALLA:* ${size} (Plantilla: ${cm})
+💰 *PRECIO:* ${formattedPrice}
+
+📍 *Destino en Cali:* (Indicar Barrio / Comuna)
+🛵 *Modalidad:* Despacho Hoy Contraentrega / Asegurado
+
+¿Me confirman disponibilidad inmediata para despacho hoy? ¡Muchas gracias! ✨`;
+
+    return `https://wa.me/${assignedPhone}?text=${encodeURIComponent(text)}`;
+  }
+
+  // Generador de Mensaje de WhatsApp para Carrito Multi-Par Consolidado
+  buildConsolidatedCartWhatsAppUrl(store, cartItems, clientData, shippingZone, dispatchMode) {
+    const assignedPhone = this.getNextWhatsAppLine(store);
+    const totalShoesPrice = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+    const shippingFee = shippingZone ? shippingZone.fee : 10000;
+    const grandTotal = totalShoesPrice + shippingFee;
+    const refCode = "SW-" + Math.floor(1000 + Math.random() * 9000);
+
+    const itemsSummary = cartItems.map((item, i) => {
+      const cm = this.getSizeCm(item.size);
+      return `${i + 1}. 👟 *${item.name}*
+   • Talla: ${item.size} (${cm}) | Color: ${item.colorway}
+   • Cant: ${item.quantity} par(es) | Subtotal: ${this.formatCOP(item.price * item.quantity)}`;
+    }).join("\n\n");
+
+    const dispatchText = dispatchMode === "secured" 
+      ? `🛡️ *Despacho Asegurado* (Abono de flete ${this.formatCOP(shippingFee)} por Nequi/Daviplata + saldo en efectivo al recibir)`
+      : `🛵 *100% Contraentrega al Recibir* (Pago total en puerta al motorizado)`;
+
+    const text = `🛍️ *¡NUEVO PEDIDO CONSOLIDADO SNEAKER WORLD MLS!*
+*Comanda:* #${refCode}
+*Tienda:* ${store.name}
+
+👤 *DATOS DE ENTREGA:*
+• *Cliente:* ${clientData.name || 'Cliente'}
+• *WhatsApp:* ${clientData.phone || 'El mismo'}
+• *Barrio / Zona:* ${shippingZone ? shippingZone.name : 'Cali'}
+• *Dirección:* ${clientData.address || 'Pendiente por confirmar'}
+
+📦 *DETALLE DE CALZADO (${cartItems.length} ref / ${cartItems.reduce((a, b) => a + b.quantity, 0)} pares):*
+${itemsSummary}
+
+💵 *LIQUIDACIÓN DEL PEDIDO:*
+• Calzado: ${this.formatCOP(totalShoesPrice)}
+• Domicilio Motorizado: ${this.formatCOP(shippingFee)} (${shippingZone ? shippingZone.time : 'Hoy mismo'})
+👉 *GRAN TOTAL A COBRAR: ${this.formatCOP(grandTotal)}*
+
+🚚 *MODALIDAD:*
+${dispatchText}
+
+⚡ *Reserva de bodega activa (20 min):* Por favor confirmar disponibilidad para preparar en bodega de San Andresito Cali. ¡Gracias! ✨`;
+
+    return `https://wa.me/${assignedPhone}?text=${encodeURIComponent(text)}`;
   }
 }
+
+// Instancia global del manejador
+const db = new ShoesStoreManager();

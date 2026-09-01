@@ -1,5 +1,19 @@
 // Base de datos oficial - Catálogo Maestro SNEAKER WORLD MLS Cali (Bastion AI)
 // 18 Referencias reales ordenadas exactamente según la vitrina matriz de Vanessa Castellar Shoes
+// Con las 10 líneas oficiales de atención de Vanessa Castellar
+
+const VANESSA_WHATSAPP_LINES = [
+  { id: "line-1", phone: "573505337256", name: "Línea 1 - Vanessa Directo", active: true },
+  { id: "line-2", phone: "573505292624", name: "Línea 2 - Asesoría Cali", active: true },
+  { id: "line-3", phone: "573505332700", name: "Línea 3 - Mayoristas Nacional", active: true },
+  { id: "line-4", phone: "573505292805", name: "Línea 4 - Despachos Hoy", active: true },
+  { id: "line-5", phone: "573505333793", name: "Línea 5 - Contraentrega", active: true },
+  { id: "line-6", phone: "573505292964", name: "Línea 6 - Reposiciones B2B", active: true },
+  { id: "line-7", phone: "573505341713", name: "Línea 7 - Alistamiento Bodega", active: true },
+  { id: "line-8", phone: "573505340375", name: "Línea 8 - Pedidos Rápidos", active: true },
+  { id: "line-9", phone: "573505332728", name: "Línea 9 - Atención Satélites", active: true },
+  { id: "line-10", phone: "573505332595", name: "Línea 10 - Garantías & Envíos", active: true }
+];
 
 const INITIAL_MASTER_PRODUCTS = [
   // 1. Nike Initiator Retro Runner Dama (Baby Blue)
@@ -373,9 +387,11 @@ const INITIAL_STORES = [
     id: "store-001",
     name: "Vanessa Castellar Shoes",
     tagline: "San Andresito de la 38, Cali — Calzado Urbano y Deportivo al por Mayor y Detal con Envíos a Toda Colombia.",
-    phone: "573155551234",
+    phone: "573505337256", // Línea Principal de Vanessa
+    whatsappLines: VANESSA_WHATSAPP_LINES,
     neighborhood: "San Andresito de la 38, Cali (Bodega Central)",
     isSupplierStore: true,
+    themeColor: "#e6192e", // Rojo Torino Oficial
     products: [
       { productId: "prod-snk-001", customPrice: 185000, active: true, availableSizes: [35, 36, 37, 38, 39, 40] },
       { productId: "prod-snk-002", customPrice: 200000, active: true, availableSizes: [38, 39, 40, 41, 42, 43] },
@@ -404,6 +420,7 @@ const INITIAL_STORES = [
     phone: "573154443322",
     neighborhood: "Ciudad Jardín / Valle del Lili, Cali",
     isSupplierStore: false,
+    themeColor: "#e6192e",
     products: [
       { productId: "prod-snk-005", customPrice: 265000, active: true, availableSizes: [39, 40, 41, 42] },
       { productId: "prod-snk-004", customPrice: 245000, active: true, availableSizes: [39, 40, 41, 42, 43] },
@@ -420,6 +437,7 @@ const INITIAL_STORES = [
     phone: "573187776655",
     neighborhood: "Aguablanca / Mariano Ramos, Cali",
     isSupplierStore: false,
+    themeColor: "#e6192e",
     products: [
       { productId: "prod-snk-001", customPrice: 175000, active: true, availableSizes: [35, 36, 37, 38, 39] },
       { productId: "prod-snk-007", customPrice: 205000, active: true, availableSizes: [38, 39, 40, 41, 42] },

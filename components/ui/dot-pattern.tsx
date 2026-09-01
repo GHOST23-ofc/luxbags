@@ -54,4 +54,3 @@ function DotPattern({
 }
 
 export { DotPattern };
-export default DotPattern;
