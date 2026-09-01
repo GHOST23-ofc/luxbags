@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal Proveedores & Revendedores | SNEAKER WORLD MLS</title>
+  <meta name="description" content="Portal administrativo multi-inquilino de bodegas matrices y tiendas revendedoras de SNEAKER WORLD MLS.">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32.png">
+  <meta name="theme-color" content="#e6192e">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .login-container-card {
+      max-width: 460px;
+      margin: 60px auto;
+      background: #ffffff;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 36px 30px;
+      box-shadow: var(--shadow-card), 0 20px 40px rgba(15, 23, 42, 0.08);
+      text-align: center;
+    }
+    .role-badge-choice {
+      display: flex;
+      gap: 10px;
+      margin: 20px 0;
+    }
+    .role-choice-btn {
+      flex: 1;
+      padding: 12px 10px;
+      background: var(--bg-surface-elevated);
+      border: 1.5px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      font-family: var(--font-main);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      transition: all 0.2s;
+    }
+    .role-choice-btn.active {
+      background: var(--primary-red-light);
+      border-color: var(--primary-red);
+      color: var(--primary-red);
+    }
+    .tenant-badge {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--primary-red);
+      background: var(--primary-red-light);
+      padding: 3px 8px;
+      border-radius: var(--radius-full);
+      border: 1px solid rgba(230, 25, 46, 0.2);
+      display: inline-block;
+      margin-bottom: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Dot Pattern Background -->
+  <svg aria-hidden="true" class="dot-pattern-overlay">
+    <defs>
+      <pattern id="dot-pattern-admin" width="20" height="20" patternUnits="userSpaceOnUse" patternContentUnits="userSpaceOnUse" x="0" y="0">
+        <circle cx="2" cy="2" r="1.1" fill="rgba(15, 23, 42, 0.16)" />
+      </pattern>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#dot-pattern-admin)" />
+  </svg>
+
+  <div class="app-wrapper">
+    <!-- Top Header -->
+    <header style="background: var(--bg-glass); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border-subtle); padding: 14px 20px;">
+      <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center;">
+        <a href="index.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
+          <img src="assets/images/favicon.png" alt="Sneaker World" style="width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--primary-red);">
+          <span style="font-family: var(--font-brand); font-size: 16px; font-weight: 900; color: var(--text-primary);">SNEAKER WORLD <span style="color: var(--primary-red);">MLS</span></span>
+        </a>
+        <a href="index.html" class="btn-secondary" style="font-size: 12px; padding: 6px 14px; text-decoration: none;">
+          ← Volver a Vitrina Pública
+        </a>
+      </div>
+    </header>
+
+    <!-- Formulario de Inicio de Sesión Multi-Tenant -->
+    <div class="login-container-card" id="login-card">
+      <span class="tenant-badge">🔐 Portal Privado Multi-Proveedor</span>
+      <h1 style="font-size: 22px; font-weight: 900; color: var(--text-primary); margin-bottom: 6px;">Iniciar Sesión</h1>
+      <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.4;">Accede a tu panel administrativo aislado con tu propio catálogo y red de revendedores.</p>
+
+      <div class="role-badge-choice">
+        <button type="button" class="role-choice-btn active" id="btn-choice-supplier">
+          📦 Soy Proveedor Matriz
+        </button>
+        <button type="button" class="role-choice-btn" id="btn-choice-reseller">
+          🏪 Soy Tienda Revendedora
+        </button>
+      </div>
+
+      <form id="form-login-tenant" style="text-align: left;">
+        <div class="form-group">
+          <label class="form-label" id="lbl-login-tenant">Selecciona tu Empresa / Bodega:</label>
+          <select id="login-tenant-select" class="form-select" style="font-weight: 700;">
+            <option value="sup-001">Vanessa Castellar Shoes (San Andresito Cali)</option>
+            <option value="sup-002">Urban Kicks Colombia (Bodega Bogotá)</option>
+            <option value="sup-003">Paisa Sneaker Import (Medellín)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Correo Electrónico / Usuario:</label>
+          <input type="text" id="login-email" class="form-input" placeholder="vanessa@castellarshoes.com" value="vanessa@castellarshoes.com" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">PIN o Contraseña de Seguridad:</label>
+          <input type="password" id="login-pin" class="form-input" placeholder="PIN: 8820" value="8820" required>
+        </div>
+
+        <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; font-size: 14px; padding: 12px; margin-top: 10px;">
+          Ingresar al Panel de Control →
+        </button>
+      </form>
+
+      <!-- Guía Rápida de Cuentas Demo -->
+      <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-subtle); text-align: left; font-size: 11px; color: var(--text-secondary);">
+        <strong style="color: var(--text-primary); display: block; margin-bottom: 4px;">🔑 Credenciales de Acceso Directo:</strong>
+        <div>• <strong>Vanessa Castellar (Matriz Cali):</strong> PIN <code>8820</code></div>
+        <div>• <strong>Urban Kicks (Matriz Bogotá):</strong> PIN <code>8820</code></div>
+        <div>• <strong>Sneakers Ciudad Jardín (Revendedor):</strong> PIN <code>1234</code></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BASTION AI WATERMARK -->
+  <div class="bastion-watermark">
+    <span>Made by <strong>BASTION AI</strong></span>
+    <span class="sparkle">✨</span>
+  </div>
+
+  <script src="js/mockData.js"></script>
+  <script src="js/store.js"></script>
+  <script>
+    const btnSupplier = document.getElementById("btn-choice-supplier");
+    const btnReseller = document.getElementById("btn-choice-reseller");
+    const tenantSelect = document.getElementById("login-tenant-select");
+    const emailInput = document.getElementById("login-email");
+    const pinInput = document.getElementById("login-pin");
+    const lblTenant = document.getElementById("lbl-login-tenant");
+    let currentRole = "supplier";
+
+    btnSupplier.onclick = () => {
+      currentRole = "supplier";
+      btnSupplier.classList.add("active");
+      btnReseller.classList.remove("active");
+      lblTenant.textContent = "Selecciona tu Bodega Matriz:";
+      tenantSelect.innerHTML = `
+        <option value="sup-001">Vanessa Castellar Shoes (San Andresito Cali)</option>
+        <option value="sup-002">Urban Kicks Colombia (Bodega Bogotá)</option>
+        <option value="sup-003">Paisa Sneaker Import (Medellín)</option>
+      `;
+      emailInput.value = "vanessa@castellarshoes.com";
+      pinInput.value = "8820";
+    };
+
+    btnReseller.onclick = () => {
+      currentRole = "store-admin";
+      btnReseller.classList.add("active");
+      btnSupplier.classList.remove("active");
+      lblTenant.textContent = "Selecciona tu Tienda Satélite:";
+      tenantSelect.innerHTML = `
+        <option value="store-002">Sneakers Ciudad Jardín (Sur Cali - Revendedor Vanessa)</option>
+        <option value="store-003">Zapatillas Aguablanca VIP (Oriente Cali - Revendedor Vanessa)</option>
+      `;
+      emailInput.value = "contacto@sneakersciudadjardin.com";
+      pinInput.value = "1234";
+    };
+
+    document.getElementById("form-login-tenant").onsubmit = (e) => {
+      e.preventDefault();
+      const tenantId = tenantSelect.value;
+      const pin = pinInput.value.trim();
+
+      if (currentRole === "supplier") {
+        db.authenticate("supplier", pin);
+        // Guardar proveedor activo
+        localStorage.setItem("sneakerworld_active_supplier_id", tenantId);
+        window.location.href = "index.html?view=supplier&supplier=" + tenantId;
+      } else {
+        db.authenticate("store-admin", pin);
+        db.setCurrentStoreId(tenantId);
+        window.location.href = "index.html?view=store-admin&store=" + tenantId;
+      }
+    };
+  </script>
+</body>
+</html>

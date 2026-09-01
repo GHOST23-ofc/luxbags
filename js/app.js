@@ -21,6 +21,22 @@ document.addEventListener("DOMContentLoaded", () => {
   initApp();
 
   function initApp() {
+    // Manejo de parámetros de URL Multi-Tenant (?store=... &view=... &supplier=...)
+    const urlParams = new URLSearchParams(window.location.search);
+    const paramStore = urlParams.get("store");
+    const paramView = urlParams.get("view");
+    const paramSupplier = urlParams.get("supplier");
+
+    if (paramStore) {
+      db.setCurrentStoreId(paramStore);
+    }
+    if (paramSupplier) {
+      localStorage.setItem("sneakerworld_active_supplier_id", paramSupplier);
+    }
+    if (paramView && ["storefront", "store-admin", "supplier", "directory"].includes(paramView)) {
+      currentView = paramView;
+    }
+
     renderHudStores();
     setupNavigation();
     setupFilters();
@@ -28,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setupCartDrawer();
     setupAddProductModal();
     setupRoiCalculator();
-    renderCurrentView();
+    switchView(currentView);
   }
 
   // =========================================================================
