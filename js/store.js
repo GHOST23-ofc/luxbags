@@ -41,7 +41,12 @@ class BagsWorldStoreManager {
   getMasterProducts() {
     try {
       const raw = localStorage.getItem(DB_KEYS.MASTER_PRODUCTS);
-      return raw ? JSON.parse(raw) : INITIAL_MASTER_PRODUCTS;
+      const parsed = raw ? JSON.parse(raw) : INITIAL_MASTER_PRODUCTS;
+      if (!Array.isArray(parsed) || parsed.length < 8 || !parsed[0].sku.startsWith("BW-")) {
+        localStorage.setItem(DB_KEYS.MASTER_PRODUCTS, JSON.stringify(INITIAL_MASTER_PRODUCTS));
+        return INITIAL_MASTER_PRODUCTS;
+      }
+      return parsed;
     } catch (e) {
       return INITIAL_MASTER_PRODUCTS;
     }
@@ -54,7 +59,12 @@ class BagsWorldStoreManager {
   getStores() {
     try {
       const raw = localStorage.getItem(DB_KEYS.STORES);
-      return raw ? JSON.parse(raw) : INITIAL_STORES;
+      const parsed = raw ? JSON.parse(raw) : INITIAL_STORES;
+      if (!Array.isArray(parsed) || parsed.length === 0 || !parsed[0].name.includes("BAGS WORLD")) {
+        localStorage.setItem(DB_KEYS.STORES, JSON.stringify(INITIAL_STORES));
+        return INITIAL_STORES;
+      }
+      return parsed;
     } catch (e) {
       return INITIAL_STORES;
     }
@@ -93,11 +103,11 @@ class BagsWorldStoreManager {
 
   getStorefrontProducts(store) {
     const master = this.getMasterProducts();
-    const storeProducts = store.products || [];
+    const storeProducts = store && Array.isArray(store.products) ? store.products : [];
 
     return master.map(mp => {
       const sp = storeProducts.find(p => p.productId === mp.id);
-      const isActive = sp ? sp.active : true;
+      const isActive = sp ? sp.active !== false : true;
       const customPrice = sp && sp.customPrice ? sp.customPrice : mp.suggestedRetailPrice;
 
       return {
@@ -105,7 +115,7 @@ class BagsWorldStoreManager {
         storeRetailPrice: customPrice,
         isActiveInStore: isActive
       };
-    }).filter(p => p.isActiveInStore);
+    }).filter(p => p.isActiveInStore !== false);
   }
 
   updateStorePrice(storeId, productId, newPrice) {

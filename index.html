@@ -9,7 +9,7 @@
   <meta name="description" content="Plataforma SaaS BAGS WORLD MLS de bolsos y carteras importadas en Colombia. Catálogo maestro compartido de bodegas, vitrinas personalizadas con selector de colores, fletes liquidados y pedidos consolidados a WhatsApp.">
   <meta name="keywords" content="bolsos al por mayor colombia, bags world, carteras cali mayoristas, bolsos importados medellin, carteras bogota, dropshipping bolsos, bastion ai">
   <meta name="author" content="BASTION AI">
-  <meta name="theme-color" content="#e6192e">
+  <meta name="theme-color" content="#06070a">
 
   <!-- Open Graph / WhatsApp / Facebook Link Previews -->
   <meta property="og:type" content="website">
@@ -19,7 +19,7 @@
   <meta property="og:image" content="assets/images/bags_world_logo_transparent.png">
   <meta property="og:url" content="https://luxbags-nine.vercel.app/">
 
-  <!-- Favicons con el nuevo logo sin fondo -->
+  <!-- Favicons -->
   <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32.png">
   <link rel="icon" type="image/png" sizes="64x64" href="assets/images/favicon-64.png">
   <link rel="icon" type="image/png" href="assets/images/favicon.png">
@@ -33,14 +33,14 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <!-- Canvas Background Interactivo Black Hole & Partículas (Modo Oscuro) -->
-  <canvas id="black-hole-canvas"></canvas>
+  <!-- Canvas Background Interactivo (Fixed para no empujar el contenido) -->
+  <canvas id="black-hole-canvas" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; pointer-events: none;"></canvas>
 
-  <!-- Dot Pattern Matrix Overlay (Modo Oscuro Cosmic Gold / Red Glow) -->
-  <svg aria-hidden="true" class="dot-pattern-overlay">
+  <!-- Dot Pattern Matrix Overlay (Fixed) -->
+  <svg aria-hidden="true" class="dot-pattern-overlay" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none;">
     <defs>
-      <pattern id="dot-pattern-grid" width="22" height="22" patternUnits="userSpaceOnUse" patternContentUnits="userSpaceOnUse" x="0" y="0">
-        <circle cx="2" cy="2" r="1.2" fill="rgba(227, 194, 116, 0.38)" />
+      <pattern id="dot-pattern-grid" width="24" height="24" patternUnits="userSpaceOnUse" patternContentUnits="userSpaceOnUse" x="0" y="0">
+        <circle cx="2" cy="2" r="1.1" fill="rgba(227, 194, 116, 0.45)" />
       </pattern>
     </defs>
     <rect width="100%" height="100%" fill="url(#dot-pattern-grid)" />
@@ -492,7 +492,7 @@ Medidas 16 alto x 20 ancho"></textarea>
 
       <!-- Botones de Acción: Agregar al Carrito o Pedir Directo -->
       <div style="display: flex; flex-direction: column; gap: 10px;">
-        <button type="button" id="modal-btn-add-cart" class="btn-primary" style="width: 100%; justify-content: center; font-size: 15px; padding: 12px; background: linear-gradient(135deg, var(--primary-gold) 0%, #b8860b 100%);">
+        <button type="button" id="modal-btn-add-cart" class="btn-primary" style="width: 100%; justify-content: center; font-size: 15px; padding: 12px;">
           <span>🛍️ Agregar al Pedido / Carrito</span>
         </button>
 
