@@ -161,11 +161,21 @@ class ShoesStoreManager {
     const stores = this.getStores();
     const store = stores.find(s => s.id === storeId);
     if (store) {
-      const p = store.products.find(item => item.productId === productId);
-      if (p) {
+      let p = store.products.find(item => item.productId === productId);
+      if (!p) {
+        const master = this.getMasterProducts(false);
+        const mp = master.find(m => m.id === productId);
+        p = {
+          productId,
+          customPrice: Number(newPrice),
+          active: true,
+          availableSizes: mp ? [...mp.sizes] : [37, 38, 39, 40, 41, 42]
+        };
+        store.products.push(p);
+      } else {
         p.customPrice = Number(newPrice);
-        localStorage.setItem(DB_KEYS.STORES, JSON.stringify(stores));
       }
+      localStorage.setItem(DB_KEYS.STORES, JSON.stringify(stores));
     }
   }
 
@@ -173,12 +183,58 @@ class ShoesStoreManager {
     const stores = this.getStores();
     const store = stores.find(s => s.id === storeId);
     if (store) {
-      const p = store.products.find(item => item.productId === productId);
-      if (p) {
+      let p = store.products.find(item => item.productId === productId);
+      if (!p) {
+        const master = this.getMasterProducts(false);
+        const mp = master.find(m => m.id === productId);
+        p = {
+          productId,
+          customPrice: mp ? mp.suggestedRetailPrice : 185000,
+          active: false, // si no estaba, al hacer toggle se desactiva
+          availableSizes: mp ? [...mp.sizes] : [37, 38, 39, 40, 41, 42]
+        };
+        store.products.push(p);
+      } else {
         p.active = !p.active;
-        localStorage.setItem(DB_KEYS.STORES, JSON.stringify(stores));
-        return p.active;
       }
+      localStorage.setItem(DB_KEYS.STORES, JSON.stringify(stores));
+      return p.active;
+    }
+    return false;
+  }
+
+  toggleStoreSize(storeId, productId, size) {
+    const stores = this.getStores();
+    const store = stores.find(s => s.id === storeId);
+    if (store) {
+      let p = store.products.find(item => item.productId === productId);
+      const master = this.getMasterProducts(false);
+      const mp = master.find(m => m.id === productId);
+
+      if (!p) {
+        p = {
+          productId,
+          customPrice: mp ? mp.suggestedRetailPrice : 185000,
+          active: true,
+          availableSizes: mp ? [...mp.sizes] : [37, 38, 39, 40, 41, 42]
+        };
+        store.products.push(p);
+      }
+
+      if (!p.availableSizes) {
+        p.availableSizes = mp ? [...mp.sizes] : [37, 38, 39, 40, 41, 42];
+      }
+
+      const numSize = Number(size);
+      if (p.availableSizes.includes(numSize)) {
+        p.availableSizes = p.availableSizes.filter(s => s !== numSize);
+      } else {
+        p.availableSizes.push(numSize);
+        p.availableSizes.sort((a, b) => a - b);
+      }
+
+      localStorage.setItem(DB_KEYS.STORES, JSON.stringify(stores));
+      return p.availableSizes.includes(numSize);
     }
     return false;
   }
@@ -187,15 +243,18 @@ class ShoesStoreManager {
     const master = this.getMasterProducts(false);
     return master
       .filter(mp => {
-        const sp = store.products.find(p => p.productId === mp.id);
-        return sp && sp.active && sp.availableSizes && sp.availableSizes.length > 0;
+        const sp = (store.products || []).find(p => p.productId === mp.id);
+        if (store.isSupplierStore) {
+          return !sp || sp.active !== false;
+        }
+        return sp && sp.active !== false && sp.availableSizes && sp.availableSizes.length > 0;
       })
       .map(mp => {
-        const sp = store.products.find(p => p.productId === mp.id);
+        const sp = (store.products || []).find(p => p.productId === mp.id);
         return {
           ...mp,
-          storeRetailPrice: sp.customPrice || mp.suggestedRetailPrice,
-          storeAvailableSizes: sp.availableSizes || mp.sizes
+          storeRetailPrice: (sp && sp.customPrice) ? sp.customPrice : mp.suggestedRetailPrice,
+          storeAvailableSizes: (sp && sp.availableSizes) ? sp.availableSizes : mp.sizes
         };
       });
   }
