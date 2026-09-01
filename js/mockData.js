@@ -1,366 +1,495 @@
-// Base de datos oficial - Catálogo Maestro LUXBAGS COLOMBIA (Bastion AI)
-// 8 Referencias reales de bodega de bolsos, carteras y accesorios importados
+// Base de datos oficial - Catálogo Maestro SNEAKER WORLD MLS Cali (Bastion AI)
+// 18 Referencias reales ordenadas exactamente según la vitrina matriz de Vanessa Castellar Shoes
+// Con las 10 líneas oficiales de atención de Vanessa Castellar
+
+const VANESSA_WHATSAPP_LINES = [
+  { id: "line-1", phone: "573505337256", name: "Línea 1 - Vanessa Directo", active: true },
+  { id: "line-2", phone: "573505292624", name: "Línea 2 - Asesoría Cali", active: true },
+  { id: "line-3", phone: "573505332700", name: "Línea 3 - Mayoristas Nacional", active: true },
+  { id: "line-4", phone: "573505292805", name: "Línea 4 - Despachos Hoy", active: true },
+  { id: "line-5", phone: "573505333793", name: "Línea 5 - Contraentrega", active: true },
+  { id: "line-6", phone: "573505292964", name: "Línea 6 - Reposiciones B2B", active: true },
+  { id: "line-7", phone: "573505341713", name: "Línea 7 - Alistamiento Bodega", active: true },
+  { id: "line-8", phone: "573505340375", name: "Línea 8 - Pedidos Rápidos", active: true },
+  { id: "line-9", phone: "573505332728", name: "Línea 9 - Atención Satélites", active: true },
+  { id: "line-10", phone: "573505332595", name: "Línea 10 - Garantías & Envíos", active: true }
+];
 
 const INITIAL_MASTER_PRODUCTS = [
-  // 1. Bolso Tote Mini Horse Charm 'Colección Amor y Amistad'
+  // 1. Nike Initiator Retro Runner Dama (Baby Blue)
   {
-    id: "prod-lux-001",
-    sku: "LUX-HORS-68",
-    name: "Bolso Tote Mini Horse Charm 'Colección Amor y Amistad'",
-    category: "Totes & Handbags",
-    tagline: "Bolso importado calidad superior con colgante de caballito y correa delgada.",
-    description: "Confeccionado en cuero PU graneado con herrajes metálicos reforzados. Cuenta con un compartimento principal con cierre y bolsillo interno con cremallera, asas de mano rígidas, correa delgada ajustable e incluye accesorio decorativo de caballito.",
-    image: "assets/images/bags/tote_horse_charm_cream.jpg",
-    dimensions: "16 cm (Alto) x 20 cm (Ancho) x 8 cm (Profundidad)",
-    sizeCategory: "Compacto (<20cm)",
+    id: "prod-snk-001",
+    sku: "NK-INIT-BLU",
+    name: "Nike Initiator Retro Runner Dama",
+    category: "Running & Tech",
+    tagline: "Silueta retro runner Y2K ultra liviana con malla transpirable celeste pastel.",
+    description: "Inspirada en el estilo running de los 2000s. Capellada de malla transpirable con refuerzos metálicos y entresuela de espuma suave para amortiguación diaria.",
+    image: "assets/images/nike_initiator_babyblue.jpg",
     colorways: [
-      { name: "Bicolor Crema / Negro", image: "assets/images/bags/tote_horse_charm_cream.jpg", sku: "LUX-HORS-CRM" },
-      { name: "Negro Ónix", image: "assets/images/bags/tote_horse_charm_cream.jpg", sku: "LUX-HORS-BLK" },
-      { name: "Camel / Miel", image: "assets/images/bags/tote_horse_charm_cream.jpg", sku: "LUX-HORS-CAM" },
-      { name: "Rosa Pastel", image: "assets/images/bags/tote_horse_charm_cream.jpg", sku: "LUX-HORS-PNK" },
-      { name: "Marrón Chocolate", image: "assets/images/bags/tote_horse_charm_cream.jpg", sku: "LUX-HORS-CHO" }
+      { name: "Baby Blue Pastel", image: "assets/images/nike_initiator_babyblue.jpg", sku: "NK-INIT-BLU" },
+      { name: "Bone Mocha Beige", image: "assets/images/nike_initiator_bone_mocha.jpg", sku: "NK-INIT-MOC" },
+      { name: "White Blue Metallic", image: "assets/images/nike_initiator_white_blue.jpg", sku: "NK-INIT-WHTBLU" }
     ],
-    specs: [
-      "Importado calidad superior",
-      "Un compartimento con cremallera",
-      "Cierre y bolsillo interno",
-      "Trae correa delgada ajustable",
-      "Incluye accesorio decorativo de caballito",
-      "Medidas: 16 alto x 20 ancho x 8 profundidad cm"
-    ],
-    wholesalePrice: 68000,
-    suggestedRetailPrice: 125000,
+    wholesalePrice: 115000,
+    suggestedRetailPrice: 185000,
+    sizes: [35, 36, 37, 38, 39, 40],
     supplierId: "sup-001",
-    supplierName: "LUXBAGS Colombia (Bodega Matriz)",
+    supplierName: "Vanessa Castellar Shoes (Bodega Central)",
     createdAt: "2026-09-01"
   },
 
-  // 2. Bolso Crossbody Acolchado TOUS Pop 'Flap Edition'
+  // 2. Nike Air Zoom Pegasus Structure
   {
-    id: "prod-lux-002",
-    sku: "LUX-TOUS-POP",
-    name: "Bolso Crossbody Acolchado TOUS Pop 'Flap Edition'",
-    category: "Crossbody & Flap",
-    tagline: "Textura acolchada con icónico relieve en bajo relieve y correa deportiva.",
-    description: "Bolso bandolera de solapa con broche imantado, confeccionado en ecocuero de tacto ultra suave con motivos en relieve tridimensional. Interior forrado con compartimentos organizadores y correa ancha textil estampada intercambiable.",
-    image: "assets/images/bags/tous_crossbody_black.jpg",
-    dimensions: "18 cm (Alto) x 22 cm (Ancho) x 7 cm (Profundidad)",
-    sizeCategory: "Mediano (20-28cm)",
+    id: "prod-snk-002",
+    sku: "NK-ZOOM-RED",
+    name: "Nike Air Zoom Pegasus Structure",
+    category: "Running & Tech",
+    tagline: "Cápsula Zoom Air presurizada para respuesta instantánea en entrenamiento diario.",
+    description: "Malla Engineered Mesh transpirable con soporte dinámico en el mediopié y entresuela de espuma React suave con cápsula Zoom Air.",
+    image: "assets/images/nike_airzoom_white_red.jpg",
     colorways: [
-      { name: "Negro Noir", image: "assets/images/bags/tous_crossbody_black.jpg", sku: "LUX-TOUS-BLK" }
+      { name: "White / Red Rush", image: "assets/images/nike_airzoom_white_red.jpg", sku: "NK-ZOOM-RED" },
+      { name: "Black / White Classic", image: "assets/images/nike_airzoom_black_white.jpg", sku: "NK-ZOOM-BLK" }
     ],
-    specs: [
-      "Solapa frontal con broche magnético",
-      "Relieve acolchado 3D de alta densidad",
-      "Forro interno impermeable con cremallera",
-      "Correa cruzada ajustable con mosquetones cromados",
-      "Etiqueta y herrajes grabados TOUS"
-    ],
-    wholesalePrice: 72000,
-    suggestedRetailPrice: 135000,
+    wholesalePrice: 120000,
+    suggestedRetailPrice: 200000,
+    sizes: [38, 39, 40, 41, 42, 43],
     supplierId: "sup-001",
-    supplierName: "LUXBAGS Colombia (Bodega Matriz)",
+    supplierName: "Vanessa Castellar Shoes (Bodega Central)",
     createdAt: "2026-09-01"
   },
 
-  // 3. Bolso Satchel Estructurado Padlock 'Milano Chic'
+  // 3. On Cloud 5 Everyday Comfort
   {
-    id: "prod-lux-003",
-    sku: "LUX-STCH-OLV",
-    name: "Bolso Satchel Estructurado Padlock 'Milano Chic'",
-    category: "Satchel & Estructurados",
-    tagline: "Elegante silueta de mano con candado metálico plateado y panel frontal plisado.",
-    description: "Diseño estructurado de alta presencia con manijas dobles reforzadas y correa de hombro ajustable. Incluye detalle de candado frontal funcional, textura acanalada de alta densidad y compartimento con triple fuelle.",
-    image: "assets/images/bags/satchel_padlock_olive.jpg",
-    dimensions: "21 cm (Alto) x 26 cm (Ancho) x 11 cm (Profundidad)",
-    sizeCategory: "Mediano (20-28cm)",
+    id: "prod-snk-003",
+    sku: "ON-C5-GRY",
+    name: "On Cloud 5 Everyday Comfort",
+    category: "Running & Tech",
+    tagline: "El ícono suizo favorito de uso diario con sistema de atado rápido 'speed-lacing'.",
+    description: "Amortiguación ultraligera CloudTec® en espuma Zero-Gravity. Ajuste anatómico moldeado y membrana transpirable para uso urbano prolongado.",
+    image: "assets/images/on_cloud5_grey_cream.jpg",
     colorways: [
-      { name: "Verde Oliva", image: "assets/images/bags/satchel_padlock_olive.jpg", sku: "LUX-STCH-OLV" },
-      { name: "Negro Clásico", image: "assets/images/bags/satchel_padlock_multi.jpg", sku: "LUX-STCH-BLK" },
-      { name: "Café Chocolate", image: "assets/images/bags/satchel_padlock_multi.jpg", sku: "LUX-STCH-CHO" },
-      { name: "Blanco Nieve", image: "assets/images/bags/satchel_padlock_multi.jpg", sku: "LUX-STCH-WHT" },
-      { name: "Rosa Palo", image: "assets/images/bags/satchel_padlock_multi.jpg", sku: "LUX-STCH-PNK" },
-      { name: "Camel Miel", image: "assets/images/bags/satchel_padlock_multi.jpg", sku: "LUX-STCH-CAM" }
+      { name: "Grey / Cream Neutral", image: "assets/images/on_cloud5_grey_cream.jpg", sku: "ON-C5-GRY" },
+      { name: "All White Pure", image: "assets/images/on_cloud5_all_white.jpg", sku: "ON-C5-WHT" }
     ],
-    specs: [
-      "Doble manija tubular reforzada",
-      "Candado metálico pulido frontal",
-      "Correa larga graduable y removible",
-      "Triple fuelle interior con organizadores",
-      "Base rígida con topes metálicos de protección"
-    ],
-    wholesalePrice: 78000,
-    suggestedRetailPrice: 145000,
+    wholesalePrice: 140000,
+    suggestedRetailPrice: 220000,
+    sizes: [36, 37, 38, 39, 40, 41, 42, 43],
     supplierId: "sup-001",
-    supplierName: "LUXBAGS Colombia (Bodega Matriz)",
+    supplierName: "Vanessa Castellar Shoes (Bodega Central)",
     createdAt: "2026-09-01"
   },
 
-  // 4. Colección Satchel Padlock 6 Tonos 'Paleta Completa'
+  // 4. On Cloudmonster Swiss Engineering (Olive)
   {
-    id: "prod-lux-004",
-    sku: "LUX-STCH-6COL",
-    name: "Colección Satchel Padlock 6 Tonos 'Paleta Completa'",
-    category: "Satchel & Estructurados",
-    tagline: "Edición especial en 6 variantes de color con candado plateado y herrajes de lujo.",
-    description: "Paleta completa para boutique: Negro, Chocolate, Oliva, Blanco, Rosa Pastel y Camel. Estructura rígida que no pierde la forma, costuras reforzadas y acabados importados de primera línea.",
-    image: "assets/images/bags/satchel_padlock_multi.jpg",
-    dimensions: "21 cm (Alto) x 26 cm (Ancho) x 11 cm (Profundidad)",
-    sizeCategory: "Mediano (20-28cm)",
+    id: "prod-snk-004",
+    sku: "ON-MONSTER-OLV",
+    name: "On Cloudmonster Swiss Engineering",
+    category: "Running & Tech",
+    tagline: "Máxima amortiguación CloudTec® con retorno de energía explosivo para asfalto y gym.",
+    description: "Equipada con los elementos Cloud más grandes de la historia de On, combinados con la placa Speedboard® de propulsión y superespuma Helion™.",
+    image: "assets/images/on_cloudmonster_olive.jpg",
     colorways: [
-      { name: "Negro Ónix", image: "assets/images/bags/satchel_padlock_multi.jpg", sku: "LUX-6COL-BLK" },
-      { name: "Marrón Chocolate", image: "assets/images/bags/satchel_padlock_multi.jpg", sku: "LUX-6COL-CHO" },
-      { name: "Verde Oliva", image: "assets/images/bags/satchel_padlock_olive.jpg", sku: "LUX-6COL-OLV" },
-      { name: "Blanco Puro", image: "assets/images/bags/satchel_padlock_multi.jpg", sku: "LUX-6COL-WHT" },
-      { name: "Rosa Pastel", image: "assets/images/bags/satchel_padlock_multi.jpg", sku: "LUX-6COL-PNK" },
-      { name: "Camel Cuero", image: "assets/images/bags/satchel_padlock_multi.jpg", sku: "LUX-6COL-CAM" }
+      { name: "Olive Aloe Green", image: "assets/images/on_cloudmonster_olive.jpg", sku: "ON-MONSTER-OLV" },
+      { name: "Mint Lime Accent", image: "assets/images/on_cloudmonster_mint.jpg", sku: "ON-MONSTER-MNT" }
     ],
-    specs: [
-      "6 colores disponibles listos para despacho",
-      "Candado frontal plateado con grabado fino",
-      "Manijas estructuradas de mano",
-      "Correa larga removible incluida",
-      "Material anti-rayones de fácil limpieza"
-    ],
-    wholesalePrice: 78000,
-    suggestedRetailPrice: 145000,
+    wholesalePrice: 145000,
+    suggestedRetailPrice: 235000,
+    sizes: [38, 39, 40, 41, 42, 43, 44],
     supplierId: "sup-001",
-    supplierName: "LUXBAGS Colombia (Bodega Matriz)",
+    supplierName: "Vanessa Castellar Shoes (Bodega Central)",
     createdAt: "2026-09-01"
   },
 
-  // 5. Mini Morral Dama 'Glitz & Glam' con Cristales Strass
+  // 5. Air Jordan 4 Retro 'Military Black'
   {
-    id: "prod-lux-005",
-    sku: "LUX-MRL-STRASS",
-    name: "Mini Morral Dama 'Glitz & Glam' con Cristales Strass",
-    category: "Morrales & Mochilas",
-    tagline: "Mochila urbana compacta con incrustaciones de cristales brillantes y cremallera frontal.",
-    description: "Morral compacto en ecocuero negro y gamuza con cientos de cristales strass termofijados de alto brillo. Correas de espalda graduables, asa de mano superior y bolsillo frontal con tirador de piel.",
-    image: "assets/images/bags/backpack_strass_black.jpg",
-    dimensions: "24 cm (Alto) x 19 cm (Ancho) x 10 cm (Profundidad)",
-    sizeCategory: "Mediano (20-28cm)",
+    id: "prod-snk-005",
+    sku: "AJ4-MIL-BLK",
+    name: "Air Jordan 4 Retro 'Military Black'",
+    category: "Urbano Retro",
+    tagline: "El clásico más codiciado en cuero blanco premium con detalles en gris ante y negro mate.",
+    description: "Construcción en cuero suave blanco con puntera en gamuza gris claro y acentos en negro mate en los ojales 'wings', talón y entresuela Air-Sole visible.",
+    image: "assets/images/jordan_4_military_black.jpg",
     colorways: [
-      { name: "Negro Strass Cristal", image: "assets/images/bags/backpack_strass_black.jpg", sku: "LUX-MRL-BLK" }
+      { name: "Military Black Clásico", image: "assets/images/jordan_4_military_black.jpg", sku: "AJ4-MIL-BLK" }
     ],
-    specs: [
-      "Incrustaciones strass brillantes termofijadas",
-      "Bolsillo frontal de acceso rápido con cremallera",
-      "Correas de espalda reforzadas y ajustables",
-      "Asa superior para llevar de mano",
-      "Forro interior negro de alta resistencia"
-    ],
-    wholesalePrice: 65000,
-    suggestedRetailPrice: 120000,
+    wholesalePrice: 155000,
+    suggestedRetailPrice: 250000,
+    sizes: [38, 39, 40, 41, 42, 43],
     supplierId: "sup-001",
-    supplierName: "LUXBAGS Colombia (Bodega Matriz)",
+    supplierName: "Vanessa Castellar Shoes (Bodega Central)",
     createdAt: "2026-09-01"
   },
 
-  // 6. Billetera Compacta GUESS Scarlet Red
+  // 6. Air Jordan 1 Mid 'Canyon Rust'
   {
-    id: "prod-lux-006",
-    sku: "LUX-GSS-RED",
-    name: "Billetera Compacta GUESS Scarlet Red",
-    category: "Billeteras & Clutches",
-    tagline: "Billetera de 3 cuerpos en cuero graneado rojo escarlata con herraje metálico 'DGC'.",
-    description: "Elegante billetera importada en tono rojo vibrante con textura Saffiano resistente a rayaduras. Incluye broche con detalle de eslabón dorado 'GUESS', monedero lateral con cremallera y 8 ranuras para tarjetas.",
-    image: "assets/images/bags/guess_wallet_red.jpg",
-    dimensions: "10 cm (Alto) x 14 cm (Ancho) x 3.5 cm (Profundidad)",
-    sizeCategory: "Compacto (<20cm)",
+    id: "prod-snk-006",
+    sku: "AJ1-CYN-RST",
+    name: "Air Jordan 1 Mid 'Canyon Rust'",
+    category: "Urbano Retro",
+    tagline: "Mezcla terrosa premium en tonos terracota, rosa empolvado y nobuck envejecido.",
+    description: "Combinación de ante aterciopelado, nobuck y lona suave en tonos óxido y negro descolorido con Swoosh texturizado en tono denim.",
+    image: "assets/images/jordan_1_canyon_rust.jpg",
     colorways: [
-      { name: "Scarlet Red", image: "assets/images/bags/guess_wallet_red.jpg", sku: "LUX-GSS-RED" },
-      { name: "Noir Black", image: "assets/images/bags/guess_wallet_black.jpg", sku: "LUX-GSS-BLK" }
+      { name: "Canyon Rust / Terracota", image: "assets/images/jordan_1_canyon_rust.jpg", sku: "AJ1-CYN-RST" }
     ],
-    specs: [
-      "Cuero texturizado estilo Saffiano",
-      "Herraje de eslabón dorado con relieve GUESS",
-      "Compartimento amplio para billetes",
-      "8 ranuras para tarjetas y documentos",
-      "Monedero lateral con cremallera dorada"
-    ],
-    wholesalePrice: 42000,
-    suggestedRetailPrice: 79000,
+    wholesalePrice: 140000,
+    suggestedRetailPrice: 230000,
+    sizes: [36, 37, 38, 39, 40, 41],
     supplierId: "sup-001",
-    supplierName: "LUXBAGS Colombia (Bodega Matriz)",
+    supplierName: "Vanessa Castellar Shoes (Bodega Central)",
     createdAt: "2026-09-01"
   },
 
-  // 7. Billetera Compacta GUESS Noir Black
+  // 7. Nike Dunk Low x Initial D 'AE86 Tofu Shop'
   {
-    id: "prod-lux-007",
-    sku: "LUX-GSS-BLK",
-    name: "Billetera Compacta GUESS Noir Black",
-    category: "Billeteras & Clutches",
-    tagline: "Billetera de lujo en negro clásico con herraje dorado y cremallera para monedas.",
-    description: "La versión en negro atemporal de la billetera GUESS. Estructura compacta ideal para llevar en cualquier bolso mediano o de mano, con finos acabados dorados y cierre suave.",
-    image: "assets/images/bags/guess_wallet_black.jpg",
-    dimensions: "10 cm (Alto) x 14 cm (Ancho) x 3.5 cm (Profundidad)",
-    sizeCategory: "Compacto (<20cm)",
+    id: "prod-snk-007",
+    sku: "NK-DUNK-INITD",
+    name: "Nike Dunk Low x Initial D 'AE86 Tofu Shop'",
+    category: "Skate & Casual",
+    tagline: "Edición especial tributo al legendario Toyota Sprinter Trueno AE86 de Takumi Fujiwara.",
+    description: "Cuero blanco y negro mate de alto gramaje con caligrafía japonesa en el lateral, placa morada en el talón que emula la matrícula japonesa y suela bitono.",
+    image: "assets/images/nike_dunk_initial_d.jpg",
     colorways: [
-      { name: "Noir Black", image: "assets/images/bags/guess_wallet_black.jpg", sku: "LUX-GSS-BLK" },
-      { name: "Scarlet Red", image: "assets/images/bags/guess_wallet_red.jpg", sku: "LUX-GSS-RED" }
+      { name: "Panda AE86 Edition", image: "assets/images/nike_dunk_initial_d.jpg", sku: "NK-DUNK-INITD" }
     ],
-    specs: [
-      "Ecocuero negro graneado de alta durabilidad",
-      "Letras y herraje en relieve dorado",
-      "Ranuras organizadoras para tarjetas y cédula",
-      "Monedero con cremallera metálica suave",
-      "Broche a presión seguro"
-    ],
-    wholesalePrice: 42000,
-    suggestedRetailPrice: 79000,
+    wholesalePrice: 135000,
+    suggestedRetailPrice: 215000,
+    sizes: [37, 38, 39, 40, 41, 42, 43],
     supplierId: "sup-001",
-    supplierName: "LUXBAGS Colombia (Bodega Matriz)",
+    supplierName: "Vanessa Castellar Shoes (Bodega Central)",
     createdAt: "2026-09-01"
   },
 
-  // 8. Billetera / Clutch Flap Chloé Woody Lona & Cuero
+  // 8. Nike Air Force 1 Low 'Valentine Love Pink'
   {
-    id: "prod-lux-008",
-    sku: "LUX-CHL-WDY",
-    name: "Billetera / Clutch Flap Chloé Woody Lona & Cuero",
-    category: "Billeteras & Clutches",
-    tagline: "Clutch billetera de solapa en lona beige con tipografía bordada y ribete en cuero negro.",
-    description: "Inspirada en el estilo bohemio de lujo parisino. Confeccionada en lona de algodón natural de alto gramaje con bordado 'Chloé' en contraste, ribete de cuero genuino y presentación en caja de regalo rígida.",
-    image: "assets/images/bags/chloe_wallet_canvas.jpg",
-    dimensions: "11 cm (Alto) x 19 cm (Ancho) x 3 cm (Profundidad)",
-    sizeCategory: "Compacto (<20cm)",
+    id: "prod-snk-008",
+    sku: "AF1-VAL-PNK",
+    name: "Nike Air Force 1 Low 'Valentine Love Pink'",
+    category: "Skate & Casual",
+    tagline: "Edición romántica con detalles en rosa cereza y corazones perforados en la puntera.",
+    description: "Cuero blanco impoluto con Swoosh lateral en rosa intenso, bordados conmemorativos y suela cosida reforzada de alta resistencia.",
+    image: "assets/images/af1_valentine_pink.jpg",
     colorways: [
-      { name: "Lona Beige / Negro", image: "assets/images/bags/chloe_wallet_canvas.jpg", sku: "LUX-CHL-WDY" }
+      { name: "Pink Valentine Love", image: "assets/images/af1_valentine_pink.jpg", sku: "AF1-VAL-PNK" }
     ],
-    specs: [
-      "Lona gruesa de algodón natural + Cuero negro",
-      "Bordado frontal de alta definición",
-      "Múltiples separadores internos para tarjetas y billetes",
-      "Solapa con broche imantado",
-      "Incluye caja rígida de presentación"
-    ],
-    wholesalePrice: 48000,
-    suggestedRetailPrice: 89000,
+    wholesalePrice: 120000,
+    suggestedRetailPrice: 195000,
+    sizes: [35, 36, 37, 38, 39],
     supplierId: "sup-001",
-    supplierName: "LUXBAGS Colombia (Bodega Matriz)",
+    supplierName: "Vanessa Castellar Shoes (Bodega Central)",
+    createdAt: "2026-09-01"
+  },
+
+  // 9. Adidas Samba OG Corduroy 'Velvet Sand'
+  {
+    id: "prod-snk-009",
+    sku: "ADI-SAMBA-CRD",
+    name: "Adidas Samba OG Corduroy 'Velvet Sand'",
+    category: "Skate & Casual",
+    tagline: "El clásico terrace reinventado con paneles de pana suave (corduroy) y suela de goma caramelo.",
+    description: "Textura acanalada de pana en color marfil con las 3 rayas en cuero marrón chocolate y la clásica puntera en T en gamuza tonal. Suela plana gumsole.",
+    image: "assets/images/adidas_samba_corduroy.jpg",
+    colorways: [
+      { name: "Corduroy Cream / Brown", image: "assets/images/adidas_samba_corduroy.jpg", sku: "ADI-SAMBA-CRD" }
+    ],
+    wholesalePrice: 130000,
+    suggestedRetailPrice: 210000,
+    sizes: [36, 37, 38, 39, 40, 41, 42, 43],
+    supplierId: "sup-001",
+    supplierName: "Vanessa Castellar Shoes (Bodega Central)",
+    createdAt: "2026-09-01"
+  },
+
+  // 10. Adidas Adizero Pro Navy Marathon
+  {
+    id: "prod-snk-010",
+    sku: "ADI-ADIZ-NVY",
+    name: "Adidas Adizero Pro Navy Marathon",
+    category: "Running & Tech",
+    tagline: "Diseñado para velocidad y media maratón con amortiguación Lightstrike ultra reactiva.",
+    description: "Capellada de malla Celermesh translúcida ultraligera con placas de tracción Continental™ y entresuela Lightstrike de alto rendimiento.",
+    image: "assets/images/adidas_adizero_pro_navy.jpg",
+    colorways: [
+      { name: "Navy Blue / White", image: "assets/images/adidas_adizero_pro_navy.jpg", sku: "ADI-ADIZ-NVY" }
+    ],
+    wholesalePrice: 125000,
+    suggestedRetailPrice: 195000,
+    sizes: [38, 39, 40, 41, 42, 43],
+    supplierId: "sup-001",
+    supplierName: "Vanessa Castellar Shoes (Bodega Central)",
+    createdAt: "2026-09-01"
+  },
+
+  // 11. Adidas Response 2.0 Neon Boost
+  {
+    id: "prod-snk-011",
+    sku: "ADI-RESP-NEON",
+    name: "Adidas Response 2.0 Neon Boost",
+    category: "Running & Tech",
+    tagline: "Amortiguación suave Cloudfoam con acentos vibrantes verde neón para alto rendimiento.",
+    description: "Cuello acolchado de espuma, soporte exterior en el talón de TPU y entresuela gruesa Cloudfoam para absorber impactos repetitivos.",
+    image: "assets/images/adidas_response2_neon.jpg",
+    colorways: [
+      { name: "Grey / Neon Green Spark", image: "assets/images/adidas_response2_neon.jpg", sku: "ADI-RESP-NEON" }
+    ],
+    wholesalePrice: 125000,
+    suggestedRetailPrice: 200000,
+    sizes: [38, 39, 40, 41, 42, 43],
+    supplierId: "sup-001",
+    supplierName: "Vanessa Castellar Shoes (Bodega Central)",
+    createdAt: "2026-09-01"
+  },
+
+  // 12. Skechers Trail Explorer All-Terrain (Ref 8088)
+  {
+    id: "prod-snk-012",
+    sku: "SKC-TRL-8088",
+    name: "Skechers Trail Explorer All-Terrain (Ref 8088)",
+    category: "Running & Tech",
+    tagline: "Diseñado para caminatas, cerros de Cali (Tres Cruces / Cristo Rey) y asfalto rudo.",
+    description: "Suela con tacos multidireccionales de tracción agresiva, plantilla Memory Foam refrigerada por aire y capellada hidrófuga reforzada.",
+    image: "assets/images/skechers_trail_8088.jpg",
+    colorways: [
+      { name: "Charcoal Trail Rugged", image: "assets/images/skechers_trail_8088.jpg", sku: "SKC-TRL-8088" }
+    ],
+    wholesalePrice: 125000,
+    suggestedRetailPrice: 200000,
+    sizes: [38, 39, 40, 41, 42, 43, 44],
+    supplierId: "sup-001",
+    supplierName: "Vanessa Castellar Shoes (Bodega Central)",
+    createdAt: "2026-09-01"
+  },
+
+  // 13. Le Coq Sportif Omega Urban Pink
+  {
+    id: "prod-snk-013",
+    sku: "LCS-URB-PNK",
+    name: "Le Coq Sportif Omega Urban Pink",
+    category: "Skate & Casual",
+    tagline: "Elegancia francesa en gamuza suave color rosa pastel con suela de goma vintage.",
+    description: "Perfil bajo clásico confeccionado en gamuza aterciopelada y nylon transpirable con el emblemático logo del gallo bordado al tono.",
+    image: "assets/images/lecoq_runner_pink.jpg",
+    colorways: [
+      { name: "Rose Pastel Vintage", image: "assets/images/lecoq_runner_pink.jpg", sku: "LCS-URB-PNK" }
+    ],
+    wholesalePrice: 110000,
+    suggestedRetailPrice: 180000,
+    sizes: [35, 36, 37, 38, 39],
+    supplierId: "sup-001",
+    supplierName: "Vanessa Castellar Shoes (Bodega Central)",
+    createdAt: "2026-09-01"
+  },
+
+  // 14. LV Trainer Maxi Black Diamond Edition
+  {
+    id: "prod-snk-014",
+    sku: "LV-TRN-MAXIBLK",
+    name: "LV Trainer Maxi Black Diamond Edition",
+    category: "Chunky & Moda",
+    tagline: "Inspirada en el básquetbol vintage con cordones gruesos maxi y motivos Monogram.",
+    description: "Cuero de becerro grabado de alto gramaje con flores Monogram en la suela y lateral. Cordones anchos acolchados de impacto visual extremo.",
+    image: "assets/images/lv_trainer_maxi_black.jpg",
+    colorways: [
+      { name: "Black Monogram Luxury", image: "assets/images/lv_trainer_maxi_black.jpg", sku: "LV-TRN-MAXIBLK" }
+    ],
+    wholesalePrice: 185000,
+    suggestedRetailPrice: 320000,
+    sizes: [39, 40, 41, 42, 43],
+    supplierId: "sup-001",
+    supplierName: "Vanessa Castellar Shoes (Bodega Central)",
+    createdAt: "2026-09-01"
+  },
+
+  // 15. New Balance 9060 Triple Black (Ref 7128A)
+  {
+    id: "prod-snk-015",
+    sku: "NB-9060-7128A",
+    name: "New Balance 9060 Triple Black (Ref 7128A)",
+    category: "Chunky & Moda",
+    tagline: "La silueta chunky más viral con diseño futurista de la serie 99X y amortiguación ABZORB.",
+    description: "Líneas onduladas y proporciones exageradas en la entresuela esculpida. Detalles reflectivos sutiles, amortiguación ABZORB y SBS, con logo 'N' lateral bordado.",
+    image: "assets/images/nb_9060_triple_black.jpg",
+    colorways: [
+      { name: "Phantom Black", image: "assets/images/nb_9060_triple_black.jpg", sku: "NB-9060-7128A" }
+    ],
+    wholesalePrice: 155000,
+    suggestedRetailPrice: 250000,
+    sizes: [38, 39, 40, 41, 42, 43],
+    supplierId: "sup-001",
+    supplierName: "Vanessa Castellar Shoes (Bodega Central)",
+    createdAt: "2026-09-01"
+  },
+
+  // 16. Hugo Boss Titanium Runner (Ref D5 2867)
+  {
+    id: "prod-snk-016",
+    sku: "BOSS-TITAN-D5",
+    name: "Hugo Boss Titanium Runner (Ref D5 2867)",
+    category: "Chunky & Moda",
+    tagline: "Sneaker casual de lujo europeo en malla técnica transpirable con suela geométrica.",
+    description: "Combinación de neopreno elástico, malla deportiva de alta densidad y termoformados sintéticos con branding 'BOSS' en relieve lateral dorado.",
+    image: "assets/images/boss_titanium_runner.jpg",
+    colorways: [
+      { name: "Black Gold Edition", image: "assets/images/boss_titanium_runner.jpg", sku: "BOSS-TITAN-D5" }
+    ],
+    wholesalePrice: 160000,
+    suggestedRetailPrice: 260000,
+    sizes: [39, 40, 41, 42, 43],
+    supplierId: "sup-001",
+    supplierName: "Vanessa Castellar Shoes (Bodega Central)",
+    createdAt: "2026-09-01"
+  },
+
+  // 17. On Cloudmonster Swiss Engineering (Mint)
+  {
+    id: "prod-snk-017",
+    sku: "ON-MONSTER-MNT",
+    name: "On Cloudmonster Swiss Engineering (Mint)",
+    category: "Running & Tech",
+    tagline: "Máxima amortiguación CloudTec® en combinación de blanco puro con detalles verde menta.",
+    description: "Superespuma Helion™ y placa Speedboard® de propulsión rápida. Capellada ligera en poliéster reciclado con detalles reflectivos.",
+    image: "assets/images/on_cloudmonster_mint.jpg",
+    colorways: [
+      { name: "Mint Lime Accent", image: "assets/images/on_cloudmonster_mint.jpg", sku: "ON-MONSTER-MNT" }
+    ],
+    wholesalePrice: 145000,
+    suggestedRetailPrice: 235000,
+    sizes: [38, 39, 40, 41, 42, 43],
+    supplierId: "sup-001",
+    supplierName: "Vanessa Castellar Shoes (Bodega Central)",
+    createdAt: "2026-09-01"
+  },
+
+  // 18. Adidas Superstar XLG Chunky Platform
+  {
+    id: "prod-snk-018",
+    sku: "ADI-SST-XLG",
+    name: "Adidas Superstar XLG Chunky Platform",
+    category: "Chunky & Moda",
+    tagline: "Proporciones aumentadas con entresuela de plataforma y la icónica puntera concha de caucho.",
+    description: "Cuero suave blanco con 3 rayas negras dentadas sobredimensionadas, lengüeta acolchada con acolchado EVA y forro textil suave.",
+    image: "assets/images/adidas_superstar_xlg.jpg",
+    colorways: [
+      { name: "White Black XLG", image: "assets/images/adidas_superstar_xlg.jpg", sku: "ADI-SST-XLG" }
+    ],
+    wholesalePrice: 135000,
+    suggestedRetailPrice: 220000,
+    sizes: [36, 37, 38, 39, 40, 41, 42],
+    supplierId: "sup-001",
+    supplierName: "Vanessa Castellar Shoes (Bodega Central)",
     createdAt: "2026-09-01"
   }
 ];
 
-// Tiendas / Boutiques de la Red LUXBAGS MLS
 const INITIAL_STORES = [
   {
     id: "store-001",
-    name: "LUXBAGS Colombia",
-    tagline: "Bodega Mayorista Matriz | Bolsos, Carteras y Accesorios Importados con Envíos Contraentrega a Toda Colombia.",
-    phone: "573155551234",
-    neighborhood: "Bodega Central Mayorista · Despachos Nacionales",
+    name: "Vanessa Castellar Shoes",
+    tagline: "San Andresito de la 38, Cali — Calzado Urbano y Deportivo al por Mayor y Detal con Envíos a Toda Colombia.",
+    phone: "573505337256", // Línea Principal de Vanessa
+    whatsappLines: VANESSA_WHATSAPP_LINES,
+    neighborhood: "San Andresito de la 38, Cali (Bodega Central)",
     isSupplierStore: true,
+    themeColor: "#e6192e", // Rojo Torino Oficial
     products: [
-      { productId: "prod-lux-001", customPrice: 125000, active: true },
-      { productId: "prod-lux-002", customPrice: 135000, active: true },
-      { productId: "prod-lux-003", customPrice: 145000, active: true },
-      { productId: "prod-lux-004", customPrice: 145000, active: true },
-      { productId: "prod-lux-005", customPrice: 120000, active: true },
-      { productId: "prod-lux-006", customPrice: 79000, active: true },
-      { productId: "prod-lux-007", customPrice: 79000, active: true },
-      { productId: "prod-lux-008", customPrice: 89000, active: true }
+      { productId: "prod-snk-001", customPrice: 185000, active: true, availableSizes: [35, 36, 37, 38, 39, 40] },
+      { productId: "prod-snk-002", customPrice: 200000, active: true, availableSizes: [38, 39, 40, 41, 42, 43] },
+      { productId: "prod-snk-003", customPrice: 220000, active: true, availableSizes: [36, 37, 38, 39, 40, 41, 42, 43] },
+      { productId: "prod-snk-004", customPrice: 235000, active: true, availableSizes: [38, 39, 40, 41, 42, 43, 44] },
+      { productId: "prod-snk-005", customPrice: 250000, active: true, availableSizes: [38, 39, 40, 41, 42, 43] },
+      { productId: "prod-snk-006", customPrice: 230000, active: true, availableSizes: [36, 37, 38, 39, 40, 41] },
+      { productId: "prod-snk-007", customPrice: 215000, active: true, availableSizes: [37, 38, 39, 40, 41, 42, 43] },
+      { productId: "prod-snk-008", customPrice: 195000, active: true, availableSizes: [35, 36, 37, 38, 39] },
+      { productId: "prod-snk-009", customPrice: 210000, active: true, availableSizes: [36, 37, 38, 39, 40, 41, 42, 43] },
+      { productId: "prod-snk-010", customPrice: 195000, active: true, availableSizes: [38, 39, 40, 41, 42, 43] },
+      { productId: "prod-snk-011", customPrice: 200000, active: true, availableSizes: [38, 39, 40, 41, 42, 43] },
+      { productId: "prod-snk-012", customPrice: 200000, active: true, availableSizes: [38, 39, 40, 41, 42, 43, 44] },
+      { productId: "prod-snk-013", customPrice: 180000, active: true, availableSizes: [35, 36, 37, 38, 39] },
+      { productId: "prod-snk-014", customPrice: 320000, active: true, availableSizes: [39, 40, 41, 42, 43] },
+      { productId: "prod-snk-015", customPrice: 250000, active: true, availableSizes: [38, 39, 40, 41, 42, 43] },
+      { productId: "prod-snk-016", customPrice: 260000, active: true, availableSizes: [39, 40, 41, 42, 43] },
+      { productId: "prod-snk-017", customPrice: 235000, active: true, availableSizes: [38, 39, 40, 41, 42, 43] },
+      { productId: "prod-snk-018", customPrice: 220000, active: true, availableSizes: [36, 37, 38, 39, 40, 41, 42] }
     ]
   },
   {
     id: "store-002",
-    name: "Boutique Sofía Lux (Cali)",
-    tagline: "Boutique de Bolsos, Carteras de Fiesta y Accesorios Exclusivos con Entregas el Mismo Día en Cali.",
-    phone: "573165552345",
-    neighborhood: "Granada / Ciudad Jardín, Cali",
+    name: "Sneakers Ciudad Jardín",
+    tagline: "Boutique especializada en calzado importado exclusivo en el Sur de Cali.",
+    phone: "573154443322",
+    neighborhood: "Ciudad Jardín / Valle del Lili, Cali",
     isSupplierStore: false,
+    themeColor: "#e6192e",
     products: [
-      { productId: "prod-lux-001", customPrice: 129000, active: true },
-      { productId: "prod-lux-002", customPrice: 139000, active: true },
-      { productId: "prod-lux-003", customPrice: 149000, active: true },
-      { productId: "prod-lux-004", customPrice: 149000, active: true },
-      { productId: "prod-lux-005", customPrice: 125000, active: true },
-      { productId: "prod-lux-006", customPrice: 82000, active: true },
-      { productId: "prod-lux-007", customPrice: 82000, active: true },
-      { productId: "prod-lux-008", customPrice: 92000, active: true }
+      { productId: "prod-snk-005", customPrice: 265000, active: true, availableSizes: [39, 40, 41, 42] },
+      { productId: "prod-snk-004", customPrice: 245000, active: true, availableSizes: [39, 40, 41, 42, 43] },
+      { productId: "prod-snk-015", customPrice: 260000, active: true, availableSizes: [39, 40, 41, 42] },
+      { productId: "prod-snk-014", customPrice: 340000, active: true, availableSizes: [40, 41, 42, 43] },
+      { productId: "prod-snk-016", customPrice: 275000, active: true, availableSizes: [39, 40, 41, 42] },
+      { productId: "prod-snk-009", customPrice: 225000, active: true, availableSizes: [37, 38, 39, 40, 41] }
     ]
   },
   {
     id: "store-003",
-    name: "Milán Handbags (Medellín)",
-    tagline: "Tendencias en Bolsos Importados, Totes y Billeteras con Domicilio Hoy en Medellín y Área Metropolitana.",
-    phone: "573175553456",
-    neighborhood: "El Poblado / Laureles, Medellín",
+    name: "Zapatillas Aguablanca VIP",
+    tagline: "Precios directos de bodega con domicilio inmediato en todo el Oriente y Norte de Cali.",
+    phone: "573187776655",
+    neighborhood: "Aguablanca / Mariano Ramos, Cali",
     isSupplierStore: false,
+    themeColor: "#e6192e",
     products: [
-      { productId: "prod-lux-001", customPrice: 125000, active: true },
-      { productId: "prod-lux-003", customPrice: 145000, active: true },
-      { productId: "prod-lux-005", customPrice: 120000, active: true },
-      { productId: "prod-lux-006", customPrice: 79000, active: true },
-      { productId: "prod-lux-008", customPrice: 89000, active: true }
-    ]
-  },
-  {
-    id: "store-004",
-    name: "Trendy Bags Colombia (Bogotá / TikTok)",
-    tagline: "Los bolsos y carteras más virales de TikTok e Instagram con Pago Contraentrega Garantizado en Bogotá.",
-    phone: "573185554567",
-    neighborhood: "Bogotá D.C. & Envíos Nacionales",
-    isSupplierStore: false,
-    products: [
-      { productId: "prod-lux-001", customPrice: 130000, active: true },
-      { productId: "prod-lux-002", customPrice: 140000, active: true },
-      { productId: "prod-lux-004", customPrice: 150000, active: true },
-      { productId: "prod-lux-006", customPrice: 85000, active: true },
-      { productId: "prod-lux-007", customPrice: 85000, active: true }
+      { productId: "prod-snk-001", customPrice: 175000, active: true, availableSizes: [35, 36, 37, 38, 39] },
+      { productId: "prod-snk-007", customPrice: 205000, active: true, availableSizes: [38, 39, 40, 41, 42] },
+      { productId: "prod-snk-003", customPrice: 210000, active: true, availableSizes: [37, 38, 39, 40, 41] },
+      { productId: "prod-snk-008", customPrice: 185000, active: true, availableSizes: [35, 36, 37, 38] },
+      { productId: "prod-snk-012", customPrice: 190000, active: true, availableSizes: [38, 39, 40, 41, 42, 43] },
+      { productId: "prod-snk-002", customPrice: 180000, active: true, availableSizes: [38, 39, 40, 41, 42] }
     ]
   }
 ];
 
-// Zonas y Tarifas de Despacho en Colombia
-const COLOMBIAN_SHIPPING_ZONES = [
-  { zone: "Cali", name: "Cali Urbano (Norte / Sur / Centro / Oeste)", fee: 12000, time: "Mismo Día (2-4 Horas)" },
-  { zone: "Cali", name: "Jamundí / Yumbo / Palmira", fee: 16000, time: "Mismo Día / 24h" },
-  { zone: "Medellín", name: "Medellín Urbano (Poblado / Laureles / Envigado / Sabaneta)", fee: 14000, time: "Mismo Día / 24h" },
-  { zone: "Bogotá", name: "Bogotá D.C. (Urbano)", fee: 14000, time: "24-48 Horas" },
-  { zone: "Barranquilla", name: "Barranquilla / Soledad", fee: 16000, time: "24-48 Horas" },
-  { zone: "Bucaramanga", name: "Bucaramanga / Floridablanca", fee: 15000, time: "24-48 Horas" },
-  { zone: "Eje Cafetero", name: "Pereira / Manizales / Armenia", fee: 15000, time: "24-48 Horas" },
-  { zone: "Nacional", name: "Otras Ciudades y Municipios de Colombia", fee: 18000, time: "2-3 Días Hábiles" }
+const CALI_NEIGHBORHOODS = [
+  { zone: "Cali Sur (Comunas 17, 19, 22)", name: "El Ingenio / Comuna 17", fee: 12000, time: "Hoy en la tarde" },
+  { zone: "Cali Sur (Comunas 17, 19, 22)", name: "Ciudad Jardín / Comuna 22", fee: 12000, time: "Hoy en la tarde" },
+  { zone: "Cali Sur (Comunas 17, 19, 22)", name: "Valle del Lili / Bochalema", fee: 12000, time: "Hoy en la tarde" },
+  { zone: "Cali Sur (Comunas 17, 19, 22)", name: "Limonar / Capri / Comuna 19", fee: 10000, time: "Hoy en la tarde" },
+  { zone: "Cali Norte (Comunas 2, 4)", name: "Granada / Versalles / Comuna 2", fee: 10000, time: "Hoy en la tarde" },
+  { zone: "Cali Norte (Comunas 2, 4)", name: "Chipichape / La Flora / Menga", fee: 12000, time: "Hoy en la tarde" },
+  { zone: "Cali Centro & Oeste (Comunas 1, 3, 9)", name: "San Antonio / El Peñón / Comuna 3", fee: 9000, time: "Inmediato (Cerca a Bodega)" },
+  { zone: "Cali Centro & Oeste (Comunas 1, 3, 9)", name: "San Fernando / Alameda", fee: 9000, time: "Inmediato (Cerca a Bodega)" },
+  { zone: "Cali Oriente (Comunas 13, 14, 15, 16)", name: "Aguablanca / Mariano Ramos", fee: 14000, time: "Ruta AM / PM" },
+  { zone: "Cali Oriente (Comunas 13, 14, 15, 16)", name: "Ciudad Córdoba / Antonio Nariño", fee: 13000, time: "Ruta AM / PM" },
+  { zone: "Área Metropolitana", name: "Yumbo (Centro / Acopi)", fee: 15000, time: "24 Horas" },
+  { zone: "Área Metropolitana", name: "Jamundí (Alfaguara / Urbano)", fee: 16000, time: "24 Horas" },
+  { zone: "Área Metropolitana", name: "Palmira Urbano", fee: 18000, time: "24 Horas" }
 ];
 
 const INITIAL_ORDERS = [
   {
-    id: "ord-9921",
-    date: "2026-09-01 11:20",
-    storeName: "Boutique Sofía Lux (Cali)",
-    productName: "Bolso Tote Mini Horse Charm 'Colección Amor y Amistad'",
-    colorway: "Bicolor Crema / Negro",
-    type: "B2B Restock (Reposición)",
-    units: 6,
-    totalWholesale: 408000,
-    status: "En Alistamiento",
-    supplierName: "LUXBAGS Colombia (Bodega Matriz)"
-  },
-  {
-    id: "ord-9920",
-    date: "2026-09-01 09:45",
-    storeName: "Trendy Bags Colombia",
-    productName: "Bolso Satchel Estructurado Padlock 'Milano Chic'",
-    colorway: "Verde Oliva",
+    id: "ord-8812",
+    date: "2026-09-01 10:24",
+    storeName: "Sneakers Ciudad Jardín",
+    productName: "Air Jordan 4 Retro 'Military Black'",
+    size: 41,
+    colorway: "Military Black Clásico",
     type: "B2B Restock (Reposición)",
     units: 4,
-    totalWholesale: 312000,
-    status: "Despachado en Coordinadora",
-    supplierName: "LUXBAGS Colombia (Bodega Matriz)"
+    totalWholesale: 620000,
+    status: "En Preparación",
+    supplierName: "Vanessa Castellar Shoes (Bodega Central)"
   },
   {
-    id: "ord-9919",
-    date: "2026-08-31 16:30",
-    storeName: "Milán Handbags (Medellín)",
-    productName: "Billetera Compacta GUESS Scarlet Red",
-    colorway: "Scarlet Red",
+    id: "ord-8811",
+    date: "2026-09-01 09:45",
+    storeName: "Zapatillas Aguablanca VIP",
+    productName: "Nike Initiator Retro Runner Dama",
+    size: 37,
+    colorway: "Baby Blue Pastel",
     type: "B2B Restock (Reposición)",
-    units: 10,
-    totalWholesale: 420000,
-    status: "Entregado",
-    supplierName: "LUXBAGS Colombia (Bodega Matriz)"
+    units: 6,
+    totalWholesale: 690000,
+    status: "Despachado en Moto",
+    supplierName: "Vanessa Castellar Shoes (Bodega Central)"
   }
 ];
