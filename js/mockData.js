@@ -244,33 +244,22 @@ const INITIAL_MASTER_PRODUCTS = [
   }
 ];
 
-// Tiendas / Boutiques de la Red BAGS WORLD MLS
+// =========================================================================
+// ESCENARIOS DEMO OFICIALES (EXACTAMENTE LOS 2 CLIENTES + PROVEEDOR SAAS)
+// =========================================================================
 const INITIAL_STORES = [
+  // ESCENARIO 1: BolsosCOL (Cliente Clave para Cierre)
   {
-    id: "store-001",
-    name: "BAGS WORLD Colombia",
-    tagline: "Bodega Mayorista Matriz | Bolsos, Carteras y Accesorios Importados con Envíos Contraentrega a Toda Colombia.",
-    phone: "573155551234",
-    neighborhood: "Bodega Central Mayorista · Despachos Nacionales",
-    isSupplierStore: true,
-    products: [
-      { productId: "prod-lux-001", customPrice: 125000, active: true },
-      { productId: "prod-lux-002", customPrice: 135000, active: true },
-      { productId: "prod-lux-003", customPrice: 145000, active: true },
-      { productId: "prod-lux-004", customPrice: 145000, active: true },
-      { productId: "prod-lux-005", customPrice: 120000, active: true },
-      { productId: "prod-lux-006", customPrice: 79000, active: true },
-      { productId: "prod-lux-007", customPrice: 79000, active: true },
-      { productId: "prod-lux-008", customPrice: 89000, active: true }
-    ]
-  },
-  {
-    id: "store-002",
-    name: "Boutique Sofía Lux (Cali)",
-    tagline: "Boutique de Bolsos, Carteras de Fiesta y Accesorios Exclusivos con Entregas el Mismo Día en Cali.",
-    phone: "573165552345",
-    neighborhood: "Granada / Ciudad Jardín, Cali",
+    id: "store-bolsoscol",
+    name: "BolsosCOL",
+    email: "contacto@bolsoscol.com",
+    password: "BolsosCOL2026*",
+    role: "store_owner",
+    tagline: "Boutique de Bolsos y Carteras de Alta Gama | Envíos Express y Contraentrega a Toda Colombia.",
+    phone: "573165558899",
+    neighborhood: "Bogotá D.C. & Cobertura Nacional",
     isSupplierStore: false,
+    verifiedBadge: "CLIENTE VIP",
     products: [
       { productId: "prod-lux-001", customPrice: 129000, active: true },
       { productId: "prod-lux-002", customPrice: 139000, active: true },
@@ -282,44 +271,62 @@ const INITIAL_STORES = [
       { productId: "prod-lux-008", customPrice: 92000, active: true }
     ]
   },
+
+  // ESCENARIO 2: Calibolsos2026 (Boutique de Alto Rendimiento en Cali)
   {
-    id: "store-003",
-    name: "Milán Handbags (Medellín)",
-    tagline: "Tendencias en Bolsos Importados, Totes y Billeteras con Domicilio Hoy en Medellín y Área Metropolitana.",
-    phone: "573175553456",
-    neighborhood: "El Poblado / Laureles, Medellín",
+    id: "store-calibolsos",
+    name: "Calibolsos 2026",
+    email: "ventas@calibolsos.com",
+    password: "Cali2026*",
+    role: "store_owner",
+    tagline: "Moda en Carteras, Totes y Billeteras con Entrega el Mismo Día en Cali y Valle del Cauca.",
+    phone: "573187774433",
+    neighborhood: "Granada / Ciudad Jardín, Cali",
     isSupplierStore: false,
+    verifiedBadge: "BOUTIQUE OFICIAL",
     products: [
       { productId: "prod-lux-001", customPrice: 125000, active: true },
+      { productId: "prod-lux-002", customPrice: 135000, active: true },
       { productId: "prod-lux-003", customPrice: 145000, active: true },
+      { productId: "prod-lux-004", customPrice: 145000, active: true },
       { productId: "prod-lux-005", customPrice: 120000, active: true },
       { productId: "prod-lux-006", customPrice: 79000, active: true },
+      { productId: "prod-lux-007", customPrice: 79000, active: true },
       { productId: "prod-lux-008", customPrice: 89000, active: true }
     ]
   },
+
+  // ESCENARIO MATRIZ: Dueño del SaaS / Bodega Central BAGS WORLD
   {
-    id: "store-004",
-    name: "Trendy Bags Colombia (Bogotá / TikTok)",
-    tagline: "Los bolsos y carteras más virales de TikTok e Instagram con Pago Contraentrega Garantizado en Bogotá.",
-    phone: "573185554567",
-    neighborhood: "Bogotá D.C. & Envíos Nacionales",
-    isSupplierStore: false,
+    id: "store-bagsworld-admin",
+    name: "BAGS WORLD Colombia (Bodega Central)",
+    email: "admin@bagsworld.com",
+    password: "BastionSaaS2026*",
+    role: "super_admin",
+    tagline: "Bodega Mayorista Matriz | Centro de Despachos Nacionales y Administración de la Red MLS.",
+    phone: "573155551234",
+    neighborhood: "Bodega Central Mayorista · Despachos Nacionales",
+    isSupplierStore: true,
+    verifiedBadge: "BODEGA MATRIZ VERIFICADA",
     products: [
-      { productId: "prod-lux-001", customPrice: 130000, active: true },
-      { productId: "prod-lux-002", customPrice: 140000, active: true },
-      { productId: "prod-lux-004", customPrice: 150000, active: true },
-      { productId: "prod-lux-006", customPrice: 85000, active: true },
-      { productId: "prod-lux-007", customPrice: 85000, active: true }
+      { productId: "prod-lux-001", customPrice: 125000, active: true },
+      { productId: "prod-lux-002", customPrice: 135000, active: true },
+      { productId: "prod-lux-003", customPrice: 145000, active: true },
+      { productId: "prod-lux-004", customPrice: 145000, active: true },
+      { productId: "prod-lux-005", customPrice: 120000, active: true },
+      { productId: "prod-lux-006", customPrice: 79000, active: true },
+      { productId: "prod-lux-007", customPrice: 79000, active: true },
+      { productId: "prod-lux-008", customPrice: 89000, active: true }
     ]
   }
 ];
 
 // Zonas y Tarifas de Despacho en Colombia
 const COLOMBIAN_SHIPPING_ZONES = [
-  { zone: "Cali", name: "Cali Urbano (Norte / Sur / Centro / Oeste)", fee: 12000, time: "Mismo Día (2-4 Horas)" },
-  { zone: "Cali", name: "Jamundí / Yumbo / Palmira", fee: 16000, time: "Mismo Día / 24h" },
-  { zone: "Medellín", name: "Medellín Urbano (Poblado / Laureles / Envigado / Sabaneta)", fee: 14000, time: "Mismo Día / 24h" },
-  { zone: "Bogotá", name: "Bogotá D.C. (Urbano)", fee: 14000, time: "24-48 Horas" },
+  { zone: "Bogotá", name: "Bogotá D.C. (Urbano & Alrededores)", fee: 14000, time: "24-48 Horas" },
+  { zone: "Cali", name: "Cali Urbano (Norte / Sur / Oeste)", fee: 12000, time: "Mismo Día (2-4 Horas)" },
+  { zone: "Cali", name: "Jamundí / Palmira / Yumbo", fee: 16000, time: "Mismo Día / 24h" },
+  { zone: "Medellín", name: "Medellín Urbano (Poblado / Laureles / Envigado)", fee: 14000, time: "Mismo Día / 24h" },
   { zone: "Barranquilla", name: "Barranquilla / Soledad", fee: 16000, time: "24-48 Horas" },
   { zone: "Bucaramanga", name: "Bucaramanga / Floridablanca", fee: 15000, time: "24-48 Horas" },
   { zone: "Eje Cafetero", name: "Pereira / Manizales / Armenia", fee: 15000, time: "24-48 Horas" },
@@ -330,7 +337,7 @@ const INITIAL_ORDERS = [
   {
     id: "ord-9921",
     date: "2026-09-01 11:20",
-    storeName: "Boutique Sofía Lux (Cali)",
+    storeName: "BolsosCOL",
     productName: "Bolso Tote Mini Horse Charm 'Colección Amor y Amistad'",
     colorway: "Bicolor Crema / Negro",
     type: "B2B Restock (Reposición)",
@@ -342,25 +349,13 @@ const INITIAL_ORDERS = [
   {
     id: "ord-9920",
     date: "2026-09-01 09:45",
-    storeName: "Trendy Bags Colombia",
+    storeName: "Calibolsos 2026",
     productName: "Bolso Satchel Estructurado Padlock 'Milano Chic'",
     colorway: "Verde Oliva",
     type: "B2B Restock (Reposición)",
     units: 4,
     totalWholesale: 312000,
     status: "Despachado en Coordinadora",
-    supplierName: "BAGS WORLD Colombia (Bodega Matriz)"
-  },
-  {
-    id: "ord-9919",
-    date: "2026-08-31 16:30",
-    storeName: "Milán Handbags (Medellín)",
-    productName: "Billetera Compacta GUESS Scarlet Red",
-    colorway: "Scarlet Red",
-    type: "B2B Restock (Reposición)",
-    units: 10,
-    totalWholesale: 420000,
-    status: "Entregado",
     supplierName: "BAGS WORLD Colombia (Bodega Matriz)"
   }
 ];

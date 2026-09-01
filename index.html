@@ -7,7 +7,7 @@
   <!-- Primary SEO -->
   <title>BAGS WORLD MLS | Bolsa Mayorista de Bolsos & Carteras Colombia</title>
   <meta name="description" content="Plataforma SaaS BAGS WORLD MLS de bolsos y carteras importadas en Colombia. Catálogo maestro compartido de bodegas, vitrinas personalizadas con selector de colores, fletes liquidados y pedidos consolidados a WhatsApp.">
-  <meta name="keywords" content="bolsos al por mayor colombia, bags world, carteras cali mayoristas, bolsos importados medellin, carteras bogota, dropshipping bolsos, bastion ai">
+  <meta name="keywords" content="bolsos al por mayor colombia, bags world, bolsoscol, calibolsos2026, carteras cali mayoristas, bolsos importados medellin, carteras bogota, dropshipping bolsos, bastion ai">
   <meta name="author" content="BASTION AI">
   <meta name="theme-color" content="#06070a">
 
@@ -48,7 +48,7 @@
 
   <div class="app-wrapper">
     <!-- =========================================================================
-         HUD SUPERIOR DE CONTROL MULTI-ROL (SAAS DEMO & STORE SWITCHER)
+         HUD SUPERIOR DE CONTROL MULTI-ROL & AUTH (CRM BASTION / CRM GHOST STYLE)
          ========================================================================= -->
     <header class="top-demo-hud">
       <div class="hud-container">
@@ -76,10 +76,17 @@
           </button>
         </nav>
 
-        <!-- Selector de Vitrina Activa en Modo Demostración -->
+        <!-- Acciones de Cuenta & Sesión -->
         <div class="hud-actions">
+          <!-- Botón de Login / Sesión Activa -->
+          <button id="btn-open-auth-modal" class="auth-session-btn" title="Iniciar sesión o cambiar cuenta">
+            <span class="auth-icon-badge">🔐</span>
+            <span id="hud-user-name">BolsosCOL</span>
+            <span class="auth-role-pill" id="hud-user-role">VIP</span>
+          </button>
+
+          <!-- Selector de Vitrina Activa en Modo Demostración -->
           <div class="store-selector-wrapper" id="store-selector-box">
-            <span style="font-size: 11px; color: var(--text-muted);">Vitrina:</span>
             <select id="hud-store-select" class="hud-select" aria-label="Seleccionar Tienda Activa">
               <!-- Renderizado dinámico de tiendas -->
             </select>
@@ -101,10 +108,10 @@
               <img src="assets/images/bags_world_logo_transparent.png" alt="Logo Tienda" style="width: 100%; height: 100%; object-fit: contain; padding: 2px;">
             </div>
             <div class="store-meta">
-              <h1 id="storefront-name">BAGS WORLD Colombia <span class="badge-verified" id="storefront-badge">BODEGA MATRIZ VERIFICADA</span></h1>
-              <p id="storefront-tagline">Bodega Mayorista Matriz | Bolsos, Carteras y Accesorios Importados con Envíos Contraentrega a Toda Colombia.</p>
+              <h1 id="storefront-name">BolsosCOL <span class="badge-verified" id="storefront-badge">CLIENTE VIP</span></h1>
+              <p id="storefront-tagline">Boutique de Bolsos y Carteras de Alta Gama | Envíos Express y Contraentrega a Toda Colombia.</p>
               <div class="store-location-badge">
-                📍 <span id="storefront-location">Bodega Central Mayorista · Despachos Nacionales</span>
+                📍 <span id="storefront-location">Bogotá D.C. & Cobertura Nacional</span>
               </div>
             </div>
           </div>
@@ -208,13 +215,14 @@
               <span class="category-tag">🏪 Portal de Mi Boutique</span>
               <span style="font-size: 11px; color: var(--text-muted);">Sincronizado con Bodega Central BAGS WORLD</span>
             </div>
-            <h1 class="admin-heading-title" id="admin-store-title">Panel de Control de Boutique</h1>
+            <h1 class="admin-heading-title" id="admin-store-title">Panel de Control: BolsosCOL</h1>
             <p style="font-size: 13px; color: var(--text-secondary);">
-              Personaliza tus precios de venta al público (PVP), activa referencias en tu vitrina y genera reposiciones automáticas a bodega.
+              Personaliza tus precios de venta al público (PVP), activa referencias en tu vitrina y mantén tu información 100% protegida.
             </p>
           </div>
           <div style="display: flex; gap: 10px; flex-wrap: wrap;">
             <button class="btn-secondary" id="btn-open-store-settings">⚙️ Configurar Boutique</button>
+            <button class="btn-secondary" id="btn-export-store-backup" style="border-color: rgba(56, 189, 248, 0.4); color: var(--accent-blue);">💾 Respaldar Data Privada</button>
           </div>
         </div>
 
@@ -241,6 +249,20 @@
               <div class="stat-label">Línea WhatsApp de Ventas</div>
             </div>
           </div>
+        </div>
+
+        <!-- Banner de Privacidad y Respaldo del Cliente -->
+        <div style="background: linear-gradient(135deg, rgba(56, 189, 248, 0.08) 0%, rgba(14, 17, 23, 0.95) 100%); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: var(--radius-md); padding: 14px 18px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="font-size: 24px;">🛡️</span>
+            <div>
+              <div style="font-size: 13px; font-weight: 800; color: #fff;">Tu información y catálogo están protegidos</div>
+              <div style="font-size: 11px; color: var(--text-secondary);">Puedes modificar tus credenciales o descargar un respaldo en cualquier momento. Si olvidas tu clave, el soporte maestro SaaS puede restaurarla.</div>
+            </div>
+          </div>
+          <button class="btn-action-sm" id="btn-open-privacy-modal" style="background: rgba(56, 189, 248, 0.15); color: var(--accent-blue); border-color: rgba(56, 189, 248, 0.4); font-weight: 700;">
+            🔒 Modificar Correo / Clave
+          </button>
         </div>
 
         <!-- Tabla de Gestión de Inventario para la Tienda -->
@@ -281,16 +303,17 @@
         <div class="admin-top-bar">
           <div>
             <div style="display: flex; align-items: center; gap: 8px;">
-              <span class="category-tag" style="background: rgba(227, 194, 116, 0.15); color: var(--primary-gold); border-color: rgba(227, 194, 116, 0.35);">👑 Bodega Mayorista Matriz</span>
-              <span style="font-size: 11px; color: var(--text-muted);">BAGS WORLD Colombia · Despachos Nacionales</span>
+              <span class="category-tag" style="background: rgba(227, 194, 116, 0.15); color: var(--primary-gold); border-color: rgba(227, 194, 116, 0.35);">👑 Dueño del SaaS & Bodega Central</span>
+              <span style="font-size: 11px; color: var(--text-muted);">BAGS WORLD Colombia · Control Maestro de Red</span>
             </div>
-            <h1 class="admin-heading-title">BAGS WORLD Colombia — Portal Bodega</h1>
+            <h1 class="admin-heading-title">BAGS WORLD Colombia — SuperAdmin SaaS</h1>
             <p style="font-size: 13px; color: var(--text-secondary);">
-              Carga nuevas referencias de bolsos importados, importa mensajes de WhatsApp y gestiona las órdenes B2B de las boutiques.
+              Supervisa las boutiques conectadas (BolsosCOL & Calibolsos2026), asístelas si olvidan sus claves, gestiona el catálogo y realiza backups maestros.
             </p>
           </div>
           <div style="display: flex; gap: 10px; flex-wrap: wrap;">
             <button class="btn-primary" id="btn-open-new-product-modal">➕ Cargar Nueva Referencia</button>
+            <button class="btn-secondary" id="btn-export-full-saas-backup" style="border-color: rgba(227, 194, 116, 0.4); color: var(--primary-gold);">📦 Exportar Master Backup SaaS</button>
           </div>
         </div>
 
@@ -306,8 +329,8 @@
           <div class="stat-card">
             <div class="stat-icon-badge" style="background: rgba(56, 189, 248, 0.15); color: var(--accent-blue);">🏪</div>
             <div>
-              <div class="stat-number" id="supplier-stat-stores">4</div>
-              <div class="stat-label">Boutiques Conectadas</div>
+              <div class="stat-number" id="supplier-stat-stores">2</div>
+              <div class="stat-label">Boutiques Clientes Activas</div>
             </div>
           </div>
           <div class="stat-card">
@@ -319,6 +342,36 @@
           </div>
         </div>
 
+        <!-- Panel de Soporte & Gestión de Clientes (Anti-Pérdida de Información) -->
+        <div class="table-container-card" style="margin-bottom: 24px; border: 1.5px solid rgba(227, 194, 116, 0.35); background: linear-gradient(180deg, rgba(227, 194, 116, 0.05) 0%, rgba(14, 17, 23, 0.95) 100%);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
+            <div>
+              <h3 style="font-size: 16px; font-weight: 800; color: var(--primary-gold); display: flex; align-items: center; gap: 8px;">
+                <span>🛡️ Centro de Control de Boutiques Clientes (CRM Ghost / Bastion)</span>
+              </h3>
+              <span style="font-size: 12px; color: var(--text-secondary);">Si el cliente olvida su clave o necesita soporte, puedes restablecerla o ingresar a su panel con 1 clic:</span>
+            </div>
+          </div>
+          
+          <div class="table-responsive-box">
+            <table class="mls-data-table">
+              <thead>
+                <tr>
+                  <th>Boutique Cliente</th>
+                  <th>Correo de Acceso</th>
+                  <th>Contraseña Actual</th>
+                  <th>WhatsApp Comercial</th>
+                  <th>Ubicación</th>
+                  <th>Acciones de Soporte</th>
+                </tr>
+              </thead>
+              <tbody id="saas-admin-clients-table">
+                <!-- Renderizado dinámico de clientes -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
         <!-- Herramienta Rápida de Importación desde WhatsApp -->
         <div class="table-container-card" style="margin-bottom: 24px; border: 1px solid rgba(37, 211, 102, 0.35); background: linear-gradient(180deg, rgba(37, 211, 102, 0.05) 0%, rgba(16, 19, 26, 0.95) 100%);">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
@@ -326,7 +379,7 @@
               <h3 style="font-size: 16px; font-weight: 800; color: #25d366; display: flex; align-items: center; gap: 8px;">
                 <span>⚡ Importador Rápido desde WhatsApp Mayoristas</span>
               </h3>
-              <span style="font-size: 12px; color: var(--text-secondary);">Pega el texto del grupo de WhatsApp (ej: BAGS WORLD MAYORISTAS #67) y se creará el bolso automáticamente:</span>
+              <span style="font-size: 12px; color: var(--text-secondary);">Pega el texto del grupo de WhatsApp y se creará el bolso automáticamente:</span>
             </div>
           </div>
           <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 14px;">
@@ -386,7 +439,7 @@ Medidas 16 alto x 20 ancho"></textarea>
             <span class="category-tag">📍 Ecosistema Mayorista BAGS WORLD</span>
             <h1 class="admin-heading-title">Red de Boutiques & Simulación de Ganancias</h1>
             <p style="font-size: 13px; color: var(--text-secondary);">
-              Descubre cómo las boutiques y revendedoras conectadas al catálogo maestro de BAGS WORLD escalan sus ingresos mensuales sin inmovilizar capital en inventario.
+              Descubre cómo <strong>BolsosCOL</strong> y <strong>Calibolsos 2026</strong> escalan sus ingresos mensuales sin inmovilizar capital en inventario.
             </p>
           </div>
         </div>
@@ -439,6 +492,117 @@ Medidas 16 alto x 20 ancho"></textarea>
         </div>
       </div>
     </main>
+  </div>
+
+  <!-- =========================================================================
+       MODAL DE AUTENTICACIÓN / LOGIN (CRM BASTION / CRM GHOST STYLE)
+       ========================================================================= -->
+  <div class="modal-backdrop" id="modal-auth-login" role="dialog" aria-modal="true">
+    <div class="modal-dialog" style="max-width: 480px;">
+      <div class="modal-header">
+        <div>
+          <span style="font-size: 11px; font-weight: 800; color: var(--primary-gold); background: rgba(227, 194, 116, 0.15); padding: 3px 8px; border-radius: var(--radius-full);">BASTION AI AUTH SYSTEM</span>
+          <h3 style="margin-top: 4px;">🔐 Iniciar Sesión / Selector de Cuenta</h3>
+        </div>
+        <button class="btn-close-modal" data-close="modal-auth-login">&times;</button>
+      </div>
+
+      <!-- Accesos Rápidos Demo de 1 Clic -->
+      <div style="margin-bottom: 20px;">
+        <label class="form-label" style="color: #fff; font-weight: 800;">⚡ Accesos Rápidos para Demostración:</label>
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
+          <!-- Opción 1: BolsosCOL -->
+          <button type="button" class="quick-auth-btn" data-auth-id="store-bolsoscol">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span class="auth-card-avatar" style="background: rgba(230, 25, 46, 0.2); color: var(--primary-red); border-color: var(--primary-red);">👜</span>
+              <div style="text-align: left;">
+                <div style="font-weight: 800; font-size: 13px; color: #fff;">BolsosCOL <span style="font-size: 10px; color: var(--primary-gold); background: rgba(227, 194, 116, 0.15); padding: 2px 6px; border-radius: 4px;">Cliente Clave</span></div>
+                <div style="font-size: 11px; color: var(--text-muted);">contacto@bolsoscol.com · Clave: BolsosCOL2026*</div>
+              </div>
+            </div>
+            <span style="font-size: 12px; color: var(--primary-gold);">Entrar →</span>
+          </button>
+
+          <!-- Opción 2: Calibolsos2026 -->
+          <button type="button" class="quick-auth-btn" data-auth-id="store-calibolsos">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span class="auth-card-avatar" style="background: rgba(56, 189, 248, 0.2); color: var(--accent-blue); border-color: var(--accent-blue);">👠</span>
+              <div style="text-align: left;">
+                <div style="font-weight: 800; font-size: 13px; color: #fff;">Calibolsos 2026 <span style="font-size: 10px; color: var(--accent-blue); background: rgba(56, 189, 248, 0.15); padding: 2px 6px; border-radius: 4px;">Boutique Cali</span></div>
+                <div style="font-size: 11px; color: var(--text-muted);">ventas@calibolsos.com · Clave: Cali2026*</div>
+              </div>
+            </div>
+            <span style="font-size: 12px; color: var(--accent-blue);">Entrar →</span>
+          </button>
+
+          <!-- Opción 3: SuperAdmin Dueño SaaS -->
+          <button type="button" class="quick-auth-btn" data-auth-id="store-bagsworld-admin">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span class="auth-card-avatar" style="background: rgba(227, 194, 116, 0.2); color: var(--primary-gold); border-color: var(--primary-gold);">👑</span>
+              <div style="text-align: left;">
+                <div style="font-weight: 800; font-size: 13px; color: #fff;">BAGS WORLD (SuperAdmin) <span style="font-size: 10px; color: var(--accent-emerald); background: rgba(16, 185, 129, 0.15); padding: 2px 6px; border-radius: 4px;">Dueño SaaS</span></div>
+                <div style="font-size: 11px; color: var(--text-muted);">admin@bagsworld.com · Clave: BastionSaaS2026*</div>
+              </div>
+            </div>
+            <span style="font-size: 12px; color: var(--accent-emerald);">Entrar →</span>
+          </button>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 10px; margin: 16px 0;">
+        <hr style="flex: 1; border: 0; border-top: 1px solid var(--border-subtle);">
+        <span style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">O ingresa con credenciales</span>
+        <hr style="flex: 1; border: 0; border-top: 1px solid var(--border-subtle);">
+      </div>
+
+      <!-- Formulario Clásico de Login -->
+      <form id="form-auth-login">
+        <div class="form-group">
+          <label class="form-label">Correo Electrónico *</label>
+          <input type="email" id="auth-input-email" class="form-input" required placeholder="ej: contacto@bolsoscol.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contraseña *</label>
+          <input type="password" id="auth-input-password" class="form-input" required placeholder="Ingresa tu contraseña">
+        </div>
+        <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; padding: 12px;">
+          Ingresar al Panel
+        </button>
+      </form>
+
+      <div style="margin-top: 16px; padding: 10px 14px; background: rgba(0, 0, 0, 0.4); border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); font-size: 11px; color: var(--text-secondary); line-height: 1.4;">
+        🛡️ <strong>Privacidad & Respaldo Garantizado:</strong> Toda tu información está resguardada. Si olvidas tu clave, el soporte maestro SaaS te asiste sin perder nunca tus productos ni tus pedidos.
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL DE PRIVACIDAD & SEGURIDAD (CAMBIO DE CLAVE / CORREO)
+       ========================================================================= -->
+  <div class="modal-backdrop" id="modal-privacy-settings" role="dialog" aria-modal="true">
+    <div class="modal-dialog" style="max-width: 460px;">
+      <div class="modal-header">
+        <h3>🔒 Seguridad & Privacidad de Cuenta</h3>
+        <button class="btn-close-modal" data-close="modal-privacy-settings">&times;</button>
+      </div>
+      <form id="form-privacy-settings">
+        <div class="form-group">
+          <label class="form-label">Correo de Acceso</label>
+          <input type="email" id="privacy-email" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contraseña Actual *</label>
+          <input type="password" id="privacy-current-pass" class="form-input" required placeholder="Ingresa tu clave actual">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nueva Contraseña (Opcional)</label>
+          <input type="password" id="privacy-new-pass" class="form-input" placeholder="Mínimo 4 caracteres">
+        </div>
+        <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; padding: 12px; margin-top: 10px;">
+          Actualizar Seguridad
+        </button>
+      </form>
+    </div>
   </div>
 
   <!-- =========================================================================
@@ -563,7 +727,7 @@ Medidas 16 alto x 20 ancho"></textarea>
             <div>
               <div style="font-weight: 800; font-size: 13px; color: var(--primary-gold);">🛡️ Despacho Asegurado (Recomendado)</div>
               <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">
-                Aseguras tus bolsos abonando el flete (<span id="cart-flete-preview">$12.000 COP</span>) por Nequi/Daviplata. Pagas los bolsos al recibir en puerta.
+                Aseguras tus bolsos abonando el flete (<span id="cart-flete-preview">$14.000 COP</span>) por Nequi/Daviplata. Pagas los bolsos al recibir en puerta.
               </div>
             </div>
           </label>
@@ -588,7 +752,7 @@ Medidas 16 alto x 20 ancho"></textarea>
         </div>
         <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px;">
           <span style="color: var(--text-muted);">Flete Domicilio:</span>
-          <strong id="cart-summary-shipping" style="color: var(--primary-gold);">$12.000 COP</strong>
+          <strong id="cart-summary-shipping" style="color: var(--primary-gold);">$14.000 COP</strong>
         </div>
         <div style="display: flex; justify-content: space-between; font-size: 16px; font-weight: 900; padding-top: 8px; border-top: 1px solid var(--border-subtle);">
           <span style="color: #fff;">Gran Total:</span>
@@ -694,12 +858,12 @@ Medidas 16 alto x 20 ancho"></textarea>
         </div>
         <div class="form-group">
           <label class="form-label">Número de WhatsApp (con código 57) *</label>
-          <input type="text" id="setting-store-phone" class="form-input" required placeholder="573155551234">
+          <input type="text" id="setting-store-phone" class="form-input" required placeholder="573165558899">
           <small style="color: var(--text-muted); font-size: 11px;">A este número te llegarán los pedidos con los bolsos y colores seleccionados.</small>
         </div>
         <div class="form-group">
           <label class="form-label">Ciudad / Ubicación</label>
-          <input type="text" id="setting-store-location" class="form-input" placeholder="Ej: Granada / Ciudad Jardín, Cali">
+          <input type="text" id="setting-store-location" class="form-input" placeholder="Ej: Bogotá D.C. & Cobertura Nacional">
         </div>
         <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; padding: 12px; margin-top: 10px;">
           Guardar Cambios

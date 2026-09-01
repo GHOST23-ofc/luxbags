@@ -1,13 +1,14 @@
 // =========================================================================
-// BAGS WORLD MLS COLOMBIA - GESTOR DE ESTADO & CATÁLOGO MAESTRO (Bastion AI)
+// BAGS WORLD MLS COLOMBIA - GESTOR DE ESTADO, AUTH & CATÁLOGO MAESTRO (Bastion AI)
 // =========================================================================
 
 const DB_KEYS = {
-  MASTER_PRODUCTS: "bagsworld_master_products_v10",
-  STORES: "bagsworld_stores_v10",
-  CURRENT_STORE_ID: "bagsworld_current_store_id_v10",
-  ORDERS: "bagsworld_orders_v10",
-  CART_ITEMS: "bagsworld_cart_items_v10"
+  MASTER_PRODUCTS: "bagsworld_master_products_v11",
+  STORES: "bagsworld_stores_v11",
+  CURRENT_STORE_ID: "bagsworld_current_store_id_v11",
+  ORDERS: "bagsworld_orders_v11",
+  CART_ITEMS: "bagsworld_cart_items_v11",
+  AUTH_SESSION: "bagsworld_auth_session_v11"
 };
 
 class BagsWorldStoreManager {
@@ -26,7 +27,7 @@ class BagsWorldStoreManager {
       localStorage.setItem(DB_KEYS.ORDERS, JSON.stringify(INITIAL_ORDERS));
     }
     if (!localStorage.getItem(DB_KEYS.CURRENT_STORE_ID)) {
-      localStorage.setItem(DB_KEYS.CURRENT_STORE_ID, "store-001");
+      localStorage.setItem(DB_KEYS.CURRENT_STORE_ID, "store-bolsoscol");
     }
   }
 
@@ -34,10 +35,138 @@ class BagsWorldStoreManager {
     localStorage.setItem(DB_KEYS.MASTER_PRODUCTS, JSON.stringify(INITIAL_MASTER_PRODUCTS));
     localStorage.setItem(DB_KEYS.STORES, JSON.stringify(INITIAL_STORES));
     localStorage.setItem(DB_KEYS.ORDERS, JSON.stringify(INITIAL_ORDERS));
-    localStorage.setItem(DB_KEYS.CURRENT_STORE_ID, "store-001");
+    localStorage.setItem(DB_KEYS.CURRENT_STORE_ID, "store-bolsoscol");
     localStorage.removeItem(DB_KEYS.CART_ITEMS);
+    localStorage.removeItem(DB_KEYS.AUTH_SESSION);
   }
 
+  // =========================================================================
+  // SISTEMA DE AUTENTICACIÓN (CRM BASTION / CRM GHOST STYLE)
+  // =========================================================================
+  login(email, password) {
+    const stores = this.getStores();
+    const cleanEmail = (email || "").trim().toLowerCase();
+    const cleanPass = (password || "").trim();
+
+    const store = stores.find(s => (s.email || "").toLowerCase() === cleanEmail && s.password === cleanPass);
+
+    if (!store) {
+      return { success: false, message: "Correo o contraseña incorrectos. Revisa tus credenciales o usa el Acceso Demo." };
+    }
+
+    this.setCurrentStoreId(store.id);
+    const sessionData = {
+      storeId: store.id,
+      name: store.name,
+      email: store.email,
+      role: store.role || (store.isSupplierStore ? "super_admin" : "store_owner"),
+      loginTime: new Date().toISOString()
+    };
+    localStorage.setItem(DB_KEYS.AUTH_SESSION, JSON.stringify(sessionData));
+    return { success: true, store, session: sessionData };
+  }
+
+  quickLogin(storeId) {
+    const stores = this.getStores();
+    const store = stores.find(s => s.id === storeId);
+    if (!store) return false;
+
+    this.setCurrentStoreId(store.id);
+    const sessionData = {
+      storeId: store.id,
+      name: store.name,
+      email: store.email,
+      role: store.role || (store.isSupplierStore ? "super_admin" : "store_owner"),
+      loginTime: new Date().toISOString()
+    };
+    localStorage.setItem(DB_KEYS.AUTH_SESSION, JSON.stringify(sessionData));
+    return store;
+  }
+
+  getCurrentSession() {
+    try {
+      const raw = localStorage.getItem(DB_KEYS.AUTH_SESSION);
+      if (raw) return JSON.parse(raw);
+    } catch (e) {}
+    const store = this.getCurrentStore();
+    return {
+      storeId: store.id,
+      name: store.name,
+      email: store.email,
+      role: store.role || (store.isSupplierStore ? "super_admin" : "store_owner")
+    };
+  }
+
+  logout() {
+    localStorage.removeItem(DB_KEYS.AUTH_SESSION);
+    this.setCurrentStoreId("store-bolsoscol");
+  }
+
+  // =========================================================================
+  // PRIVACIDAD & GESTIÓN DE SEGURIDAD
+  // =========================================================================
+  updateStoreSecurity(storeId, { email, currentPassword, newPassword }) {
+    const stores = this.getStores();
+    const store = stores.find(s => s.id === storeId);
+    if (!store) return { success: false, message: "Tienda no encontrada." };
+
+    if (currentPassword && store.password !== currentPassword.trim()) {
+      return { success: false, message: "La contraseña actual no coincide." };
+    }
+
+    if (email && email.trim() !== "") {
+      store.email = email.trim().toLowerCase();
+    }
+
+    if (newPassword && newPassword.trim().length >= 4) {
+      store.password = newPassword.trim();
+    }
+
+    this.saveStores(stores);
+    return { success: true, store, message: "Credenciales y privacidad actualizadas correctamente." };
+  }
+
+  // Respaldo Maestro / Recuperación de Contraseña por el Dueño del SaaS
+  resetStorePasswordByAdmin(storeId, newPassword) {
+    const stores = this.getStores();
+    const store = stores.find(s => s.id === storeId);
+    if (!store) return { success: false, message: "Tienda no encontrada." };
+
+    store.password = (newPassword || "Bolsos2026*").trim();
+    this.saveStores(stores);
+    return { success: true, store, newPassword: store.password };
+  }
+
+  // =========================================================================
+  // GESTIÓN DE BACKUPS & SEGURIDAD DE DATOS (NO DATA LOSS)
+  // =========================================================================
+  exportStoreBackup(storeId) {
+    const store = this.getStores().find(s => s.id === storeId);
+    const master = this.getMasterProducts();
+    const orders = this.getOrders().filter(o => o.storeName === (store ? store.name : ""));
+
+    return {
+      timestamp: new Date().toISOString(),
+      saas: "BAGS WORLD MLS (Bastion AI)",
+      store,
+      customCatalog: this.getStorefrontProducts(store),
+      orders
+    };
+  }
+
+  exportSaaSFullBackup() {
+    return {
+      timestamp: new Date().toISOString(),
+      saas: "BAGS WORLD MLS (Bastion AI)",
+      masterProducts: this.getMasterProducts(),
+      stores: this.getStores(),
+      orders: this.getOrders()
+    };
+  }
+
+  // =========================================================================
+  // CATÁLOGO & PRODUCTOS
+  // =========================================================================
   getMasterProducts() {
     try {
       const raw = localStorage.getItem(DB_KEYS.MASTER_PRODUCTS);
@@ -60,7 +189,7 @@ class BagsWorldStoreManager {
     try {
       const raw = localStorage.getItem(DB_KEYS.STORES);
       const parsed = raw ? JSON.parse(raw) : INITIAL_STORES;
-      if (!Array.isArray(parsed) || parsed.length === 0 || !parsed[0].name.includes("BAGS WORLD")) {
+      if (!Array.isArray(parsed) || parsed.length === 0 || !parsed.some(s => s.id === "store-bolsoscol")) {
         localStorage.setItem(DB_KEYS.STORES, JSON.stringify(INITIAL_STORES));
         return INITIAL_STORES;
       }
@@ -75,7 +204,7 @@ class BagsWorldStoreManager {
   }
 
   getCurrentStoreId() {
-    return localStorage.getItem(DB_KEYS.CURRENT_STORE_ID) || "store-001";
+    return localStorage.getItem(DB_KEYS.CURRENT_STORE_ID) || "store-bolsoscol";
   }
 
   setCurrentStoreId(storeId) {
@@ -267,7 +396,7 @@ class BagsWorldStoreManager {
   }
 
   buildSingleProductWhatsAppUrl(store, product, selectedColorway) {
-    const cleanPhone = (store.phone || "573155551234").replace(/[^0-9]/g, "");
+    const cleanPhone = (store.phone || "573165558899").replace(/[^0-9]/g, "");
     const colorName = selectedColorway ? selectedColorway.name : "Color Original";
     const formattedPrice = this.formatCOP(product.storeRetailPrice);
 
@@ -290,7 +419,7 @@ class BagsWorldStoreManager {
   }
 
   buildConsolidatedCartWhatsAppUrl(store, cartItems, customerData, selectedZone, dispatchMode) {
-    const cleanPhone = (store.phone || "573155551234").replace(/[^0-9]/g, "");
+    const cleanPhone = (store.phone || "573165558899").replace(/[^0-9]/g, "");
     const totalBags = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
     const shippingFee = selectedZone ? selectedZone.fee : 12000;
     const grandTotal = totalBags + shippingFee;
