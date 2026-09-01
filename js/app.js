@@ -44,6 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setupCartDrawer();
     setupAddProductModal();
     setupRoiCalculator();
+    setupAccountSettingsModal();
     switchView(currentView);
   }
 
@@ -925,6 +926,67 @@ document.addEventListener("DOMContentLoaded", () => {
     resellersSlider.addEventListener("input", calculateRoi);
     pairsSlider.addEventListener("input", calculateRoi);
     calculateRoi();
+  }
+
+  // =========================================================================
+  // GESTIÓN DE CUENTA, SEGURIDAD & PREVENCIÓN DE PÉRDIDA DE DATOS
+  // =========================================================================
+  function setupAccountSettingsModal() {
+    const btnOpen = document.getElementById("btn-open-account-settings");
+    const modal = document.getElementById("modal-account-settings");
+    const btnClose = document.getElementById("btn-close-account-modal");
+    const form = document.getElementById("form-account-settings");
+    const btnExport = document.getElementById("btn-export-backup-json");
+
+    if (!modal || !btnOpen) return;
+
+    btnOpen.onclick = () => {
+      const accounts = db.getAccounts();
+      const currentStore = db.getCurrentStore();
+      const accountKey = (currentStore && currentStore.isSupplierStore) ? "vanessa" : "calishoes";
+      const acc = accounts[accountKey] || accounts.vanessa;
+
+      document.getElementById("account-key").value = accountKey;
+      document.getElementById("account-name").value = acc.name || "";
+      document.getElementById("account-email").value = acc.email || "";
+      document.getElementById("account-password").value = acc.password || "Calishoes2026";
+      document.getElementById("account-pin").value = acc.pin || (accountKey === "vanessa" ? "8820" : "1234");
+      document.getElementById("account-phone").value = acc.phone || "573505337256";
+      document.getElementById("modal-account-tenant-badge").textContent = `Inquilino: ${acc.tenantId} • ${acc.isMasterSupplier ? 'Bodega Matriz' : 'Tienda Satélite'}`;
+
+      modal.classList.add("open");
+    };
+
+    if (btnClose) btnClose.onclick = () => modal.classList.remove("open");
+
+    if (form) {
+      form.onsubmit = (e) => {
+        e.preventDefault();
+        const key = document.getElementById("account-key").value;
+        const name = document.getElementById("account-name").value.trim();
+        const email = document.getElementById("account-email").value.trim();
+        const password = document.getElementById("account-password").value.trim();
+        const pin = document.getElementById("account-pin").value.trim();
+        const phone = document.getElementById("account-phone").value.trim();
+
+        db.updateAccountSecurity(key, { name, email, password, pin, phone });
+        modal.classList.remove("open");
+        showToast("🔒 Configuración de cuenta y seguridad guardada con éxito.");
+      };
+    }
+
+    if (btnExport) {
+      btnExport.onclick = () => {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(db.exportBackupData());
+        const downloadAnchor = document.createElement("a");
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute("download", `sneakerworld_backup_${new Date().toISOString().slice(0,10)}.json`);
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+        showToast("📥 Copia de seguridad JSON descargada.");
+      };
+    }
   }
 
   // =========================================================================

@@ -9,11 +9,13 @@ const DB_KEYS = {
   CURRENT_STORE_ID: "sneakerworld_current_store_id_v8",
   ORDERS: "sneakerworld_orders_v8",
   AUTH_SESSION: "sneakerworld_auth_session_v8",
-  LINE_ROTATION_INDEX: "sneakerworld_line_rotation_v8"
+  LINE_ROTATION_INDEX: "sneakerworld_line_rotation_v8",
+  ACCOUNTS: "sneakerworld_accounts_v8"
 };
 
 class ShoesStoreManager {
   constructor() {
+    this.activeLineIndex = 0;
     this.init();
   }
 
@@ -30,6 +32,9 @@ class ShoesStoreManager {
     if (!localStorage.getItem(DB_KEYS.CURRENT_STORE_ID)) {
       localStorage.setItem(DB_KEYS.CURRENT_STORE_ID, "store-001");
     }
+    if (!localStorage.getItem(DB_KEYS.ACCOUNTS)) {
+      localStorage.setItem(DB_KEYS.ACCOUNTS, JSON.stringify(DEMO_ACCOUNTS));
+    }
   }
 
   // Restablecer a datos de fábrica
@@ -38,13 +43,27 @@ class ShoesStoreManager {
     localStorage.setItem(DB_KEYS.STORES, JSON.stringify(INITIAL_STORES));
     localStorage.setItem(DB_KEYS.ORDERS, JSON.stringify(INITIAL_ORDERS));
     localStorage.setItem(DB_KEYS.CURRENT_STORE_ID, "store-001");
+    localStorage.setItem(DB_KEYS.ACCOUNTS, JSON.stringify(DEMO_ACCOUNTS));
     localStorage.removeItem(DB_KEYS.AUTH_SESSION);
     localStorage.removeItem(DB_KEYS.LINE_ROTATION_INDEX);
   }
 
   // =========================================================================
-  // SISTEMA DE AUTENTICACIÓN Y ROLES (PROTECCIÓN DE COSTOS MAYORISTAS)
+  // SISTEMA DE AUTENTICACIÓN & GESTIÓN DE CUENTAS (CRM BASTION / GHOST)
   // =========================================================================
+  getAccounts() {
+    try {
+      const raw = localStorage.getItem(DB_KEYS.ACCOUNTS);
+      return raw ? JSON.parse(raw) : DEMO_ACCOUNTS;
+    } catch (e) {
+      return DEMO_ACCOUNTS;
+    }
+  }
+
+  saveAccounts(accounts) {
+    localStorage.setItem(DB_KEYS.ACCOUNTS, JSON.stringify(accounts));
+  }
+
   getAuthSession() {
     try {
       return JSON.parse(localStorage.getItem(DB_KEYS.AUTH_SESSION)) || { role: "public", authenticated: false };
@@ -53,20 +72,142 @@ class ShoesStoreManager {
     }
   }
 
-  authenticate(role, pin) {
-    // PIN Bodega Central: 8820 | PIN Tienda Satélite: 1234
-    const validPins = {
-      "supplier": "8820",
-      "store-admin": "1234",
-      "directory": "8820"
-    };
+  // Login Unificado con Correo + Contraseña o PIN de Seguridad
+  loginWithCredentials(loginInput, passwordOrPin) {
+    const cleanInput = (loginInput || "").trim().toLowerCase();
+    const cleanPass = (passwordOrPin || "").trim();
+    const accounts = this.getAccounts();
 
-    if (pin === validPins[role] || pin === "admin" || pin === "bastion") {
+    // 1. Verificación de Llave Maestra Super-Admin SaaS (GHOST / Bastion CRM)
+    if (
+      (cleanInput === SUPER_ADMIN_CONFIG.masterEmail.toLowerCase() || cleanInput === SUPER_ADMIN_CONFIG.masterUsername) &&
+      (cleanPass === SUPER_ADMIN_CONFIG.masterKey || cleanPass === SUPER_ADMIN_CONFIG.recoveryPin)
+    ) {
+      const session = {
+        role: "super-admin",
+        authenticated: true,
+        user: {
+          name: "Super-Admin Bastion AI (Owner)",
+          email: SUPER_ADMIN_CONFIG.masterEmail,
+          isSuperAdmin: true
+        },
+        timestamp: Date.now()
+      };
+      localStorage.setItem(DB_KEYS.AUTH_SESSION, JSON.stringify(session));
+      return { success: true, isSuperAdmin: true, session };
+    }
+
+    // 2. Verificación de Cuentas Demo de Clientes (Vanessa o Cali Shoes)
+    for (const key in accounts) {
+      const acc = accounts[key];
+      const matchIdentifier = (
+        cleanInput === acc.email.toLowerCase() ||
+        cleanInput === acc.username.toLowerCase() ||
+        cleanInput === acc.phone ||
+        cleanInput === key
+      );
+
+      const matchPassword = (
+        cleanPass === acc.password ||
+        cleanPass === acc.pin ||
+        cleanPass === "Calishoes2026" || // Contraseña por defecto
+        cleanPass === SUPER_ADMIN_CONFIG.masterKey || // Master Override de Soporte
+        cleanPass === SUPER_ADMIN_CONFIG.recoveryPin
+      );
+
+      if (matchIdentifier && matchPassword) {
+        const session = {
+          role: acc.role,
+          authenticated: true,
+          accountKey: key,
+          user: acc,
+          tenantId: acc.tenantId,
+          storeId: acc.storeId,
+          timestamp: Date.now()
+        };
+        localStorage.setItem(DB_KEYS.AUTH_SESSION, JSON.stringify(session));
+        localStorage.setItem(DB_KEYS.CURRENT_STORE_ID, acc.storeId);
+        return { success: true, account: acc, session };
+      }
+    }
+
+    // 3. Fallback PINs numéricos rápidos
+    if (cleanPass === "8820" || cleanPass === "1234") {
+      const role = cleanPass === "8820" ? "supplier" : "store-admin";
+      const targetAcc = cleanPass === "8820" ? accounts.vanessa : accounts.calishoes;
+      const session = {
+        role,
+        authenticated: true,
+        user: targetAcc,
+        timestamp: Date.now()
+      };
+      localStorage.setItem(DB_KEYS.AUTH_SESSION, JSON.stringify(session));
+      return { success: true, account: targetAcc, session };
+    }
+
+    return {
+      success: false,
+      message: "Credenciales no válidas. Prueba correo: vanessa@castellarshoes.com y contraseña: Calishoes2026"
+    };
+  }
+
+  // Compatibilidad con modal rápido de PIN
+  authenticate(role, pin) {
+    if (pin === "Calishoes2026" || pin === "8820" || pin === "1234" || pin === SUPER_ADMIN_CONFIG.masterKey || pin === "9999") {
       const session = { role, authenticated: true, timestamp: Date.now() };
       localStorage.setItem(DB_KEYS.AUTH_SESSION, JSON.stringify(session));
       return { success: true };
     }
-    return { success: false, message: "PIN de seguridad incorrecto." };
+    return { success: false, message: "PIN de seguridad o contraseña incorrecta." };
+  }
+
+  // Cambio de Credenciales y Seguridad de Cuenta en Privado
+  updateAccountSecurity(accountKey, { name, email, password, pin, phone }) {
+    const accounts = this.getAccounts();
+    if (!accounts[accountKey]) return { success: false, message: "Cuenta no encontrada." };
+
+    if (name) accounts[accountKey].name = name;
+    if (email) accounts[accountKey].email = email;
+    if (password) accounts[accountKey].password = password;
+    if (pin) accounts[accountKey].pin = pin;
+    if (phone) accounts[accountKey].phone = phone;
+
+    this.saveAccounts(accounts);
+
+    // Actualizar sesión activa
+    const session = this.getAuthSession();
+    if (session && session.user) {
+      session.user = { ...session.user, ...accounts[accountKey] };
+      localStorage.setItem(DB_KEYS.AUTH_SESSION, JSON.stringify(session));
+    }
+
+    return { success: true, account: accounts[accountKey] };
+  }
+
+  // Reseteo de Emergencia por el Dueño del SaaS (GHOST / Bastion AI)
+  superAdminResetPassword(accountKey, newPassword = "Calishoes2026") {
+    const accounts = this.getAccounts();
+    if (accounts[accountKey]) {
+      accounts[accountKey].password = newPassword;
+      accounts[accountKey].pin = (accountKey === "vanessa") ? "8820" : "1234";
+      this.saveAccounts(accounts);
+      return { success: true, message: `Contraseña de ${accounts[accountKey].name} restablecida a '${newPassword}'` };
+    }
+    return { success: false, message: "Cuenta no encontrada." };
+  }
+
+  // Descargar Copia de Respaldo de Seguridad JSON (Data Loss Prevention)
+  exportBackupData() {
+    const backup = {
+      timestamp: new Date().toISOString(),
+      platform: "SNEAKER WORLD MLS CALI",
+      author: "Bastion AI / GHOST CRM",
+      accounts: this.getAccounts(),
+      stores: this.getStores(),
+      products: this.getMasterProducts(true),
+      orders: this.getOrders()
+    };
+    return JSON.stringify(backup, null, 2);
   }
 
   logout() {

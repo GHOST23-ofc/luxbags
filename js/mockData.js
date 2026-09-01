@@ -382,21 +382,70 @@ const INITIAL_MASTER_PRODUCTS = [
   }
 ];
 
+// =========================================================================
+// SISTEMA DE AUTENTICACIÓN & 2 ESCENARIOS DEMO OFICIALES (CRM BASTION / GHOST)
+// =========================================================================
+const DEMO_ACCOUNTS = {
+  // ESCENARIO 1: Vanessa Castellar (Bodega Matriz Cali - Cliente Objetivo)
+  vanessa: {
+    id: "user-vanessa-01",
+    tenantId: "sup-001",
+    storeId: "store-001",
+    role: "supplier",
+    name: "Vanessa Castellar Shoes",
+    businessName: "Vanessa Castellar Shoes (San Andresito de la 38, Cali)",
+    email: "vanessa@castellarshoes.com",
+    username: "vanessa",
+    password: "Calishoes2026",
+    pin: "8820",
+    phone: "573505337256",
+    isMasterSupplier: true,
+    securityNote: "Cuenta Matriz Mayorista con 10 líneas de WhatsApp y red de revendedores."
+  },
+
+  // ESCENARIO 2: Cali Shoes Distribuidora (Tienda Satélite / Revendedor de Vanessa)
+  calishoes: {
+    id: "user-calishoes-02",
+    tenantId: "sup-001", // Afiliado a Vanessa
+    storeId: "store-002",
+    role: "store-admin",
+    name: "Cali Shoes Distribuidora",
+    businessName: "Cali Shoes Distribuidora (Sur / Ciudad Jardín, Cali)",
+    email: "contacto@calishoes.com",
+    username: "calishoes",
+    password: "Calishoes2026",
+    pin: "1234",
+    phone: "573154443322",
+    isMasterSupplier: false,
+    securityNote: "Cuenta Revendedora con margen propio y vitrina para clientes."
+  }
+};
+
+// LLAVE MAESTRA SUPER ADMIN SAAS (BASTION AI / GHOST CRM RECOVERY)
+const SUPER_ADMIN_CONFIG = {
+  masterEmail: "admin@bastion.ai",
+  masterUsername: "ghost",
+  masterKey: "BASTION-GHOST-2026",
+  recoveryPin: "9999",
+  platformOwner: "GHOST Infoproducer / Bastion AI",
+  supportHotline: "+57 350 533 7256"
+};
+
 const INITIAL_STORES = [
   {
     id: "store-001",
     name: "Vanessa Castellar Shoes",
-    tagline: "San Andresito de la 38, Cali — Calzado Urbano y Deportivo al por Mayor y Detal con Envíos a Toda Colombia.",
-    phone: "573505337256", // Línea Principal de Vanessa
+    tagline: "Bodega Matriz Mayorista — San Andresito de la 38, Cali.",
+    phone: "573505337256",
     whatsappLines: VANESSA_WHATSAPP_LINES,
-    neighborhood: "San Andresito de la 38, Cali (Bodega Central)",
+    neighborhood: "San Andresito de la 38 (Centro / Comuna 3), Cali",
     isSupplierStore: true,
-    themeColor: "#e6192e", // Rojo Torino Oficial
+    themeColor: "#e6192e",
     products: [
       { productId: "prod-snk-001", customPrice: 185000, active: true, availableSizes: [35, 36, 37, 38, 39, 40] },
       { productId: "prod-snk-002", customPrice: 200000, active: true, availableSizes: [38, 39, 40, 41, 42, 43] },
-      { productId: "prod-snk-003", customPrice: 220000, active: true, availableSizes: [36, 37, 38, 39, 40, 41, 42, 43] },
-      { productId: "prod-snk-004", customPrice: 235000, active: true, availableSizes: [38, 39, 40, 41, 42, 43, 44] },
+      { productId: "prod-snk-003", customPrice: 220000, active: true, availableSizes: [37, 38, 39, 40, 41, 42] },
+      { productId: "prod-snk-004", customPrice: 235000, active: true, availableSizes: [38, 39, 40, 41, 42, 43] },
       { productId: "prod-snk-005", customPrice: 250000, active: true, availableSizes: [38, 39, 40, 41, 42, 43] },
       { productId: "prod-snk-006", customPrice: 230000, active: true, availableSizes: [36, 37, 38, 39, 40, 41] },
       { productId: "prod-snk-007", customPrice: 215000, active: true, availableSizes: [37, 38, 39, 40, 41, 42, 43] },
@@ -415,36 +464,21 @@ const INITIAL_STORES = [
   },
   {
     id: "store-002",
-    name: "Sneakers Ciudad Jardín",
-    tagline: "Boutique especializada en calzado importado exclusivo en el Sur de Cali.",
+    name: "Cali Shoes Distribuidora",
+    tagline: "Boutique especializada en calzado importado exclusivo en el Sur de Cali (Afiliada a Vanessa).",
     phone: "573154443322",
     neighborhood: "Ciudad Jardín / Valle del Lili, Cali",
     isSupplierStore: false,
     themeColor: "#e6192e",
     products: [
-      { productId: "prod-snk-005", customPrice: 265000, active: true, availableSizes: [39, 40, 41, 42] },
+      { productId: "prod-snk-001", customPrice: 195000, active: true, availableSizes: [35, 36, 37, 38, 39] },
+      { productId: "prod-snk-002", customPrice: 215000, active: true, availableSizes: [38, 39, 40, 41, 42] },
       { productId: "prod-snk-004", customPrice: 245000, active: true, availableSizes: [39, 40, 41, 42, 43] },
-      { productId: "prod-snk-015", customPrice: 260000, active: true, availableSizes: [39, 40, 41, 42] },
+      { productId: "prod-snk-005", customPrice: 265000, active: true, availableSizes: [39, 40, 41, 42] },
+      { productId: "prod-snk-009", customPrice: 225000, active: true, availableSizes: [37, 38, 39, 40, 41] },
       { productId: "prod-snk-014", customPrice: 340000, active: true, availableSizes: [40, 41, 42, 43] },
-      { productId: "prod-snk-016", customPrice: 275000, active: true, availableSizes: [39, 40, 41, 42] },
-      { productId: "prod-snk-009", customPrice: 225000, active: true, availableSizes: [37, 38, 39, 40, 41] }
-    ]
-  },
-  {
-    id: "store-003",
-    name: "Zapatillas Aguablanca VIP",
-    tagline: "Precios directos de bodega con domicilio inmediato en todo el Oriente y Norte de Cali.",
-    phone: "573187776655",
-    neighborhood: "Aguablanca / Mariano Ramos, Cali",
-    isSupplierStore: false,
-    themeColor: "#e6192e",
-    products: [
-      { productId: "prod-snk-001", customPrice: 175000, active: true, availableSizes: [35, 36, 37, 38, 39] },
-      { productId: "prod-snk-007", customPrice: 205000, active: true, availableSizes: [38, 39, 40, 41, 42] },
-      { productId: "prod-snk-003", customPrice: 210000, active: true, availableSizes: [37, 38, 39, 40, 41] },
-      { productId: "prod-snk-008", customPrice: 185000, active: true, availableSizes: [35, 36, 37, 38] },
-      { productId: "prod-snk-012", customPrice: 190000, active: true, availableSizes: [38, 39, 40, 41, 42, 43] },
-      { productId: "prod-snk-002", customPrice: 180000, active: true, availableSizes: [38, 39, 40, 41, 42] }
+      { productId: "prod-snk-015", customPrice: 260000, active: true, availableSizes: [39, 40, 41, 42] },
+      { productId: "prod-snk-016", customPrice: 275000, active: true, availableSizes: [39, 40, 41, 42] }
     ]
   }
 ];
