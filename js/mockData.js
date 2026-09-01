@@ -1,11 +1,11 @@
-// Base de datos oficial - Catálogo Maestro LUXBAGS COLOMBIA (Bastion AI)
+// Base de datos oficial - Catálogo Maestro BAGS WORLD COLOMBIA (Bastion AI)
 // 8 Referencias reales de bodega de bolsos, carteras y accesorios importados
 
 const INITIAL_MASTER_PRODUCTS = [
   // 1. Bolso Tote Mini Horse Charm 'Colección Amor y Amistad'
   {
     id: "prod-lux-001",
-    sku: "LUX-HORS-68",
+    sku: "BW-HORS-68",
     name: "Bolso Tote Mini Horse Charm 'Colección Amor y Amistad'",
     category: "Totes & Handbags",
     tagline: "Bolso importado calidad superior con colgante de caballito y correa delgada.",
@@ -14,11 +14,11 @@ const INITIAL_MASTER_PRODUCTS = [
     dimensions: "16 cm (Alto) x 20 cm (Ancho) x 8 cm (Profundidad)",
     sizeCategory: "Compacto (<20cm)",
     colorways: [
-      { name: "Bicolor Crema / Negro", image: "assets/images/bags/tote_horse_charm_cream.jpg", sku: "LUX-HORS-CRM" },
-      { name: "Negro Ónix", image: "assets/images/bags/tote_horse_charm_cream.jpg", sku: "LUX-HORS-BLK" },
-      { name: "Camel / Miel", image: "assets/images/bags/tote_horse_charm_cream.jpg", sku: "LUX-HORS-CAM" },
-      { name: "Rosa Pastel", image: "assets/images/bags/tote_horse_charm_cream.jpg", sku: "LUX-HORS-PNK" },
-      { name: "Marrón Chocolate", image: "assets/images/bags/tote_horse_charm_cream.jpg", sku: "LUX-HORS-CHO" }
+      { name: "Bicolor Crema / Negro", image: "assets/images/bags/tote_horse_charm_cream.jpg", sku: "BW-HORS-CRM" },
+      { name: "Negro Ónix", image: "assets/images/bags/tote_horse_charm_cream.jpg", sku: "BW-HORS-BLK" },
+      { name: "Camel / Miel", image: "assets/images/bags/tote_horse_charm_cream.jpg", sku: "BW-HORS-CAM" },
+      { name: "Rosa Pastel", image: "assets/images/bags/tote_horse_charm_cream.jpg", sku: "BW-HORS-PNK" },
+      { name: "Marrón Chocolate", image: "assets/images/bags/tote_horse_charm_cream.jpg", sku: "BW-HORS-CHO" }
     ],
     specs: [
       "Importado calidad superior",
@@ -31,14 +31,14 @@ const INITIAL_MASTER_PRODUCTS = [
     wholesalePrice: 68000,
     suggestedRetailPrice: 125000,
     supplierId: "sup-001",
-    supplierName: "LUXBAGS Colombia (Bodega Matriz)",
+    supplierName: "BAGS WORLD Colombia (Bodega Matriz)",
     createdAt: "2026-09-01"
   },
 
   // 2. Bolso Crossbody Acolchado TOUS Pop 'Flap Edition'
   {
     id: "prod-lux-002",
-    sku: "LUX-TOUS-POP",
+    sku: "BW-TOUS-POP",
     name: "Bolso Crossbody Acolchado TOUS Pop 'Flap Edition'",
     category: "Crossbody & Flap",
     tagline: "Textura acolchada con icónico relieve en bajo relieve y correa deportiva.",
@@ -47,7 +47,7 @@ const INITIAL_MASTER_PRODUCTS = [
     dimensions: "18 cm (Alto) x 22 cm (Ancho) x 7 cm (Profundidad)",
     sizeCategory: "Mediano (20-28cm)",
     colorways: [
-      { name: "Negro Noir", image: "assets/images/bags/tous_crossbody_black.jpg", sku: "LUX-TOUS-BLK" }
+      { name: "Negro Noir", image: "assets/images/bags/tous_crossbody_black.jpg", sku: "BW-TOUS-BLK" }
     ],
     specs: [
       "Solapa frontal con broche magnético",
@@ -59,14 +59,14 @@ const INITIAL_MASTER_PRODUCTS = [
     wholesalePrice: 72000,
     suggestedRetailPrice: 135000,
     supplierId: "sup-001",
-    supplierName: "LUXBAGS Colombia (Bodega Matriz)",
+    supplierName: "BAGS WORLD Colombia (Bodega Matriz)",
     createdAt: "2026-09-01"
   },
 
   // 3. Bolso Satchel Estructurado Padlock 'Milano Chic'
   {
     id: "prod-lux-003",
-    sku: "LUX-STCH-OLV",
+    sku: "BW-STCH-OLV",
     name: "Bolso Satchel Estructurado Padlock 'Milano Chic'",
     category: "Satchel & Estructurados",
     tagline: "Elegante silueta de mano con candado metálico plateado y panel frontal plisado.",
@@ -75,12 +75,12 @@ const INITIAL_MASTER_PRODUCTS = [
     dimensions: "21 cm (Alto) x 26 cm (Ancho) x 11 cm (Profundidad)",
     sizeCategory: "Mediano (20-28cm)",
     colorways: [
-      { name: "Verde Oliva", image: "assets/images/bags/satchel_padlock_olive.jpg", sku: "LUX-STCH-OLV" },
-      { name: "Negro Clásico", image: "assets/images/bags/satchel_padlock_multi.jpg", sku: "LUX-STCH-BLK" },
-      { name: "Café Chocolate", image: "assets/images/bags/satchel_padlock_multi.jpg", sku: "LUX-STCH-CHO" },
-      { name: "Blanco Nieve", image: "assets/images/bags/satchel_padlock_multi.jpg", sku: "LUX-STCH-WHT" },
-      { name: "Rosa Palo", image: "assets/images/bags/satchel_padlock_multi.jpg", sku: "LUX-STCH-PNK" },
-      { name: "Camel Miel", image: "assets/images/bags/satchel_padlock_multi.jpg", sku: "LUX-STCH-CAM" }
+      { name: "Verde Oliva", image: "assets/images/bags/satchel_padlock_olive.jpg", sku: "BW-STCH-OLV" },
+      { name: "Negro Clásico", image: "assets/images/bags/satchel_padlock_multi.jpg", sku: "BW-STCH-BLK" },
+      { name: "Café Chocolate", image: "assets/images/bags/satchel_padlock_multi.jpg", sku: "BW-STCH-CHO" },
+      { name: "Blanco Nieve", image: "assets/images/bags/satchel_padlock_multi.jpg", sku: "BW-STCH-WHT" },
+      { name: "Rosa Palo", image: "assets/images/bags/satchel_padlock_multi.jpg", sku: "BW-STCH-PNK" },
+      { name: "Camel Miel", image: "assets/images/bags/satchel_padlock_multi.jpg", sku: "BW-STCH-CAM" }
     ],
     specs: [
       "Doble manija tubular reforzada",
@@ -92,14 +92,14 @@ const INITIAL_MASTER_PRODUCTS = [
     wholesalePrice: 78000,
     suggestedRetailPrice: 145000,
     supplierId: "sup-001",
-    supplierName: "LUXBAGS Colombia (Bodega Matriz)",
+    supplierName: "BAGS WORLD Colombia (Bodega Matriz)",
     createdAt: "2026-09-01"
   },
 
   // 4. Colección Satchel Padlock 6 Tonos 'Paleta Completa'
   {
     id: "prod-lux-004",
-    sku: "LUX-STCH-6COL",
+    sku: "BW-STCH-6COL",
     name: "Colección Satchel Padlock 6 Tonos 'Paleta Completa'",
     category: "Satchel & Estructurados",
     tagline: "Edición especial en 6 variantes de color con candado plateado y herrajes de lujo.",
@@ -108,12 +108,12 @@ const INITIAL_MASTER_PRODUCTS = [
     dimensions: "21 cm (Alto) x 26 cm (Ancho) x 11 cm (Profundidad)",
     sizeCategory: "Mediano (20-28cm)",
     colorways: [
-      { name: "Negro Ónix", image: "assets/images/bags/satchel_padlock_multi.jpg", sku: "LUX-6COL-BLK" },
-      { name: "Marrón Chocolate", image: "assets/images/bags/satchel_padlock_multi.jpg", sku: "LUX-6COL-CHO" },
-      { name: "Verde Oliva", image: "assets/images/bags/satchel_padlock_olive.jpg", sku: "LUX-6COL-OLV" },
-      { name: "Blanco Puro", image: "assets/images/bags/satchel_padlock_multi.jpg", sku: "LUX-6COL-WHT" },
-      { name: "Rosa Pastel", image: "assets/images/bags/satchel_padlock_multi.jpg", sku: "LUX-6COL-PNK" },
-      { name: "Camel Cuero", image: "assets/images/bags/satchel_padlock_multi.jpg", sku: "LUX-6COL-CAM" }
+      { name: "Negro Ónix", image: "assets/images/bags/satchel_padlock_multi.jpg", sku: "BW-6COL-BLK" },
+      { name: "Marrón Chocolate", image: "assets/images/bags/satchel_padlock_multi.jpg", sku: "BW-6COL-CHO" },
+      { name: "Verde Oliva", image: "assets/images/bags/satchel_padlock_olive.jpg", sku: "BW-6COL-OLV" },
+      { name: "Blanco Puro", image: "assets/images/bags/satchel_padlock_multi.jpg", sku: "BW-6COL-WHT" },
+      { name: "Rosa Pastel", image: "assets/images/bags/satchel_padlock_multi.jpg", sku: "BW-6COL-PNK" },
+      { name: "Camel Cuero", image: "assets/images/bags/satchel_padlock_multi.jpg", sku: "BW-6COL-CAM" }
     ],
     specs: [
       "6 colores disponibles listos para despacho",
@@ -125,14 +125,14 @@ const INITIAL_MASTER_PRODUCTS = [
     wholesalePrice: 78000,
     suggestedRetailPrice: 145000,
     supplierId: "sup-001",
-    supplierName: "LUXBAGS Colombia (Bodega Matriz)",
+    supplierName: "BAGS WORLD Colombia (Bodega Matriz)",
     createdAt: "2026-09-01"
   },
 
   // 5. Mini Morral Dama 'Glitz & Glam' con Cristales Strass
   {
     id: "prod-lux-005",
-    sku: "LUX-MRL-STRASS",
+    sku: "BW-MRL-STRASS",
     name: "Mini Morral Dama 'Glitz & Glam' con Cristales Strass",
     category: "Morrales & Mochilas",
     tagline: "Mochila urbana compacta con incrustaciones de cristales brillantes y cremallera frontal.",
@@ -141,7 +141,7 @@ const INITIAL_MASTER_PRODUCTS = [
     dimensions: "24 cm (Alto) x 19 cm (Ancho) x 10 cm (Profundidad)",
     sizeCategory: "Mediano (20-28cm)",
     colorways: [
-      { name: "Negro Strass Cristal", image: "assets/images/bags/backpack_strass_black.jpg", sku: "LUX-MRL-BLK" }
+      { name: "Negro Strass Cristal", image: "assets/images/bags/backpack_strass_black.jpg", sku: "BW-MRL-BLK" }
     ],
     specs: [
       "Incrustaciones strass brillantes termofijadas",
@@ -153,14 +153,14 @@ const INITIAL_MASTER_PRODUCTS = [
     wholesalePrice: 65000,
     suggestedRetailPrice: 120000,
     supplierId: "sup-001",
-    supplierName: "LUXBAGS Colombia (Bodega Matriz)",
+    supplierName: "BAGS WORLD Colombia (Bodega Matriz)",
     createdAt: "2026-09-01"
   },
 
   // 6. Billetera Compacta GUESS Scarlet Red
   {
     id: "prod-lux-006",
-    sku: "LUX-GSS-RED",
+    sku: "BW-GSS-RED",
     name: "Billetera Compacta GUESS Scarlet Red",
     category: "Billeteras & Clutches",
     tagline: "Billetera de 3 cuerpos en cuero graneado rojo escarlata con herraje metálico 'DGC'.",
@@ -169,8 +169,8 @@ const INITIAL_MASTER_PRODUCTS = [
     dimensions: "10 cm (Alto) x 14 cm (Ancho) x 3.5 cm (Profundidad)",
     sizeCategory: "Compacto (<20cm)",
     colorways: [
-      { name: "Scarlet Red", image: "assets/images/bags/guess_wallet_red.jpg", sku: "LUX-GSS-RED" },
-      { name: "Noir Black", image: "assets/images/bags/guess_wallet_black.jpg", sku: "LUX-GSS-BLK" }
+      { name: "Scarlet Red", image: "assets/images/bags/guess_wallet_red.jpg", sku: "BW-GSS-RED" },
+      { name: "Noir Black", image: "assets/images/bags/guess_wallet_black.jpg", sku: "BW-GSS-BLK" }
     ],
     specs: [
       "Cuero texturizado estilo Saffiano",
@@ -182,14 +182,14 @@ const INITIAL_MASTER_PRODUCTS = [
     wholesalePrice: 42000,
     suggestedRetailPrice: 79000,
     supplierId: "sup-001",
-    supplierName: "LUXBAGS Colombia (Bodega Matriz)",
+    supplierName: "BAGS WORLD Colombia (Bodega Matriz)",
     createdAt: "2026-09-01"
   },
 
   // 7. Billetera Compacta GUESS Noir Black
   {
     id: "prod-lux-007",
-    sku: "LUX-GSS-BLK",
+    sku: "BW-GSS-BLK",
     name: "Billetera Compacta GUESS Noir Black",
     category: "Billeteras & Clutches",
     tagline: "Billetera de lujo en negro clásico con herraje dorado y cremallera para monedas.",
@@ -198,8 +198,8 @@ const INITIAL_MASTER_PRODUCTS = [
     dimensions: "10 cm (Alto) x 14 cm (Ancho) x 3.5 cm (Profundidad)",
     sizeCategory: "Compacto (<20cm)",
     colorways: [
-      { name: "Noir Black", image: "assets/images/bags/guess_wallet_black.jpg", sku: "LUX-GSS-BLK" },
-      { name: "Scarlet Red", image: "assets/images/bags/guess_wallet_red.jpg", sku: "LUX-GSS-RED" }
+      { name: "Noir Black", image: "assets/images/bags/guess_wallet_black.jpg", sku: "BW-GSS-BLK" },
+      { name: "Scarlet Red", image: "assets/images/bags/guess_wallet_red.jpg", sku: "BW-GSS-RED" }
     ],
     specs: [
       "Ecocuero negro graneado de alta durabilidad",
@@ -211,14 +211,14 @@ const INITIAL_MASTER_PRODUCTS = [
     wholesalePrice: 42000,
     suggestedRetailPrice: 79000,
     supplierId: "sup-001",
-    supplierName: "LUXBAGS Colombia (Bodega Matriz)",
+    supplierName: "BAGS WORLD Colombia (Bodega Matriz)",
     createdAt: "2026-09-01"
   },
 
   // 8. Billetera / Clutch Flap Chloé Woody Lona & Cuero
   {
     id: "prod-lux-008",
-    sku: "LUX-CHL-WDY",
+    sku: "BW-CHL-WDY",
     name: "Billetera / Clutch Flap Chloé Woody Lona & Cuero",
     category: "Billeteras & Clutches",
     tagline: "Clutch billetera de solapa en lona beige con tipografía bordada y ribete en cuero negro.",
@@ -227,7 +227,7 @@ const INITIAL_MASTER_PRODUCTS = [
     dimensions: "11 cm (Alto) x 19 cm (Ancho) x 3 cm (Profundidad)",
     sizeCategory: "Compacto (<20cm)",
     colorways: [
-      { name: "Lona Beige / Negro", image: "assets/images/bags/chloe_wallet_canvas.jpg", sku: "LUX-CHL-WDY" }
+      { name: "Lona Beige / Negro", image: "assets/images/bags/chloe_wallet_canvas.jpg", sku: "BW-CHL-WDY" }
     ],
     specs: [
       "Lona gruesa de algodón natural + Cuero negro",
@@ -239,16 +239,16 @@ const INITIAL_MASTER_PRODUCTS = [
     wholesalePrice: 48000,
     suggestedRetailPrice: 89000,
     supplierId: "sup-001",
-    supplierName: "LUXBAGS Colombia (Bodega Matriz)",
+    supplierName: "BAGS WORLD Colombia (Bodega Matriz)",
     createdAt: "2026-09-01"
   }
 ];
 
-// Tiendas / Boutiques de la Red LUXBAGS MLS
+// Tiendas / Boutiques de la Red BAGS WORLD MLS
 const INITIAL_STORES = [
   {
     id: "store-001",
-    name: "LUXBAGS Colombia",
+    name: "BAGS WORLD Colombia",
     tagline: "Bodega Mayorista Matriz | Bolsos, Carteras y Accesorios Importados con Envíos Contraentrega a Toda Colombia.",
     phone: "573155551234",
     neighborhood: "Bodega Central Mayorista · Despachos Nacionales",
@@ -337,7 +337,7 @@ const INITIAL_ORDERS = [
     units: 6,
     totalWholesale: 408000,
     status: "En Alistamiento",
-    supplierName: "LUXBAGS Colombia (Bodega Matriz)"
+    supplierName: "BAGS WORLD Colombia (Bodega Matriz)"
   },
   {
     id: "ord-9920",
@@ -349,7 +349,7 @@ const INITIAL_ORDERS = [
     units: 4,
     totalWholesale: 312000,
     status: "Despachado en Coordinadora",
-    supplierName: "LUXBAGS Colombia (Bodega Matriz)"
+    supplierName: "BAGS WORLD Colombia (Bodega Matriz)"
   },
   {
     id: "ord-9919",
@@ -361,7 +361,7 @@ const INITIAL_ORDERS = [
     units: 10,
     totalWholesale: 420000,
     status: "Entregado",
-    supplierName: "LUXBAGS Colombia (Bodega Matriz)"
+    supplierName: "BAGS WORLD Colombia (Bodega Matriz)"
   }
 ];
 

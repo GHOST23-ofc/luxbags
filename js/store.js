@@ -1,16 +1,16 @@
 // =========================================================================
-// LUXBAGS MLS COLOMBIA - GESTOR DE ESTADO & CATÁLOGO MAESTRO (Bastion AI)
+// BAGS WORLD MLS COLOMBIA - GESTOR DE ESTADO & CATÁLOGO MAESTRO (Bastion AI)
 // =========================================================================
 
 const DB_KEYS = {
-  MASTER_PRODUCTS: "luxbags_master_products_v9",
-  STORES: "luxbags_stores_v9",
-  CURRENT_STORE_ID: "luxbags_current_store_id_v9",
-  ORDERS: "luxbags_orders_v9",
-  CART_ITEMS: "luxbags_cart_items_v9"
+  MASTER_PRODUCTS: "bagsworld_master_products_v10",
+  STORES: "bagsworld_stores_v10",
+  CURRENT_STORE_ID: "bagsworld_current_store_id_v10",
+  ORDERS: "bagsworld_orders_v10",
+  CART_ITEMS: "bagsworld_cart_items_v10"
 };
 
-class LuxbagsStoreManager {
+class BagsWorldStoreManager {
   constructor() {
     this.init();
   }
@@ -170,7 +170,7 @@ class LuxbagsStoreManager {
     const master = this.getMasterProducts();
     const product = {
       id: "prod-lux-" + Date.now().toString(36),
-      sku: newProduct.sku || `LUX-${Math.floor(1000 + Math.random() * 9000)}`,
+      sku: newProduct.sku || `BW-${Math.floor(1000 + Math.random() * 9000)}`,
       name: newProduct.name || "Nuevo Bolso Importado",
       category: newProduct.category || "Totes & Handbags",
       tagline: newProduct.tagline || "Bolso importado calidad superior.",
@@ -179,12 +179,12 @@ class LuxbagsStoreManager {
       dimensions: newProduct.dimensions || "18 cm (Alto) x 22 cm (Ancho) x 8 cm (Prof.)",
       sizeCategory: newProduct.sizeCategory || "Mediano (20-28cm)",
       colorways: newProduct.colorways || [
-        { name: "Negro Ónix", image: newProduct.image || "assets/images/bags/tote_horse_charm_cream.jpg", sku: "LUX-BLK" }
+        { name: "Negro Ónix", image: newProduct.image || "assets/images/bags/tote_horse_charm_cream.jpg", sku: "BW-BLK" }
       ],
       wholesalePrice: parseInt(newProduct.wholesalePrice || "68000", 10),
       suggestedRetailPrice: parseInt(newProduct.suggestedRetailPrice || "125000", 10),
       supplierId: "sup-001",
-      supplierName: "LUXBAGS Colombia (Bodega Matriz)",
+      supplierName: "BAGS WORLD Colombia (Bodega Matriz)",
       createdAt: new Date().toISOString().slice(0, 10)
     };
 
@@ -211,7 +211,7 @@ class LuxbagsStoreManager {
     }
 
     const lines = rawText.split("\n").map(l => l.trim()).filter(l => l.length > 0);
-    const titleLine = lines.find(l => l.toUpperCase().includes("BOLSO") || l.toUpperCase().includes("COLECCIÓN") || l.toUpperCase().includes("TOTE")) || lines[0] || "Nuevo Bolso Importado LUXBAGS";
+    const titleLine = lines.find(l => l.toUpperCase().includes("BOLSO") || l.toUpperCase().includes("COLECCIÓN") || l.toUpperCase().includes("TOTE")) || lines[0] || "Nuevo Bolso Importado BAGS WORLD";
 
     let colorCount = 1;
     const colorMatch = rawText.match(/([0-9]+)\s*colores/i);
@@ -221,7 +221,7 @@ class LuxbagsStoreManager {
 
     return {
       name: titleLine.replace(/[$0-9.,]/g, "").replace(/[🔝🤯🖤✨]/g, "").trim(),
-      sku: `LUX-${Math.floor(1000 + Math.random() * 9000)}`,
+      sku: `BW-${Math.floor(1000 + Math.random() * 9000)}`,
       category: "Totes & Handbags",
       tagline: "Importado calidad superior detectado desde WhatsApp.",
       description: rawText.substring(0, 220),
@@ -232,7 +232,7 @@ class LuxbagsStoreManager {
       colorways: Array.from({ length: Math.min(colorCount, 6) }).map((_, i) => ({
         name: `Tono #${i + 1}`,
         image: "assets/images/bags/tote_horse_charm_cream.jpg",
-        sku: `LUX-TONO-${i + 1}`
+        sku: `BW-TONO-${i + 1}`
       }))
     };
   }
@@ -261,7 +261,7 @@ class LuxbagsStoreManager {
     const colorName = selectedColorway ? selectedColorway.name : "Color Original";
     const formattedPrice = this.formatCOP(product.storeRetailPrice);
 
-    const message = `✨ *SOLICITUD DE PEDIDO - LUXBAGS COLOMBIA* ✨
+    const message = `✨ *SOLICITUD DE PEDIDO - BAGS WORLD COLOMBIA* ✨
 ------------------------------------------
 🏪 *Boutique:* ${store.name}
 📍 *Ubicación:* ${store.neighborhood}
@@ -295,7 +295,7 @@ class LuxbagsStoreManager {
       ? `🛡️ *Despacho Asegurado:* Abono flete (${this.formatCOP(shippingFee)}) por Nequi/Daviplata y bolsos contraentrega.`
       : `🛵 *100% Contraentrega:* Pago totalidad al recibir en puerta.`;
 
-    const message = `✨ *PEDIDO CONSOLIDADO DE BOLSOS - LUXBAGS* ✨
+    const message = `✨ *PEDIDO CONSOLIDADO DE BOLSOS - BAGS WORLD* ✨
 ==========================================
 🏪 *Boutique:* ${store.name}
 
@@ -326,8 +326,8 @@ ${modeText}
   }
 }
 
-const db = new LuxbagsStoreManager();
+const db = new BagsWorldStoreManager();
 
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { LuxbagsStoreManager, db };
+  module.exports = { BagsWorldStoreManager, db };
 }

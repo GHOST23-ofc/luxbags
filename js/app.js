@@ -42,10 +42,70 @@ document.addEventListener("DOMContentLoaded", () => {
     setupSupplierFastImporter();
     setupROISimulator();
     startReservationTimer();
+    initBlackHoleCanvas();
 
     // Renderizar vista inicial
     renderCurrentView();
     updateFloatingCartBar();
+  }
+
+  // =========================================================================
+  // CANVAS BACKGROUND INTERACTIVO (MODO OSCURO COSMIC LUXURY)
+  // =========================================================================
+  function initBlackHoleCanvas() {
+    const canvas = document.getElementById("black-hole-canvas");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+
+    window.addEventListener("resize", () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    });
+
+    const particles = [];
+    const count = 55;
+    for (let i = 0; i < count; i++) {
+      particles.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        radius: Math.random() * 1.6 + 0.4,
+        vx: (Math.random() - 0.5) * 0.35,
+        vy: (Math.random() - 0.5) * 0.35,
+        color: Math.random() > 0.5 ? "rgba(227, 194, 116, 0.4)" : "rgba(244, 114, 182, 0.3)"
+      });
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+
+      // Subtle center glow
+      const grad = ctx.createRadialGradient(width / 2, height * 0.3, 20, width / 2, height * 0.3, width * 0.7);
+      grad.addColorStop(0, "rgba(227, 194, 116, 0.04)");
+      grad.addColorStop(0.5, "rgba(230, 25, 46, 0.02)");
+      grad.addColorStop(1, "rgba(8, 9, 13, 0)");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, width, height);
+
+      particles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < 0) p.x = width;
+        if (p.x > width) p.x = 0;
+        if (p.y < 0) p.y = height;
+        if (p.y > height) p.y = 0;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+      });
+
+      requestAnimationFrame(animate);
+    }
+    animate();
   }
 
   // =========================================================================

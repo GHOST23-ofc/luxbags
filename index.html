@@ -5,24 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <!-- Primary SEO -->
-  <title>LUXBAGS MLS | Bolsa Mayorista de Bolsos & Carteras Colombia</title>
-  <meta name="description" content="Plataforma SaaS LUXBAGS MLS de bolsos y carteras importadas en Colombia. Catálogo maestro compartido de bodegas, vitrinas personalizadas con selector de colores, fletes liquidados y pedidos consolidados a WhatsApp.">
-  <meta name="keywords" content="bolsos al por mayor colombia, luxbagscol, carteras cali mayoristas, bolsos importados medellin, carteras bogota, dropshipping bolsos, bastion ai">
+  <title>BAGS WORLD MLS | Bolsa Mayorista de Bolsos & Carteras Colombia</title>
+  <meta name="description" content="Plataforma SaaS BAGS WORLD MLS de bolsos y carteras importadas en Colombia. Catálogo maestro compartido de bodegas, vitrinas personalizadas con selector de colores, fletes liquidados y pedidos consolidados a WhatsApp.">
+  <meta name="keywords" content="bolsos al por mayor colombia, bags world, carteras cali mayoristas, bolsos importados medellin, carteras bogota, dropshipping bolsos, bastion ai">
   <meta name="author" content="BASTION AI">
-  <meta name="theme-color" content="#e3c274">
+  <meta name="theme-color" content="#e6192e">
 
   <!-- Open Graph / WhatsApp / Facebook Link Previews -->
   <meta property="og:type" content="website">
-  <meta property="og:site_name" content="LUXBAGS MLS COLOMBIA">
-  <meta property="og:title" content="LUXBAGS MLS | Catálogo Mayorista de Bolsos & Carteras Colombia">
+  <meta property="og:site_name" content="BAGS WORLD MLS COLOMBIA">
+  <meta property="og:title" content="BAGS WORLD MLS | Catálogo Mayorista de Bolsos & Carteras Colombia">
   <meta property="og:description" content="👜 Pide con catálogo sincronizado, selector de colores, fletes calculados por ciudad y despacho contraentrega garantizado en toda Colombia.">
-  <meta property="og:image" content="assets/images/luxbags_logo.png">
+  <meta property="og:image" content="assets/images/bags_world_logo_transparent.png">
   <meta property="og:url" content="https://luxbags-nine.vercel.app/">
 
-  <!-- Favicons -->
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon.png">
-  <link rel="icon" type="image/png" sizes="64x64" href="assets/images/favicon.png">
-  <link rel="apple-touch-icon" href="assets/images/favicon.png">
+  <!-- Favicons con el nuevo logo sin fondo -->
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="assets/images/favicon-64.png">
+  <link rel="icon" type="image/png" href="assets/images/favicon.png">
+  <link rel="apple-touch-icon" href="assets/images/favicon-64.png">
   
   <!-- Google Fonts: Outfit & Montserrat -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -32,14 +33,14 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <!-- Background Canvas Interactivo & Partículas -->
+  <!-- Canvas Background Interactivo Black Hole & Partículas (Modo Oscuro) -->
   <canvas id="black-hole-canvas"></canvas>
 
-  <!-- Dot Pattern Matrix Overlay (Modo Oscuro Luxury Gold) -->
+  <!-- Dot Pattern Matrix Overlay (Modo Oscuro Cosmic Gold / Red Glow) -->
   <svg aria-hidden="true" class="dot-pattern-overlay">
     <defs>
-      <pattern id="dot-pattern-grid" width="20" height="20" patternUnits="userSpaceOnUse" patternContentUnits="userSpaceOnUse" x="0" y="0">
-        <circle cx="2" cy="2" r="1.2" fill="rgba(227, 194, 116, 0.45)" />
+      <pattern id="dot-pattern-grid" width="22" height="22" patternUnits="userSpaceOnUse" patternContentUnits="userSpaceOnUse" x="0" y="0">
+        <circle cx="2" cy="2" r="1.2" fill="rgba(227, 194, 116, 0.38)" />
       </pattern>
     </defs>
     <rect width="100%" height="100%" fill="url(#dot-pattern-grid)" />
@@ -52,9 +53,9 @@
     <header class="top-demo-hud">
       <div class="hud-container">
         <div class="hud-brand">
-          <img src="assets/images/luxbags_logo.png" alt="LUXBAGS Colombia" class="hud-logo-img">
+          <img src="assets/images/bags_world_logo_transparent.png" alt="BAGS WORLD Colombia" class="hud-logo-img">
           <div>
-            <div class="hud-title">LUXBAGS <span>MLS</span></div>
+            <div class="hud-title">BAGS WORLD <span>MLS</span></div>
             <div style="font-size: 10px; color: var(--text-muted); letter-spacing: 0.5px;">Bolsa Mayorista de Bolsos Colombia</div>
           </div>
         </div>
@@ -97,10 +98,10 @@
         <div class="store-header-container">
           <div class="store-info-left">
             <div class="store-avatar" id="storefront-avatar">
-              <img src="assets/images/luxbags_logo.png" alt="Logo Tienda" style="width: 100%; height: 100%; border-radius: 12px; object-fit: cover;">
+              <img src="assets/images/bags_world_logo_transparent.png" alt="Logo Tienda" style="width: 100%; height: 100%; object-fit: contain; padding: 2px;">
             </div>
             <div class="store-meta">
-              <h1 id="storefront-name">LUXBAGS Colombia <span class="badge-verified" id="storefront-badge">BODEGA MATRIZ VERIFICADA</span></h1>
+              <h1 id="storefront-name">BAGS WORLD Colombia <span class="badge-verified" id="storefront-badge">BODEGA MATRIZ VERIFICADA</span></h1>
               <p id="storefront-tagline">Bodega Mayorista Matriz | Bolsos, Carteras y Accesorios Importados con Envíos Contraentrega a Toda Colombia.</p>
               <div class="store-location-badge">
                 📍 <span id="storefront-location">Bodega Central Mayorista · Despachos Nacionales</span>
@@ -205,7 +206,7 @@
           <div>
             <div style="display: flex; align-items: center; gap: 8px;">
               <span class="category-tag">🏪 Portal de Mi Boutique</span>
-              <span style="font-size: 11px; color: var(--text-muted);">Sincronizado con Bodega Central LUXBAGS</span>
+              <span style="font-size: 11px; color: var(--text-muted);">Sincronizado con Bodega Central BAGS WORLD</span>
             </div>
             <h1 class="admin-heading-title" id="admin-store-title">Panel de Control de Boutique</h1>
             <p style="font-size: 13px; color: var(--text-secondary);">
@@ -273,7 +274,7 @@
     </main>
 
     <!-- =========================================================================
-         VISTA 3: PANEL DEL PROVEEDOR / BODEGA CENTRAL (LUXBAGS MATRIZ)
+         VISTA 3: PANEL DEL PROVEEDOR / BODEGA CENTRAL (BAGS WORLD MATRIZ)
          ========================================================================= -->
     <main id="view-supplier" class="view-panel" style="display: none;">
       <div class="main-wrapper" style="padding-top: 30px;">
@@ -281,9 +282,9 @@
           <div>
             <div style="display: flex; align-items: center; gap: 8px;">
               <span class="category-tag" style="background: rgba(227, 194, 116, 0.15); color: var(--primary-gold); border-color: rgba(227, 194, 116, 0.35);">👑 Bodega Mayorista Matriz</span>
-              <span style="font-size: 11px; color: var(--text-muted);">LUXBAGS Colombia · Despachos Nacionales</span>
+              <span style="font-size: 11px; color: var(--text-muted);">BAGS WORLD Colombia · Despachos Nacionales</span>
             </div>
-            <h1 class="admin-heading-title">LUXBAGS Colombia — Portal Bodega</h1>
+            <h1 class="admin-heading-title">BAGS WORLD Colombia — Portal Bodega</h1>
             <p style="font-size: 13px; color: var(--text-secondary);">
               Carga nuevas referencias de bolsos importados, importa mensajes de WhatsApp y gestiona las órdenes B2B de las boutiques.
             </p>
@@ -325,7 +326,7 @@
               <h3 style="font-size: 16px; font-weight: 800; color: #25d366; display: flex; align-items: center; gap: 8px;">
                 <span>⚡ Importador Rápido desde WhatsApp Mayoristas</span>
               </h3>
-              <span style="font-size: 12px; color: var(--text-secondary);">Pega el texto del grupo de WhatsApp (ej: LUXBAGS MAYORISTAS #67) y se creará el bolso automáticamente:</span>
+              <span style="font-size: 12px; color: var(--text-secondary);">Pega el texto del grupo de WhatsApp (ej: BAGS WORLD MAYORISTAS #67) y se creará el bolso automáticamente:</span>
             </div>
           </div>
           <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 14px;">
@@ -382,10 +383,10 @@ Medidas 16 alto x 20 ancho"></textarea>
       <div class="main-wrapper" style="padding-top: 30px;">
         <div class="admin-top-bar">
           <div>
-            <span class="category-tag">📍 Ecosistema Mayorista LUXBAGS</span>
+            <span class="category-tag">📍 Ecosistema Mayorista BAGS WORLD</span>
             <h1 class="admin-heading-title">Red de Boutiques & Simulación de Ganancias</h1>
             <p style="font-size: 13px; color: var(--text-secondary);">
-              Descubre cómo las boutiques y revendedoras conectadas al catálogo maestro de LUXBAGS escalan sus ingresos mensuales sin inmovilizar capital en inventario.
+              Descubre cómo las boutiques y revendedoras conectadas al catálogo maestro de BAGS WORLD escalan sus ingresos mensuales sin inmovilizar capital en inventario.
             </p>
           </div>
         </div>
@@ -426,7 +427,7 @@ Medidas 16 alto x 20 ancho"></textarea>
               <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Utilidad Neta Estimada / Mes:</div>
               <div id="roi-total-profit" style="font-size: 32px; font-weight: 900; color: var(--accent-emerald); margin: 6px 0;">$2.565.000 COP</div>
               <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.4;">
-                ✨ <strong>Cero riesgo de inventario:</strong> Tu boutique publica con fotos reales en Instagram/TikTok y LUXBAGS despacha por contraentrega en toda Colombia.
+                ✨ <strong>Cero riesgo de inventario:</strong> Tu boutique publica con fotos reales en Instagram/TikTok y BAGS WORLD despacha por contraentrega en toda Colombia.
               </div>
             </div>
           </div>
@@ -621,7 +622,7 @@ Medidas 16 alto x 20 ancho"></textarea>
         </div>
         <div class="form-group">
           <label class="form-label">Código de Estilo / SKU *</label>
-          <input type="text" id="new-prod-sku" class="form-input" required placeholder="Ej: LUX-STCH-01">
+          <input type="text" id="new-prod-sku" class="form-input" required placeholder="Ej: BW-STCH-01">
         </div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
           <div class="form-group">
@@ -667,7 +668,7 @@ Medidas 16 alto x 20 ancho"></textarea>
           <textarea id="new-prod-desc" class="form-textarea" rows="2" placeholder="Materiales, cierres, forro, correa ajustable, etc."></textarea>
         </div>
         <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; padding: 12px; margin-top: 10px;">
-          Publicar al Catálogo Maestro LUXBAGS
+          Publicar al Catálogo Maestro BAGS WORLD
         </button>
       </form>
     </div>
@@ -720,7 +721,7 @@ Medidas 16 alto x 20 ancho"></textarea>
         <input type="hidden" id="restock-prod-id">
         <div style="margin-bottom: 16px;">
           <h4 id="restock-prod-title" style="font-size: 16px; font-weight: 700; color: #fff;">Nombre del Bolso</h4>
-          <div id="restock-supplier-name" style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">LUXBAGS Colombia</div>
+          <div id="restock-supplier-name" style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">BAGS WORLD Colombia</div>
           <div id="restock-wholesale-price" style="font-size: 14px; color: var(--primary-gold); font-weight: 700; margin-top: 6px;">Costo Mayorista: $0 COP</div>
         </div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
