@@ -170,8 +170,8 @@ document.addEventListener("DOMContentLoaded", () => {
       title.textContent = "Acceso a Bodega Central";
       desc.textContent = "Ingresa el PIN de seguridad de Vanessa Castellar (PIN: 8820) para gestionar costos mayoristas e inventario matriz.";
     } else {
-      title.textContent = "Acceso a Panel de Revendedor";
-      desc.textContent = "Ingresa el PIN de tu tienda satélite (PIN: 1234) para modificar precios y margen de ganancia.";
+      title.textContent = "Acceso a Panel de Sneaker Partner";
+      desc.textContent = "Ingresa el PIN de tu vitrina aliada (PIN: 1234) para modificar precios y margen de ganancia.";
     }
 
     modal.classList.add("open");
@@ -915,7 +915,7 @@ document.addEventListener("DOMContentLoaded", () => {
       resellersVal.textContent = resellers;
       pairsVal.textContent = pairs;
 
-      // Ganancia Bodega: $25.000 COP por par vendido + $150.000 COP mensualidad SaaS por revendedor
+      // Ganancia Bodega: $25.000 COP por par vendido + $150.000 COP mensualidad SaaS por Sneaker Partner
       const pairProfits = resellers * pairs * 25000;
       const saasProfits = resellers * 150000;
       const totalMonthly = pairProfits + saasProfits;

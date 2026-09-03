@@ -400,24 +400,23 @@ const DEMO_ACCOUNTS = {
     pin: "8820",
     phone: "573505337256",
     isMasterSupplier: true,
-    securityNote: "Cuenta Matriz Mayorista con 10 líneas de WhatsApp y red de revendedores."
+    securityNote: "Cuenta Matriz Mayorista con 10 líneas de WhatsApp y red de Sneaker Partners."
   },
 
-  // ESCENARIO 2: Cali Shoes Distribuidora (Tienda Satélite / Revendedor de Vanessa)
+  // ESCENARIO 2: Cali Shoes Distribuidora (Sneaker Partner Aliado de Vanessa)
   calishoes: {
     id: "user-calishoes-02",
-    tenantId: "sup-001", // Afiliado a Vanessa
+    tenantId: "store-002",
     storeId: "store-002",
-    role: "store-admin",
-    name: "Cali Shoes Distribuidora",
-    businessName: "Cali Shoes Distribuidora (Sur / Ciudad Jardín, Cali)",
-    email: "contacto@calishoes.com",
     username: "calishoes",
-    password: "Calishoes2026",
+    name: "Cali Shoes Distribuidora",
+    email: "contacto@calishoes.com",
+    password: "Calishoes2026", // Contraseña privada solicitada
     pin: "1234",
-    phone: "573154443322",
+    phone: "573155551234",
+    role: "store-admin", // Sneaker Partner
     isMasterSupplier: false,
-    securityNote: "Cuenta Revendedora con margen propio y vitrina para clientes."
+    securityNote: "Cuenta Sneaker Partner con margen propio y vitrina para clientes."
   }
 };
 
