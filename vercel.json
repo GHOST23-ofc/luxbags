@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "name": "luxbags-mls",
   "cleanUrls": true,
   "trailingSlash": false,
   "headers": [
