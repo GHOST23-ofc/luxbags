@@ -1,21 +1,18 @@
-// ==============================================================================
-// SNEAKER WORLD MLS CALI - STATE & STORAGE MANAGER (BASTION AI)
-// Modo Claro Luxury + Rojo Torino + Protección de Costos Mayoristas & Supabase Ready
-// ==============================================================================
+// =========================================================================
+// BAGS WORLD MLS COLOMBIA - GESTOR DE ESTADO, AUTH & CATÁLOGO MAESTRO (Bastion AI)
+// =========================================================================
 
 const DB_KEYS = {
-  MASTER_PRODUCTS: "sneakerworld_master_products_v8",
-  STORES: "sneakerworld_stores_v8",
-  CURRENT_STORE_ID: "sneakerworld_current_store_id_v8",
-  ORDERS: "sneakerworld_orders_v8",
-  AUTH_SESSION: "sneakerworld_auth_session_v8",
-  LINE_ROTATION_INDEX: "sneakerworld_line_rotation_v8",
-  ACCOUNTS: "sneakerworld_accounts_v8"
+  MASTER_PRODUCTS: "bagsworld_master_products_v11",
+  STORES: "bagsworld_stores_v11",
+  CURRENT_STORE_ID: "bagsworld_current_store_id_v11",
+  ORDERS: "bagsworld_orders_v11",
+  CART_ITEMS: "bagsworld_cart_items_v11",
+  AUTH_SESSION: "bagsworld_auth_session_v11"
 };
 
-class ShoesStoreManager {
+class BagsWorldStoreManager {
   constructor() {
-    this.activeLineIndex = 0;
     this.init();
   }
 
@@ -30,262 +27,184 @@ class ShoesStoreManager {
       localStorage.setItem(DB_KEYS.ORDERS, JSON.stringify(INITIAL_ORDERS));
     }
     if (!localStorage.getItem(DB_KEYS.CURRENT_STORE_ID)) {
-      localStorage.setItem(DB_KEYS.CURRENT_STORE_ID, "store-001");
-    }
-    if (!localStorage.getItem(DB_KEYS.ACCOUNTS)) {
-      localStorage.setItem(DB_KEYS.ACCOUNTS, JSON.stringify(DEMO_ACCOUNTS));
+      localStorage.setItem(DB_KEYS.CURRENT_STORE_ID, "store-bolsoscol");
     }
   }
 
-  // Restablecer a datos de fábrica
-  resetToDefaults() {
+  resetDemo() {
     localStorage.setItem(DB_KEYS.MASTER_PRODUCTS, JSON.stringify(INITIAL_MASTER_PRODUCTS));
     localStorage.setItem(DB_KEYS.STORES, JSON.stringify(INITIAL_STORES));
     localStorage.setItem(DB_KEYS.ORDERS, JSON.stringify(INITIAL_ORDERS));
-    localStorage.setItem(DB_KEYS.CURRENT_STORE_ID, "store-001");
-    localStorage.setItem(DB_KEYS.ACCOUNTS, JSON.stringify(DEMO_ACCOUNTS));
+    localStorage.setItem(DB_KEYS.CURRENT_STORE_ID, "store-bolsoscol");
+    localStorage.removeItem(DB_KEYS.CART_ITEMS);
     localStorage.removeItem(DB_KEYS.AUTH_SESSION);
-    localStorage.removeItem(DB_KEYS.LINE_ROTATION_INDEX);
   }
 
   // =========================================================================
-  // SISTEMA DE AUTENTICACIÓN & GESTIÓN DE CUENTAS (CRM BASTION / GHOST)
+  // SISTEMA DE AUTENTICACIÓN (CRM BASTION / CRM GHOST STYLE)
   // =========================================================================
-  getAccounts() {
+  login(email, password) {
+    const stores = this.getStores();
+    const cleanEmail = (email || "").trim().toLowerCase();
+    const cleanPass = (password || "").trim();
+
+    const store = stores.find(s => (s.email || "").toLowerCase() === cleanEmail && s.password === cleanPass);
+
+    if (!store) {
+      return { success: false, message: "Correo o contraseña incorrectos. Revisa tus credenciales o usa el Acceso Demo." };
+    }
+
+    this.setCurrentStoreId(store.id);
+    const sessionData = {
+      storeId: store.id,
+      name: store.name,
+      email: store.email,
+      role: store.role || (store.isSupplierStore ? "super_admin" : "store_owner"),
+      loginTime: new Date().toISOString()
+    };
+    localStorage.setItem(DB_KEYS.AUTH_SESSION, JSON.stringify(sessionData));
+    return { success: true, store, session: sessionData };
+  }
+
+  quickLogin(storeId) {
+    const stores = this.getStores();
+    const store = stores.find(s => s.id === storeId);
+    if (!store) return false;
+
+    this.setCurrentStoreId(store.id);
+    const sessionData = {
+      storeId: store.id,
+      name: store.name,
+      email: store.email,
+      role: store.role || (store.isSupplierStore ? "super_admin" : "store_owner"),
+      loginTime: new Date().toISOString()
+    };
+    localStorage.setItem(DB_KEYS.AUTH_SESSION, JSON.stringify(sessionData));
+    return store;
+  }
+
+  getCurrentSession() {
     try {
-      const raw = localStorage.getItem(DB_KEYS.ACCOUNTS);
-      return raw ? JSON.parse(raw) : DEMO_ACCOUNTS;
-    } catch (e) {
-      return DEMO_ACCOUNTS;
-    }
-  }
-
-  saveAccounts(accounts) {
-    localStorage.setItem(DB_KEYS.ACCOUNTS, JSON.stringify(accounts));
-  }
-
-  getAuthSession() {
-    try {
-      return JSON.parse(localStorage.getItem(DB_KEYS.AUTH_SESSION)) || { role: "public", authenticated: false };
-    } catch (e) {
-      return { role: "public", authenticated: false };
-    }
-  }
-
-  // Login Unificado con Correo + Contraseña o PIN de Seguridad
-  loginWithCredentials(loginInput, passwordOrPin) {
-    const cleanInput = (loginInput || "").trim().toLowerCase();
-    const cleanPass = (passwordOrPin || "").trim();
-    const accounts = this.getAccounts();
-
-    // 1. Verificación de Llave Maestra Super-Admin SaaS (GHOST / Bastion CRM)
-    if (
-      (cleanInput === SUPER_ADMIN_CONFIG.masterEmail.toLowerCase() || cleanInput === SUPER_ADMIN_CONFIG.masterUsername) &&
-      (cleanPass === SUPER_ADMIN_CONFIG.masterKey || cleanPass === SUPER_ADMIN_CONFIG.recoveryPin)
-    ) {
-      const session = {
-        role: "super-admin",
-        authenticated: true,
-        user: {
-          name: "Super-Admin Bastion AI (Owner)",
-          email: SUPER_ADMIN_CONFIG.masterEmail,
-          isSuperAdmin: true
-        },
-        timestamp: Date.now()
-      };
-      localStorage.setItem(DB_KEYS.AUTH_SESSION, JSON.stringify(session));
-      return { success: true, isSuperAdmin: true, session };
-    }
-
-    // 2. Verificación de Cuentas Demo de Clientes (Vanessa o Cali Shoes)
-    for (const key in accounts) {
-      const acc = accounts[key];
-      const matchIdentifier = (
-        cleanInput === acc.email.toLowerCase() ||
-        cleanInput === acc.username.toLowerCase() ||
-        cleanInput === acc.phone ||
-        cleanInput === key
-      );
-
-      const matchPassword = (
-        cleanPass === acc.password ||
-        cleanPass === acc.pin ||
-        cleanPass === "Calishoes2026" || // Contraseña por defecto
-        cleanPass === SUPER_ADMIN_CONFIG.masterKey || // Master Override de Soporte
-        cleanPass === SUPER_ADMIN_CONFIG.recoveryPin
-      );
-
-      if (matchIdentifier && matchPassword) {
-        const session = {
-          role: acc.role,
-          authenticated: true,
-          accountKey: key,
-          user: acc,
-          tenantId: acc.tenantId,
-          storeId: acc.storeId,
-          timestamp: Date.now()
-        };
-        localStorage.setItem(DB_KEYS.AUTH_SESSION, JSON.stringify(session));
-        localStorage.setItem(DB_KEYS.CURRENT_STORE_ID, acc.storeId);
-        return { success: true, account: acc, session };
-      }
-    }
-
-    // 3. Fallback PINs numéricos rápidos
-    if (cleanPass === "8820" || cleanPass === "1234") {
-      const role = cleanPass === "8820" ? "supplier" : "store-admin";
-      const targetAcc = cleanPass === "8820" ? accounts.vanessa : accounts.calishoes;
-      const session = {
-        role,
-        authenticated: true,
-        user: targetAcc,
-        timestamp: Date.now()
-      };
-      localStorage.setItem(DB_KEYS.AUTH_SESSION, JSON.stringify(session));
-      return { success: true, account: targetAcc, session };
-    }
-
+      const raw = localStorage.getItem(DB_KEYS.AUTH_SESSION);
+      if (raw) return JSON.parse(raw);
+    } catch (e) {}
+    const store = this.getCurrentStore();
     return {
-      success: false,
-      message: "Credenciales no válidas. Prueba correo: vanessa@castellarshoes.com y contraseña: Calishoes2026"
+      storeId: store.id,
+      name: store.name,
+      email: store.email,
+      role: store.role || (store.isSupplierStore ? "super_admin" : "store_owner")
     };
-  }
-
-  // Compatibilidad con modal rápido de PIN
-  authenticate(role, pin) {
-    if (pin === "Calishoes2026" || pin === "8820" || pin === "1234" || pin === SUPER_ADMIN_CONFIG.masterKey || pin === "9999") {
-      const session = { role, authenticated: true, timestamp: Date.now() };
-      localStorage.setItem(DB_KEYS.AUTH_SESSION, JSON.stringify(session));
-      return { success: true };
-    }
-    return { success: false, message: "PIN de seguridad o contraseña incorrecta." };
-  }
-
-  // Cambio de Credenciales y Seguridad de Cuenta en Privado
-  updateAccountSecurity(accountKey, { name, email, password, pin, phone }) {
-    const accounts = this.getAccounts();
-    if (!accounts[accountKey]) return { success: false, message: "Cuenta no encontrada." };
-
-    if (name) accounts[accountKey].name = name;
-    if (email) accounts[accountKey].email = email;
-    if (password) accounts[accountKey].password = password;
-    if (pin) accounts[accountKey].pin = pin;
-    if (phone) accounts[accountKey].phone = phone;
-
-    this.saveAccounts(accounts);
-
-    // Actualizar sesión activa
-    const session = this.getAuthSession();
-    if (session && session.user) {
-      session.user = { ...session.user, ...accounts[accountKey] };
-      localStorage.setItem(DB_KEYS.AUTH_SESSION, JSON.stringify(session));
-    }
-
-    return { success: true, account: accounts[accountKey] };
-  }
-
-  // Reseteo de Emergencia por el Dueño del SaaS (GHOST / Bastion AI)
-  superAdminResetPassword(accountKey, newPassword = "Calishoes2026") {
-    const accounts = this.getAccounts();
-    if (accounts[accountKey]) {
-      accounts[accountKey].password = newPassword;
-      accounts[accountKey].pin = (accountKey === "vanessa") ? "8820" : "1234";
-      this.saveAccounts(accounts);
-      return { success: true, message: `Contraseña de ${accounts[accountKey].name} restablecida a '${newPassword}'` };
-    }
-    return { success: false, message: "Cuenta no encontrada." };
-  }
-
-  // Descargar Copia de Respaldo de Seguridad JSON (Data Loss Prevention)
-  exportBackupData() {
-    const backup = {
-      timestamp: new Date().toISOString(),
-      platform: "SNEAKER WORLD MLS CALI",
-      author: "Bastion AI / GHOST CRM",
-      accounts: this.getAccounts(),
-      stores: this.getStores(),
-      products: this.getMasterProducts(true),
-      orders: this.getOrders()
-    };
-    return JSON.stringify(backup, null, 2);
   }
 
   logout() {
-    localStorage.setItem(DB_KEYS.AUTH_SESSION, JSON.stringify({ role: "public", authenticated: false }));
+    localStorage.removeItem(DB_KEYS.AUTH_SESSION);
+    this.setCurrentStoreId("store-bolsoscol");
   }
 
   // =========================================================================
-  // GESTIÓN DE PRODUCTOS Y MÁSCARA PÚBLICA
+  // PRIVACIDAD & GESTIÓN DE SEGURIDAD
   // =========================================================================
-  getMasterProducts(requireAuth = false) {
-    const raw = localStorage.getItem(DB_KEYS.MASTER_PRODUCTS);
-    const products = raw ? JSON.parse(raw) : INITIAL_MASTER_PRODUCTS;
-
-    // Si es público y requiere confidencialidad, se eliminan los costos mayoristas
-    if (!requireAuth) {
-      return products;
-    }
-
-    const session = this.getAuthSession();
-    if (!session.authenticated && session.role !== "supplier") {
-      // Ocultar costos mayoristas
-      return products.map(p => {
-        const { wholesalePrice, ...safeData } = p;
-        return safeData;
-      });
-    }
-
-    return products;
-  }
-
-  addMasterProduct(productData) {
-    const products = this.getMasterProducts(false);
-    const newProduct = {
-      id: "prod-snk-" + Date.now(),
-      sku: productData.sku || "NK-" + Math.floor(1000 + Math.random() * 9000),
-      name: productData.name,
-      category: productData.category || "Running & Tech",
-      tagline: productData.tagline || "Silueta deportiva premium importada.",
-      description: productData.description || "",
-      image: productData.image || "assets/images/nike_initiator_babyblue.jpg",
-      wholesalePrice: Number(productData.wholesalePrice) || 120000,
-      suggestedRetailPrice: Number(productData.suggestedRetailPrice) || 195000,
-      sizes: productData.sizes || [37, 38, 39, 40, 41, 42],
-      colorways: productData.colorways && productData.colorways.length > 0 
-        ? productData.colorways 
-        : [{ name: "Tono Principal", image: productData.image || "assets/images/nike_initiator_babyblue.jpg", sku: productData.sku || "NK-01" }],
-      supplierId: "sup-001",
-      supplierName: "Vanessa Castellar Shoes (Bodega Central)",
-      createdAt: new Date().toISOString().split("T")[0]
-    };
-    products.unshift(newProduct);
-    localStorage.setItem(DB_KEYS.MASTER_PRODUCTS, JSON.stringify(products));
-
-    // Agregar automáticamente a todas las tiendas de la red
+  updateStoreSecurity(storeId, { email, currentPassword, newPassword }) {
     const stores = this.getStores();
-    stores.forEach(st => {
-      st.products.unshift({
-        productId: newProduct.id,
-        customPrice: newProduct.suggestedRetailPrice,
-        active: true,
-        availableSizes: [...newProduct.sizes]
-      });
-    });
-    localStorage.setItem(DB_KEYS.STORES, JSON.stringify(stores));
+    const store = stores.find(s => s.id === storeId);
+    if (!store) return { success: false, message: "Tienda no encontrada." };
 
-    return newProduct;
+    if (currentPassword && store.password !== currentPassword.trim()) {
+      return { success: false, message: "La contraseña actual no coincide." };
+    }
+
+    if (email && email.trim() !== "") {
+      store.email = email.trim().toLowerCase();
+    }
+
+    if (newPassword && newPassword.trim().length >= 4) {
+      store.password = newPassword.trim();
+    }
+
+    this.saveStores(stores);
+    return { success: true, store, message: "Credenciales y privacidad actualizadas correctamente." };
+  }
+
+  // Respaldo Maestro / Recuperación de Contraseña por el Dueño del SaaS
+  resetStorePasswordByAdmin(storeId, newPassword) {
+    const stores = this.getStores();
+    const store = stores.find(s => s.id === storeId);
+    if (!store) return { success: false, message: "Tienda no encontrada." };
+
+    store.password = (newPassword || "Bolsos2026*").trim();
+    this.saveStores(stores);
+    return { success: true, store, newPassword: store.password };
   }
 
   // =========================================================================
-  // GESTIÓN DE TIENDAS Y VITRINAS
+  // GESTIÓN DE BACKUPS & SEGURIDAD DE DATOS (NO DATA LOSS)
   // =========================================================================
+  exportStoreBackup(storeId) {
+    const store = this.getStores().find(s => s.id === storeId);
+    const master = this.getMasterProducts();
+    const orders = this.getOrders().filter(o => o.storeName === (store ? store.name : ""));
+
+    return {
+      timestamp: new Date().toISOString(),
+      saas: "BAGS WORLD MLS (Bastion AI)",
+      store,
+      customCatalog: this.getStorefrontProducts(store),
+      orders
+    };
+  }
+
+  exportSaaSFullBackup() {
+    return {
+      timestamp: new Date().toISOString(),
+      saas: "BAGS WORLD MLS (Bastion AI)",
+      masterProducts: this.getMasterProducts(),
+      stores: this.getStores(),
+      orders: this.getOrders()
+    };
+  }
+
+  // =========================================================================
+  // CATÁLOGO & PRODUCTOS
+  // =========================================================================
+  getMasterProducts() {
+    try {
+      const raw = localStorage.getItem(DB_KEYS.MASTER_PRODUCTS);
+      const parsed = raw ? JSON.parse(raw) : INITIAL_MASTER_PRODUCTS;
+      if (!Array.isArray(parsed) || parsed.length < 8 || !parsed[0].sku.startsWith("BW-")) {
+        localStorage.setItem(DB_KEYS.MASTER_PRODUCTS, JSON.stringify(INITIAL_MASTER_PRODUCTS));
+        return INITIAL_MASTER_PRODUCTS;
+      }
+      return parsed;
+    } catch (e) {
+      return INITIAL_MASTER_PRODUCTS;
+    }
+  }
+
+  saveMasterProducts(products) {
+    localStorage.setItem(DB_KEYS.MASTER_PRODUCTS, JSON.stringify(products));
+  }
+
   getStores() {
-    const raw = localStorage.getItem(DB_KEYS.STORES);
-    return raw ? JSON.parse(raw) : INITIAL_STORES;
+    try {
+      const raw = localStorage.getItem(DB_KEYS.STORES);
+      const parsed = raw ? JSON.parse(raw) : INITIAL_STORES;
+      if (!Array.isArray(parsed) || parsed.length === 0 || !parsed.some(s => s.id === "store-bolsoscol")) {
+        localStorage.setItem(DB_KEYS.STORES, JSON.stringify(INITIAL_STORES));
+        return INITIAL_STORES;
+      }
+      return parsed;
+    } catch (e) {
+      return INITIAL_STORES;
+    }
+  }
+
+  saveStores(stores) {
+    localStorage.setItem(DB_KEYS.STORES, JSON.stringify(stores));
   }
 
   getCurrentStoreId() {
-    return localStorage.getItem(DB_KEYS.CURRENT_STORE_ID) || "store-001";
+    return localStorage.getItem(DB_KEYS.CURRENT_STORE_ID) || "store-bolsoscol";
   }
 
   setCurrentStoreId(storeId) {
@@ -294,259 +213,260 @@ class ShoesStoreManager {
 
   getCurrentStore() {
     const stores = this.getStores();
-    const id = this.getCurrentStoreId();
-    return stores.find(s => s.id === id) || stores[0];
+    const currentId = this.getCurrentStoreId();
+    return stores.find(s => s.id === currentId) || stores[0];
   }
 
-  updateStoreProductPrice(storeId, productId, newPrice) {
-    const stores = this.getStores();
-    const store = stores.find(s => s.id === storeId);
-    if (store) {
-      let p = store.products.find(item => item.productId === productId);
-      if (!p) {
-        const master = this.getMasterProducts(false);
-        const mp = master.find(m => m.id === productId);
-        p = {
-          productId,
-          customPrice: Number(newPrice),
-          active: true,
-          availableSizes: mp ? [...mp.sizes] : [37, 38, 39, 40, 41, 42]
-        };
-        store.products.push(p);
-      } else {
-        p.customPrice = Number(newPrice);
-      }
-      localStorage.setItem(DB_KEYS.STORES, JSON.stringify(stores));
+  getOrders() {
+    try {
+      const raw = localStorage.getItem(DB_KEYS.ORDERS);
+      return raw ? JSON.parse(raw) : INITIAL_ORDERS;
+    } catch (e) {
+      return INITIAL_ORDERS;
     }
   }
 
-  toggleStoreProductActive(storeId, productId) {
-    const stores = this.getStores();
-    const store = stores.find(s => s.id === storeId);
-    if (store) {
-      let p = store.products.find(item => item.productId === productId);
-      if (!p) {
-        const master = this.getMasterProducts(false);
-        const mp = master.find(m => m.id === productId);
-        p = {
-          productId,
-          customPrice: mp ? mp.suggestedRetailPrice : 185000,
-          active: false,
-          availableSizes: mp ? [...mp.sizes] : [37, 38, 39, 40, 41, 42]
-        };
-        store.products.push(p);
-      } else {
-        p.active = !p.active;
-      }
-      localStorage.setItem(DB_KEYS.STORES, JSON.stringify(stores));
-      return p.active;
-    }
-    return false;
-  }
-
-  toggleStoreSize(storeId, productId, size) {
-    const stores = this.getStores();
-    const store = stores.find(s => s.id === storeId);
-    if (store) {
-      let p = store.products.find(item => item.productId === productId);
-      const master = this.getMasterProducts(false);
-      const mp = master.find(m => m.id === productId);
-
-      if (!p) {
-        p = {
-          productId,
-          customPrice: mp ? mp.suggestedRetailPrice : 185000,
-          active: true,
-          availableSizes: mp ? [...mp.sizes] : [37, 38, 39, 40, 41, 42]
-        };
-        store.products.push(p);
-      }
-
-      if (!p.availableSizes) {
-        p.availableSizes = mp ? [...mp.sizes] : [37, 38, 39, 40, 41, 42];
-      }
-
-      const numSize = Number(size);
-      if (p.availableSizes.includes(numSize)) {
-        p.availableSizes = p.availableSizes.filter(s => s !== numSize);
-      } else {
-        p.availableSizes.push(numSize);
-        p.availableSizes.sort((a, b) => a - b);
-      }
-
-      localStorage.setItem(DB_KEYS.STORES, JSON.stringify(stores));
-      return p.availableSizes.includes(numSize);
-    }
-    return false;
+  saveOrders(orders) {
+    localStorage.setItem(DB_KEYS.ORDERS, JSON.stringify(orders));
   }
 
   getStorefrontProducts(store) {
-    const master = this.getMasterProducts(false);
-    return master
-      .filter(mp => {
-        const sp = (store.products || []).find(p => p.productId === mp.id);
-        if (store.isSupplierStore) {
-          return !sp || sp.active !== false;
-        }
-        return sp && sp.active !== false && sp.availableSizes && sp.availableSizes.length > 0;
-      })
-      .map(mp => {
-        const sp = (store.products || []).find(p => p.productId === mp.id);
-        const { wholesalePrice, ...safeMp } = mp;
-        return {
-          ...safeMp,
-          storeRetailPrice: (sp && sp.customPrice) ? sp.customPrice : mp.suggestedRetailPrice,
-          storeAvailableSizes: (sp && sp.availableSizes) ? sp.availableSizes : mp.sizes
-        };
+    const master = this.getMasterProducts();
+    const storeProducts = store && Array.isArray(store.products) ? store.products : [];
+
+    return master.map(mp => {
+      const sp = storeProducts.find(p => p.productId === mp.id);
+      const isActive = sp ? sp.active !== false : true;
+      const customPrice = sp && sp.customPrice ? sp.customPrice : mp.suggestedRetailPrice;
+
+      return {
+        ...mp,
+        storeRetailPrice: customPrice,
+        isActiveInStore: isActive
+      };
+    }).filter(p => p.isActiveInStore !== false);
+  }
+
+  updateStorePrice(storeId, productId, newPrice) {
+    const stores = this.getStores();
+    const store = stores.find(s => s.id === storeId);
+    if (!store) return false;
+
+    if (!store.products) store.products = [];
+    const prodConfig = store.products.find(p => p.productId === productId);
+
+    if (prodConfig) {
+      prodConfig.customPrice = parseInt(newPrice, 10);
+    } else {
+      store.products.push({
+        productId,
+        customPrice: parseInt(newPrice, 10),
+        active: true
       });
+    }
+
+    this.saveStores(stores);
+    return true;
   }
 
-  // =========================================================================
-  // GESTIÓN DE PEDIDOS Y FLETES
-  // =========================================================================
-  getOrders() {
-    const raw = localStorage.getItem(DB_KEYS.ORDERS);
-    return raw ? JSON.parse(raw) : INITIAL_ORDERS;
+  toggleProductActive(storeId, productId) {
+    const stores = this.getStores();
+    const store = stores.find(s => s.id === storeId);
+    if (!store) return false;
+
+    if (!store.products) store.products = [];
+    const prodConfig = store.products.find(p => p.productId === productId);
+
+    if (prodConfig) {
+      prodConfig.active = !prodConfig.active;
+    } else {
+      store.products.push({
+        productId,
+        customPrice: 120000,
+        active: false
+      });
+    }
+
+    this.saveStores(stores);
+    return prodConfig ? prodConfig.active : false;
   }
 
-  addB2BOrder(orderData) {
+  updateStoreProfile(storeId, { name, tagline, phone, neighborhood }) {
+    const stores = this.getStores();
+    const store = stores.find(s => s.id === storeId);
+    if (!store) return false;
+
+    if (name) store.name = name;
+    if (tagline) store.tagline = tagline;
+    if (phone) store.phone = phone.replace(/[^0-9]/g, "");
+    if (neighborhood) store.neighborhood = neighborhood;
+
+    this.saveStores(stores);
+    return true;
+  }
+
+  addMasterProduct(newProduct) {
+    const master = this.getMasterProducts();
+    const product = {
+      id: "prod-lux-" + Date.now().toString(36),
+      sku: newProduct.sku || `BW-${Math.floor(1000 + Math.random() * 9000)}`,
+      name: newProduct.name || "Nuevo Bolso Importado",
+      category: newProduct.category || "Totes & Handbags",
+      tagline: newProduct.tagline || "Bolso importado calidad superior.",
+      description: newProduct.description || "Confección de alta calidad con herrajes metálicos reforzados.",
+      image: newProduct.image || "assets/images/bags/tote_horse_charm_cream.jpg",
+      dimensions: newProduct.dimensions || "18 cm (Alto) x 22 cm (Ancho) x 8 cm (Prof.)",
+      sizeCategory: newProduct.sizeCategory || "Mediano (20-28cm)",
+      colorways: newProduct.colorways || [
+        { name: "Negro Ónix", image: newProduct.image || "assets/images/bags/tote_horse_charm_cream.jpg", sku: "BW-BLK" }
+      ],
+      wholesalePrice: parseInt(newProduct.wholesalePrice || "68000", 10),
+      suggestedRetailPrice: parseInt(newProduct.suggestedRetailPrice || "125000", 10),
+      supplierId: "sup-001",
+      supplierName: "BAGS WORLD Colombia (Bodega Matriz)",
+      createdAt: new Date().toISOString().slice(0, 10)
+    };
+
+    master.unshift(product);
+    this.saveMasterProducts(master);
+    return product;
+  }
+
+  parseWhatsAppWholesaleText(rawText) {
+    if (!rawText || rawText.trim() === "") return null;
+
+    const priceMatch = rawText.match(/\$?([0-9]{2,3})[.,]([0-9]{3})/);
+    let wholesalePrice = 68000;
+    if (priceMatch) {
+      wholesalePrice = parseInt(priceMatch[1] + priceMatch[2], 10);
+    }
+
+    const marginPVP = Math.round(wholesalePrice * 1.8 / 1000) * 1000;
+
+    let dimensions = "18 cm (Alto) x 22 cm (Ancho) x 8 cm (Profundidad)";
+    const dimMatch = rawText.match(/medidas?:?\s*([0-9xX\s\w]+)/i);
+    if (dimMatch) {
+      dimensions = dimMatch[1].trim();
+    }
+
+    const lines = rawText.split("\n").map(l => l.trim()).filter(l => l.length > 0);
+    const titleLine = lines.find(l => l.toUpperCase().includes("BOLSO") || l.toUpperCase().includes("COLECCIÓN") || l.toUpperCase().includes("TOTE")) || lines[0] || "Nuevo Bolso Importado BAGS WORLD";
+
+    let colorCount = 1;
+    const colorMatch = rawText.match(/([0-9]+)\s*colores/i);
+    if (colorMatch) {
+      colorCount = parseInt(colorMatch[1], 10);
+    }
+
+    return {
+      name: titleLine.replace(/[$0-9.,]/g, "").replace(/[🔝🤯🖤✨]/g, "").trim(),
+      sku: `BW-${Math.floor(1000 + Math.random() * 9000)}`,
+      category: "Totes & Handbags",
+      tagline: "Importado calidad superior detectado desde WhatsApp.",
+      description: rawText.substring(0, 220),
+      image: "assets/images/bags/tote_horse_charm_cream.jpg",
+      dimensions,
+      wholesalePrice,
+      suggestedRetailPrice: marginPVP,
+      colorways: Array.from({ length: Math.min(colorCount, 6) }).map((_, i) => ({
+        name: `Tono #${i + 1}`,
+        image: "assets/images/bags/tote_horse_charm_cream.jpg",
+        sku: `BW-TONO-${i + 1}`
+      }))
+    };
+  }
+
+  createB2BOrder({ storeName, productName, colorway, units, totalWholesale, supplierName }) {
     const orders = this.getOrders();
-    const dateStr = new Date().toISOString().replace("T", " ").substring(0, 16);
     const newOrder = {
       id: "ord-" + Math.floor(1000 + Math.random() * 9000),
-      date: dateStr,
-      storeName: orderData.storeName,
-      productName: orderData.productName,
-      size: orderData.size,
-      colorway: orderData.colorway || "Estándar",
+      date: new Date().toISOString().replace("T", " ").substring(0, 16),
+      storeName,
+      productName,
+      colorway,
       type: "B2B Restock (Reposición)",
-      units: Number(orderData.units) || 1,
-      totalWholesale: Number(orderData.totalWholesale) || 0,
+      units,
+      totalWholesale,
       status: "En Alistamiento",
-      supplierName: orderData.supplierName || "Vanessa Castellar Shoes (Bodega Central)"
+      supplierName
     };
     orders.unshift(newOrder);
-    localStorage.setItem(DB_KEYS.ORDERS, JSON.stringify(orders));
+    this.saveOrders(orders);
     return newOrder;
   }
 
-  formatCOP(value) {
-    return new Intl.NumberFormat("es-CO", {
-      style: "currency",
-      currency: "COP",
-      maximumFractionDigits: 0
-    }).format(value || 0);
+  buildSingleProductWhatsAppUrl(store, product, selectedColorway) {
+    const cleanPhone = (store.phone || "573165558899").replace(/[^0-9]/g, "");
+    const colorName = selectedColorway ? selectedColorway.name : "Color Original";
+    const formattedPrice = this.formatCOP(product.storeRetailPrice);
+
+    const message = `✨ *SOLICITUD DE PEDIDO - BAGS WORLD COLOMBIA* ✨
+------------------------------------------
+🏪 *Boutique:* ${store.name}
+📍 *Ubicación:* ${store.neighborhood}
+
+👜 *Bolso:* ${product.name}
+🎨 *Colorway:* ${colorName}
+🏷️ *SKU:* ${product.sku}
+📐 *Medidas:* ${product.dimensions || 'Estándar'}
+💰 *Valor Unitario:* ${formattedPrice} COP
+
+🛵 *Modalidad:* Despacho Contraentrega Nacional
+------------------------------------------
+👋 ¡Hola! Quiero pedir este bolso en color *${colorName}*. ¿Tienen disponibilidad para despacho hoy?`;
+
+    return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
   }
 
-  getSizeCm(size) {
-    const sizeMap = {
-      35: "22.5 cm",
-      36: "23.0 cm",
-      37: "23.8 cm",
-      38: "24.5 cm",
-      39: "25.0 cm",
-      40: "25.8 cm",
-      41: "26.5 cm",
-      42: "27.2 cm",
-      43: "28.0 cm",
-      44: "28.8 cm"
-    };
-    return sizeMap[size] || "24.5 cm";
-  }
+  buildConsolidatedCartWhatsAppUrl(store, cartItems, customerData, selectedZone, dispatchMode) {
+    const cleanPhone = (store.phone || "573165558899").replace(/[^0-9]/g, "");
+    const totalBags = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+    const shippingFee = selectedZone ? selectedZone.fee : 12000;
+    const grandTotal = totalBags + shippingFee;
 
-  // =========================================================================
-  // BALANCEADOR INTELIGENTE ROUND-ROBIN (10 LÍNEAS DE WHATSAPP)
-  // =========================================================================
-  getNextWhatsAppLine(store) {
-    const targetStore = store || this.getCurrentStore();
-    if (!targetStore || !targetStore.whatsappLines || targetStore.whatsappLines.length === 0) {
-      const fallbackPhone = (targetStore && targetStore.phone) ? targetStore.phone : "573505337256";
-      return { phone: fallbackPhone, name: "Línea Central" };
-    }
-
-    const lines = targetStore.whatsappLines.filter(l => l.active !== false);
-    if (lines.length === 0) {
-      return targetStore.whatsappLines[0] || { phone: "573505337256", name: "Línea Central" };
-    }
-
-    let currentIndex = parseInt(localStorage.getItem(DB_KEYS.LINE_ROTATION_INDEX) || "0", 10);
-    const line = lines[currentIndex % lines.length];
-    
-    // Rotar para el próximo cliente
-    localStorage.setItem(DB_KEYS.LINE_ROTATION_INDEX, (currentIndex + 1) % lines.length);
-    return line;
-  }
-
-  // Generador de Mensaje de WhatsApp para 1 solo Par
-  buildSingleProductWhatsAppUrl(store, product, colorway, size) {
-    const assignedLine = this.getNextWhatsAppLine(store);
-    const phone = assignedLine.phone || assignedLine || "573505337256";
-    const formattedPrice = this.formatCOP(product.storeRetailPrice || product.suggestedRetailPrice);
-    const colorName = colorway ? colorway.name : "Color Principal";
-    const cm = this.getSizeCm(size);
-
-    const text = `👋 *¡Hola ${store.name}!* Vi este modelo en su vitrina digital y quiero apartarlo:
-
-👟 *MODELO:* ${product.name}
-🔖 *SKU:* ${product.sku}
-🎨 *COLOR:* ${colorName}
-📏 *TALLA:* ${size} (Plantilla: ${cm})
-💰 *PRECIO:* ${formattedPrice}
-
-📍 *Destino en Cali:* (Indicar Barrio / Comuna)
-🛵 *Modalidad:* Despacho Hoy Contraentrega / Asegurado
-
-¿Me confirman disponibilidad inmediata para despacho hoy? ¡Muchas gracias! ✨`;
-
-    return `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
-  }
-
-  // Generador de Mensaje de WhatsApp para Carrito Multi-Par Consolidado
-  buildConsolidatedCartWhatsAppUrl(store, cartItems, clientData, shippingZone, dispatchMode) {
-    const assignedLine = this.getNextWhatsAppLine(store);
-    const phone = assignedLine.phone || assignedLine || "573505337256";
-    const totalShoesPrice = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-    const shippingFee = shippingZone ? shippingZone.fee : 10000;
-    const grandTotal = totalShoesPrice + shippingFee;
-    const refCode = "SW-" + Math.floor(1000 + Math.random() * 9000);
-
-    const itemsSummary = cartItems.map((item, i) => {
-      const cm = this.getSizeCm(item.size);
-      return `${i + 1}. 👟 *${item.name}*
-   • Talla: ${item.size} (${cm}) | Color: ${item.colorway}
-   • Cant: ${item.quantity} par(es) | Subtotal: ${this.formatCOP(item.price * item.quantity)}`;
+    const itemsSummary = cartItems.map((item, idx) => {
+      return `${idx + 1}. 👜 *${item.name}* (${item.quantity} und)
+   • Color: ${item.colorway}
+   • Subtotal: ${this.formatCOP(item.price * item.quantity)}`;
     }).join("\n\n");
 
-    const dispatchText = dispatchMode === "secured" 
-      ? `🛡️ *Despacho Asegurado* (Abono de flete ${this.formatCOP(shippingFee)} por Nequi/Daviplata + saldo en efectivo al recibir)`
-      : `🛵 *100% Contraentrega al Recibir* (Pago total en puerta al motorizado)`;
+    const modeText = dispatchMode === "secured"
+      ? `🛡️ *Despacho Asegurado:* Abono flete (${this.formatCOP(shippingFee)}) por Nequi/Daviplata y bolsos contraentrega.`
+      : `🛵 *100% Contraentrega:* Pago totalidad al recibir en puerta.`;
 
-    const text = `🛍️ *¡NUEVO PEDIDO CONSOLIDADO SNEAKER WORLD MLS!*
-*Comanda:* #${refCode}
-*Tienda:* ${store.name}
+    const message = `✨ *PEDIDO CONSOLIDADO DE BOLSOS - BAGS WORLD* ✨
+==========================================
+🏪 *Boutique:* ${store.name}
 
-👤 *DATOS DE ENTREGA:*
-• *Cliente:* ${clientData.name || 'Cliente'}
-• *WhatsApp:* ${clientData.phone || 'El mismo'}
-• *Barrio / Zona:* ${shippingZone ? shippingZone.name : 'Cali'}
-• *Dirección:* ${clientData.address || 'Pendiente por confirmar'}
+👤 *Cliente:* ${customerData.name || 'Cliente Directo'}
+📱 *WhatsApp:* ${customerData.phone || 'No especificado'}
+📍 *Dirección:* ${customerData.address || 'No especificada'}
+🏙️ *Destino:* ${selectedZone ? selectedZone.name : 'Colombia'}
 
-📦 *DETALLE DE CALZADO (${cartItems.length} ref / ${cartItems.reduce((a, b) => a + b.quantity, 0)} pares):*
+🛍️ *BOLSOS SOLICITADOS:*
+------------------------------------------
 ${itemsSummary}
 
-💵 *LIQUIDACIÓN DEL PEDIDO:*
-• Calzado: ${this.formatCOP(totalShoesPrice)}
-• Domicilio Motorizado: ${this.formatCOP(shippingFee)} (${shippingZone ? shippingZone.time : 'Hoy mismo'})
-👉 *GRAN TOTAL A COBRAR: ${this.formatCOP(grandTotal)}*
+------------------------------------------
+💰 *Subtotal Bolsos:* ${this.formatCOP(totalBags)}
+🛵 *Flete Estimado:* ${this.formatCOP(shippingFee)} (${selectedZone ? selectedZone.time : 'Hoy'})
+💳 *GRAN TOTAL A PAGAR:* ${this.formatCOP(grandTotal)} COP
 
-🚚 *MODALIDAD:*
-${dispatchText}
+📦 *MODALIDAD DE DESPACHO:*
+${modeText}
+==========================================
+⚡ *Reserva de Bodega Activa:* Solicitud enviada para confirmación de inventario y despacho inmediato.`;
 
-⚡ *Reserva de bodega activa (20 min):* Por favor confirmar disponibilidad para preparar en bodega de San Andresito Cali. ¡Gracias! ✨`;
+    return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+  }
 
-    return `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
+  formatCOP(value) {
+    return "$" + parseInt(value || 0, 10).toLocaleString("es-CO");
   }
 }
 
-// Instancia global del manejador
-const db = new ShoesStoreManager();
+const db = new BagsWorldStoreManager();
+
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = { BagsWorldStoreManager, db };
+}
