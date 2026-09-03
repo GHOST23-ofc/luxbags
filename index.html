@@ -5,63 +5,89 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <!-- Primary SEO -->
-  <title>BAGS WORLD MLS | Bolsa Mayorista de Bolsos & Carteras Colombia</title>
-  <meta name="description" content="Plataforma SaaS BAGS WORLD MLS de bolsos y carteras importadas en Colombia. Catálogo maestro compartido de bodegas, vitrinas personalizadas con selector de colores, fletes liquidados y pedidos consolidados a WhatsApp.">
-  <meta name="keywords" content="bolsos al por mayor colombia, bags world, bolsoscol, calibolsos2026, carteras cali mayoristas, bolsos importados medellin, carteras bogota, dropshipping bolsos, bastion ai">
+  <title>SNEAKER WORLD MLS | Bolsa de Calzado Mayorista & Vitrinas Cali</title>
+  <meta name="description" content="Plataforma digital de calzado urbano y deportivo en Cali. Filtra por tu talla exacta (35 a 44), fletes liquidados por barrio y despacho el mismo día con Vanessa Castellar Shoes (San Andresito de la 38).">
+  <meta name="keywords" content="zapatillas cali, calzado san andresito 38 cali, mayoristas zapatillas cali, vanessa castellar shoes, dropshipping calzado colombia, sneakers cali contraentrega, bastion ai">
   <meta name="author" content="BASTION AI">
-  <meta name="theme-color" content="#06070a">
+  <meta name="theme-color" content="#e6192e">
 
   <!-- Open Graph / WhatsApp / Facebook Link Previews -->
   <meta property="og:type" content="website">
-  <meta property="og:site_name" content="BAGS WORLD MLS COLOMBIA">
-  <meta property="og:title" content="BAGS WORLD MLS | Catálogo Mayorista de Bolsos & Carteras Colombia">
-  <meta property="og:description" content="👜 Pide con catálogo sincronizado, selector de colores, fletes calculados por ciudad y despacho contraentrega garantizado en toda Colombia.">
-  <meta property="og:image" content="assets/images/bags_world_logo_transparent.png">
-  <meta property="og:url" content="https://luxbags-nine.vercel.app/">
+  <meta property="og:site_name" content="SNEAKER WORLD MLS">
+  <meta property="og:title" content="SNEAKER WORLD MLS | Catálogo Mayorista de Calzado Cali">
+  <meta property="og:description" content="👟 Pide con tu talla exacta, fletes calculados por barrio en Cali y despacho contraentrega garantizado con Vanessa Castellar Shoes.">
+  <meta property="og:image" content="https://sneakerworld-mls.vercel.app/assets/images/sneaker_world_logo_transparent.png">
+  <meta property="og:image:width" content="1024">
+  <meta property="og:image:height" content="1024">
+  <meta property="og:image:alt" content="Logo Oficial SNEAKER WORLD MLS">
+  <meta property="og:url" content="https://sneakerworld-mls.vercel.app/">
+
+  <!-- Twitter Cards -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SNEAKER WORLD MLS | Vitrina Inteligente de Calzado Cali">
+  <meta name="twitter:description" content="Catálogo sincronizado de calzado mayorista en San Andresito de la 38 Cali con Vanessa Castellar Shoes.">
+  <meta name="twitter:image" content="https://sneakerworld-mls.vercel.app/assets/images/sneaker_world_logo_transparent.png">
+
+  <!-- Structured Data JSON-LD (Local Business / Shoe Store) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ShoeStore",
+    "name": "Vanessa Castellar Shoes - SNEAKER WORLD MLS",
+    "image": "https://sneakerworld-mls.vercel.app/assets/images/sneaker_world_logo_transparent.png",
+    "description": "Bodega mayorista matriz de calzado urbano y deportivo con despacho local en Cali y envíos a toda Colombia.",
+    "telephone": "+573505337256",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "San Andresito de la 38",
+      "addressLocality": "Cali",
+      "addressRegion": "Valle del Cauca",
+      "addressCountry": "CO"
+    },
+    "priceRange": "$$",
+    "currenciesAccepted": "COP",
+    "paymentAccepted": "Efectivo Contraentrega, Nequi, Daviplata, Transferencia Bancolombia"
+  }
+  </script>
 
   <!-- Favicons -->
   <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32.png">
   <link rel="icon" type="image/png" sizes="64x64" href="assets/images/favicon-64.png">
-  <link rel="icon" type="image/png" href="assets/images/favicon.png">
-  <link rel="apple-touch-icon" href="assets/images/favicon-64.png">
+  <link rel="apple-touch-icon" href="assets/images/favicon.png">
   
   <!-- Google Fonts: Outfit & Montserrat -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   
+  <!-- Stylesheets -->
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <!-- Canvas Background Interactivo (Fixed para no empujar el contenido) -->
-  <canvas id="black-hole-canvas" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; pointer-events: none;"></canvas>
 
-  <!-- Dot Pattern Matrix Overlay (Fixed) -->
-  <svg aria-hidden="true" class="dot-pattern-overlay" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none;">
+  <!-- Dot Pattern Matrix Background (Modo Claro Shadcn Style) -->
+  <svg aria-hidden="true" class="dot-pattern-overlay">
     <defs>
-      <pattern id="dot-pattern-grid" width="24" height="24" patternUnits="userSpaceOnUse" patternContentUnits="userSpaceOnUse" x="0" y="0">
-        <circle cx="2" cy="2" r="1.1" fill="rgba(227, 194, 116, 0.45)" />
+      <pattern id="dot-pattern-grid" width="20" height="20" patternUnits="userSpaceOnUse" patternContentUnits="userSpaceOnUse" x="0" y="0">
+        <circle cx="2" cy="2" r="1.1" fill="rgba(15, 23, 42, 0.16)" />
       </pattern>
     </defs>
     <rect width="100%" height="100%" fill="url(#dot-pattern-grid)" />
   </svg>
 
   <div class="app-wrapper">
-    <!-- =========================================================================
-         HUD SUPERIOR DE CONTROL MULTI-ROL & AUTH (CRM BASTION / CRM GHOST STYLE)
-         ========================================================================= -->
+    <!-- TOP HUD: NAVEGADOR MULTI-ROL Y SELECTOR DE TIENDA -->
     <header class="top-demo-hud">
       <div class="hud-container">
         <div class="hud-brand">
-          <img src="assets/images/bags_world_logo_transparent.png" alt="BAGS WORLD Colombia" class="hud-logo-img">
+          <img src="assets/images/sneaker_world_logo_transparent.png" alt="SNEAKER WORLD MLS" class="hud-logo-img">
           <div>
-            <div class="hud-title">BAGS WORLD <span>MLS</span></div>
-            <div style="font-size: 10px; color: var(--text-muted); letter-spacing: 0.5px;">Bolsa Mayorista de Bolsos Colombia</div>
+            <div class="hud-title">SNEAKER WORLD <span>MLS</span></div>
+            <div style="font-size: 10px; color: var(--text-muted); letter-spacing: 0.5px;">Bolsa Compartida Cali</div>
           </div>
         </div>
 
-        <!-- Pestañas de Navegación de Rol -->
-        <nav class="role-switcher-tabs" aria-label="Selector de Rol de Usuario">
+        <nav class="role-switcher-tabs" aria-label="Cambio de Rol">
           <button class="role-tab-btn active" data-view="storefront" id="tab-storefront">
             🛒 Tu Tienda
           </button>
@@ -72,218 +98,175 @@
             📦 Panel Bodega / Mayorista
           </button>
           <button class="role-tab-btn" data-view="directory" id="tab-directory">
-            📍 Directorio Boutiques
+            📍 Directorio Tiendas
           </button>
         </nav>
 
-        <!-- Acciones de Cuenta & Sesión -->
         <div class="hud-actions">
-          <!-- Botón de Login / Sesión Activa -->
-          <button id="btn-open-auth-modal" class="auth-session-btn" title="Iniciar sesión o cambiar cuenta">
-            <span class="auth-icon-badge">🔐</span>
-            <span id="hud-user-name">BolsosCOL</span>
-            <span class="auth-role-pill" id="hud-user-role">VIP</span>
-          </button>
-
-          <!-- Selector de Vitrina Activa en Modo Demostración -->
           <div class="store-selector-wrapper" id="store-selector-box">
+            <span style="font-size: 11px; color: var(--text-muted);">Tienda:</span>
             <select id="hud-store-select" class="hud-select" aria-label="Seleccionar Tienda Activa">
               <!-- Renderizado dinámico de tiendas -->
             </select>
           </div>
-          <button id="btn-reset-demo" class="btn-reset-demo" title="Restaurar datos oficiales">↺ Reset</button>
+          <button id="btn-open-account-settings" class="btn-action-sm" title="Configurar Cuenta & Seguridad" style="font-size: 11px; padding: 4px 10px; font-weight: 700;">⚙️ Cuenta</button>
+          <a href="admin.html" class="btn-action-sm" style="font-size: 11px; padding: 4px 10px; text-decoration: none; font-weight: 700; color: var(--primary-red); border-color: rgba(230,25,46,0.3);">🔐 Portal B2B</a>
+          <button id="btn-reset-demo" class="btn-reset-demo" title="Restaurar datos de ejemplo">↺ Reset</button>
         </div>
       </div>
     </header>
 
     <!-- =========================================================================
-         VISTA 1: VITRINA PÚBLICA DE LA BOUTIQUE / TIENDA (STOREFRONT)
+         VISTA 1: VITRINA PÚBLICA DE LA TIENDA (CLIENTE FINAL)
          ========================================================================= -->
     <main id="view-storefront" class="view-panel">
-      <!-- Encabezado de la Boutique (Marca Blanca) -->
+      <!-- Header de la Tienda Activa -->
       <section class="store-header">
         <div class="store-header-container">
           <div class="store-info-left">
-            <div class="store-avatar" id="storefront-avatar">
-              <img src="assets/images/bags_world_logo_transparent.png" alt="Logo Tienda" style="width: 100%; height: 100%; object-fit: contain; padding: 2px;">
-            </div>
+            <div class="store-avatar" id="storefront-avatar">VC</div>
             <div class="store-meta">
-              <h1 id="storefront-name">BolsosCOL <span class="badge-verified" id="storefront-badge">CLIENTE VIP</span></h1>
-              <p id="storefront-tagline">Boutique de Bolsos y Carteras de Alta Gama | Envíos Express y Contraentrega a Toda Colombia.</p>
+              <h1 id="storefront-name">Vanessa Castellar Shoes <span class="badge-verified" id="storefront-badge">BODEGA MATRIZ VERIFICADA</span></h1>
+              <p id="storefront-tagline">San Andresito de la 38, Cali — Calzado Urbano y Deportivo al por Mayor y Detal con Envíos a Toda Colombia.</p>
               <div class="store-location-badge">
-                📍 <span id="storefront-location">Bogotá D.C. & Cobertura Nacional</span>
+                📍 <span id="storefront-location">San Andresito de la 38, Cali | ⚡ Domicilios Hoy</span>
               </div>
             </div>
           </div>
-          <div class="store-actions-right">
+          <div class="store-header-cta">
             <a href="#" id="storefront-wa-direct" target="_blank" rel="noopener" class="btn-wa-header">
-              <span>💬 Asesoría WhatsApp</span>
+              <span>💬 WhatsApp Asesora</span>
             </a>
           </div>
         </div>
       </section>
 
       <div class="main-wrapper">
-        <!-- Barra de Categorías / Drops de Bolsos -->
+        <!-- Barra de Marcas / Drops (Streetwear Style) -->
         <div class="brand-filter-bar" id="brand-filter-bar">
-          <button class="brand-chip-btn active" data-brand="all">⚡ TODOS LOS BOLSOS</button>
-          <button class="brand-chip-btn" data-brand="amor">💖 AMOR Y AMISTAD</button>
-          <button class="brand-chip-btn" data-brand="totes">👜 TOTES & HANDBAGS</button>
-          <button class="brand-chip-btn" data-brand="crossbody">🎀 CROSSBODY & FLAP</button>
-          <button class="brand-chip-btn" data-brand="satchel">👑 SATCHEL & PADLOCK</button>
-          <button class="brand-chip-btn" data-brand="morrales">🎒 MORRALES & MOCHILAS</button>
-          <button class="brand-chip-btn" data-brand="billeteras">👛 BILLETERAS & CLUTCH</button>
+          <button class="brand-chip-btn active" data-brand="all">⚡ ALL DROPS</button>
+          <button class="brand-chip-btn" data-brand="nike">NIKE & JORDAN</button>
+          <button class="brand-chip-btn" data-brand="adidas">ADIDAS ORIGINALS</button>
+          <button class="brand-chip-btn" data-brand="on">ON SUIZA</button>
+          <button class="brand-chip-btn" data-brand="nb">NEW BALANCE</button>
+          <button class="brand-chip-btn" data-brand="luxury">LUXURY (LV / BOSS)</button>
+          <button class="brand-chip-btn" data-brand="skechers">SKECHERS TRAIL</button>
         </div>
 
-        <!-- Buscador y Filtros Especializados de Bolsos -->
+        <!-- Buscador y Filtros Especializados de Calzado -->
         <section class="filter-card">
           <div class="filter-header-title">
-            <h2>🔍 <span>BUSCADOR DE BOLSOS</span> & TONOS DISPONIBLES</h2>
-            <div class="active-results-badge" id="storefront-count-badge">8 modelos disponibles</div>
+            <h2>🔍 <span>BUSCADOR POR TALLA</span> & REFERENCIA</h2>
+            <div class="active-results-badge" id="storefront-count-badge">18 modelos disponibles</div>
           </div>
 
-          <!-- Filtro Rápido por Tamaño / Capacidad -->
+          <!-- Filtro Rápido por Talla Física -->
           <div class="filter-row-section">
             <div class="filter-row-label">
-              <span>📐 Tamaño & Capacidad:</span>
+              <span>👟 Filtra por tu talla exacta:</span>
             </div>
             <div class="size-pills-row" id="storefront-size-pills">
-              <button class="size-pill-btn active" data-size="all">Todos los Tamaños</button>
-              <button class="size-pill-btn" data-size="compacto">Compacto / Mini (&lt;20 cm)</button>
-              <button class="size-pill-btn" data-size="mediano">Mediano Diario (20-28 cm)</button>
-              <button class="size-pill-btn" data-size="maxi">Maxi / Ejecutivo (&gt;28 cm)</button>
+              <button class="size-pill-btn active" data-size="all">Todas</button>
+              <button class="size-pill-btn" data-size="35">35</button>
+              <button class="size-pill-btn" data-size="36">36</button>
+              <button class="size-pill-btn" data-size="37">37</button>
+              <button class="size-pill-btn" data-size="38">38</button>
+              <button class="size-pill-btn" data-size="39">39</button>
+              <button class="size-pill-btn" data-size="40">40</button>
+              <button class="size-pill-btn" data-size="41">41</button>
+              <button class="size-pill-btn" data-size="42">42</button>
+              <button class="size-pill-btn" data-size="43">43</button>
+              <button class="size-pill-btn" data-size="44">44</button>
             </div>
           </div>
 
-          <!-- Filtro Rápido por Colorway -->
-          <div class="filter-row-section" style="margin-top: 10px;">
-            <div class="filter-row-label">
-              <span>🎨 Filtra por Colorway Principal:</span>
-            </div>
-            <div class="size-pills-row" id="storefront-color-pills">
-              <button class="size-pill-btn active" data-color="all">Todos</button>
-              <button class="size-pill-btn" data-color="negro">🖤 Negro</button>
-              <button class="size-pill-btn" data-color="crema">🤍 Crema / Hueso</button>
-              <button class="size-pill-btn" data-color="camel">🤎 Camel / Miel</button>
-              <button class="size-pill-btn" data-color="rosa">🌸 Rosa Pastel</button>
-              <button class="size-pill-btn" data-color="oliva">🫒 Verde Oliva</button>
-              <button class="size-pill-btn" data-color="rojo">❤️ Rojo Escarlata</button>
-              <button class="size-pill-btn" data-color="chocolate">🍫 Chocolate</button>
-            </div>
-          </div>
-
-          <!-- Barra de Búsqueda por Texto y Ordenamiento -->
+          <!-- Input de búsqueda por modelo y selectores -->
           <div class="search-inputs-grid">
             <div class="search-box-wrapper">
-              <span class="search-icon">🔎</span>
-              <input type="text" id="storefront-search-input" class="search-input-field" placeholder="Buscar por referencia, marca o detalle (Ej: Horse Charm, TOUS, Padlock, Guess, Chloé)...">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="storefront-search-input" class="search-input-field" placeholder="Buscar por modelo, SKU o marca (ej. Initiator, Shox, Samba)..." aria-label="Buscar Zapatillas">
             </div>
             <div class="select-group-wrapper">
-              <select id="storefront-category-select" class="custom-select" aria-label="Filtrar por estilo">
+              <select id="storefront-cat-select" class="custom-select" aria-label="Filtrar por Categoría">
                 <option value="all">Todas las Categorías</option>
-                <option value="Totes & Handbags">Totes & Handbags</option>
-                <option value="Crossbody & Flap">Crossbody & Flap</option>
-                <option value="Satchel & Estructurados">Satchel & Estructurados</option>
-                <option value="Morrales & Mochilas">Morrales & Mochilas</option>
-                <option value="Billeteras & Clutches">Billeteras & Clutches</option>
+                <option value="Running & Tech">Running & Tech</option>
+                <option value="Urbano Retro">Urbano Retro</option>
+                <option value="Skate & Casual">Skate & Casual</option>
+                <option value="Chunky & Moda">Chunky & Moda</option>
               </select>
-              <select id="storefront-sort-select" class="custom-select" aria-label="Ordenar por">
+              <select id="storefront-sort-select" class="custom-select" aria-label="Ordenar Productos">
                 <option value="default">Recomendados</option>
-                <option value="price-asc">Precio: Menor a Mayor</option>
-                <option value="price-desc">Precio: Mayor a Menor</option>
-                <option value="name-asc">Nombre: A - Z</option>
+                <option value="price-asc">Menor Precio</option>
+                <option value="price-desc">Mayor Precio</option>
+                <option value="name">Nombre (A-Z)</option>
               </select>
             </div>
           </div>
         </section>
 
-        <!-- Grid de Productos en Vitrina -->
-        <section class="products-grid-layout" id="storefront-products-grid">
-          <!-- Renderizado dinámico de tarjetas de bolsos reales -->
-        </section>
+        <!-- Grid de Tarjetas de Calzado -->
+        <div class="products-grid-layout" id="storefront-products-grid">
+          <!-- Renderizado dinámico de 18 modelos reales -->
+        </div>
       </div>
     </main>
 
     <!-- =========================================================================
-         VISTA 2: PANEL DE CONTROL DE LA TIENDA / BOUTIQUE (STORE ADMIN)
+         VISTA 2: PANEL DE LA TIENDA SATÉLITE (ADMINISTRACIÓN MARCA BLANCA)
          ========================================================================= -->
     <main id="view-store-admin" class="view-panel" style="display: none;">
-      <div class="main-wrapper" style="padding-top: 30px;">
+      <div class="main-wrapper">
         <div class="admin-top-bar">
           <div>
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <span class="category-tag">🏪 Portal de Mi Boutique</span>
-              <span style="font-size: 11px; color: var(--text-muted);">Sincronizado con Bodega Central BAGS WORLD</span>
-            </div>
-            <h1 class="admin-heading-title" id="admin-store-title">Panel de Control: BolsosCOL</h1>
-            <p style="font-size: 13px; color: var(--text-secondary);">
-              Personaliza tus precios de venta al público (PVP), activa referencias en tu vitrina y mantén tu información 100% protegida.
-            </p>
+            <span class="badge-verified">Portal Revendedor Sincronizado</span>
+            <h1 class="admin-heading-title" id="admin-store-title">Configuración de Mi Tienda</h1>
+            <p style="color: var(--text-secondary); font-size: 13px;">Fija tus propios precios de venta, activa/desactiva tallas y despacha desde la bodega central.</p>
           </div>
-          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <button class="btn-secondary" id="btn-open-store-settings">⚙️ Configurar Boutique</button>
-            <button class="btn-secondary" id="btn-export-store-backup" style="border-color: rgba(56, 189, 248, 0.4); color: var(--accent-blue);">💾 Respaldar Data Privada</button>
-          </div>
-        </div>
-
-        <!-- Métricas Rápidas de la Boutique -->
-        <div class="stats-cards-grid">
-          <div class="stat-card">
-            <div class="stat-icon-badge">👜</div>
-            <div>
-              <div class="stat-number" id="stat-active-prods">0</div>
-              <div class="stat-label">Bolsos en mi Vitrina</div>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon-badge" style="background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald);">💰</div>
-            <div>
-              <div class="stat-number" id="stat-avg-margin">$0</div>
-              <div class="stat-label">Margen Promedio / Bolso</div>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon-badge" style="background: rgba(56, 189, 248, 0.15); color: var(--accent-blue);">💬</div>
-            <div>
-              <div class="stat-number" id="stat-phone-preview" style="font-size: 16px; margin-top: 4px;">---</div>
-              <div class="stat-label">Línea WhatsApp de Ventas</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Banner de Privacidad y Respaldo del Cliente -->
-        <div style="background: linear-gradient(135deg, rgba(56, 189, 248, 0.08) 0%, rgba(14, 17, 23, 0.95) 100%); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: var(--radius-md); padding: 14px 18px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <span style="font-size: 24px;">🛡️</span>
-            <div>
-              <div style="font-size: 13px; font-weight: 800; color: #fff;">Tu información y catálogo están protegidos</div>
-              <div style="font-size: 11px; color: var(--text-secondary);">Puedes modificar tus credenciales o descargar un respaldo en cualquier momento. Si olvidas tu clave, el soporte maestro SaaS puede restaurarla.</div>
-            </div>
-          </div>
-          <button class="btn-action-sm" id="btn-open-privacy-modal" style="background: rgba(56, 189, 248, 0.15); color: var(--accent-blue); border-color: rgba(56, 189, 248, 0.4); font-weight: 700;">
-            🔒 Modificar Correo / Clave
+          <button id="btn-save-store-prices" class="btn-primary">
+            <span>💾 Guardar Cambios de Vitrina</span>
           </button>
         </div>
 
-        <!-- Tabla de Gestión de Inventario para la Tienda -->
+        <div class="stats-cards-grid">
+          <div class="stat-card">
+            <div class="stat-icon-badge">🛍️</div>
+            <div>
+              <div class="stat-number" id="stat-active-prods">18</div>
+              <div class="stat-label">Modelos Activos en mi Tienda</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon-badge">💵</div>
+            <div>
+              <div class="stat-number" id="stat-avg-margin">$72.000</div>
+              <div class="stat-label">Margen Promedio por Par</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon-badge">📲</div>
+            <div>
+              <div class="stat-number" id="stat-phone-preview">+57 315 555 1234</div>
+              <div class="stat-label">WhatsApp de Cierre Directo</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla de Gestión de Catálogo y Precios -->
         <div class="table-container-card">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
-            <div>
-              <h3 style="font-size: 16px; font-weight: 800; color: #fff;">Bolsos Disponibles en la Bodega Matriz</h3>
-              <span style="font-size: 12px; color: var(--text-muted);">Ajusta tu precio de venta final y calcula tus ganancias</span>
-            </div>
+            <h2 style="font-size: 16px; font-weight: 800; color: var(--text-primary);">Lista de Zapatillas Sincronizadas</h2>
+            <span style="font-size: 12px; color: var(--text-muted);">Los pedidos de tus clientes te llegan a ti y se despachan de la bodega central.</span>
           </div>
           <div class="table-responsive-box">
             <table class="mls-data-table">
               <thead>
                 <tr>
-                  <th>Referencia de Bolso</th>
+                  <th>Zapatilla / Ref</th>
                   <th>Costo Mayorista</th>
-                  <th>Tu Precio Venta (PVP)</th>
-                  <th>Margen Ganancia</th>
-                  <th>Dimensiones</th>
-                  <th>En Vitrina</th>
-                  <th>Acciones</th>
+                  <th>Mi Precio de Venta</th>
+                  <th>Ganancia / Par</th>
+                  <th>Tallas en Stock</th>
+                  <th>Mostrar en Vitrina</th>
                 </tr>
               </thead>
               <tbody id="store-admin-products-table">
@@ -296,131 +279,73 @@
     </main>
 
     <!-- =========================================================================
-         VISTA 3: PANEL DEL PROVEEDOR / BODEGA CENTRAL (BAGS WORLD MATRIZ)
+         VISTA 3: PANEL BODEGA CENTRAL (VANESSA CASTELLAR SHOES)
          ========================================================================= -->
     <main id="view-supplier" class="view-panel" style="display: none;">
-      <div class="main-wrapper" style="padding-top: 30px;">
+      <div class="main-wrapper">
         <div class="admin-top-bar">
           <div>
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <span class="category-tag" style="background: rgba(227, 194, 116, 0.15); color: var(--primary-gold); border-color: rgba(227, 194, 116, 0.35);">👑 Dueño del SaaS & Bodega Central</span>
-              <span style="font-size: 11px; color: var(--text-muted);">BAGS WORLD Colombia · Control Maestro de Red</span>
-            </div>
-            <h1 class="admin-heading-title">BAGS WORLD Colombia — SuperAdmin SaaS</h1>
-            <p style="font-size: 13px; color: var(--text-secondary);">
-              Supervisa las boutiques conectadas (BolsosCOL & Calibolsos2026), asístelas si olvidan sus claves, gestiona el catálogo y realiza backups maestros.
-            </p>
+            <span class="badge-verified">Centro de Distribución Mayorista</span>
+            <h1 class="admin-heading-title">Bodega Central — Vanessa Castellar</h1>
+            <p style="color: var(--text-secondary); font-size: 13px;">Control de las 10 líneas de atención, inventario maestro e historial de pedidos B2B.</p>
           </div>
-          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <button class="btn-primary" id="btn-open-new-product-modal">➕ Cargar Nueva Referencia</button>
-            <button class="btn-secondary" id="btn-export-full-saas-backup" style="border-color: rgba(227, 194, 116, 0.4); color: var(--primary-gold);">📦 Exportar Master Backup SaaS</button>
-          </div>
+          <button id="btn-open-add-product" class="btn-primary">
+            <span>➕ Agregar Nueva Referencia</span>
+          </button>
         </div>
 
-        <!-- Métricas de Bodega Mayorista -->
         <div class="stats-cards-grid">
           <div class="stat-card">
-            <div class="stat-icon-badge">👜</div>
+            <div class="stat-icon-badge">📦</div>
             <div>
-              <div class="stat-number" id="supplier-stat-refs">8</div>
-              <div class="stat-label">Referencias Reales en Bodega</div>
+              <div class="stat-number" id="stat-supplier-total-prods">18</div>
+              <div class="stat-label">Modelos Maestros Publicados</div>
             </div>
           </div>
           <div class="stat-card">
-            <div class="stat-icon-badge" style="background: rgba(56, 189, 248, 0.15); color: var(--accent-blue);">🏪</div>
+            <div class="stat-icon-badge">🏪</div>
             <div>
-              <div class="stat-number" id="supplier-stat-stores">2</div>
-              <div class="stat-label">Boutiques Clientes Activas</div>
+              <div class="stat-number">3 Tiendas</div>
+              <div class="stat-label">Vitrinas Satélites Conectadas</div>
             </div>
           </div>
           <div class="stat-card">
-            <div class="stat-icon-badge" style="background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald);">📈</div>
+            <div class="stat-icon-badge">🛵</div>
             <div>
-              <div class="stat-number" id="supplier-stat-orders">1,420</div>
-              <div class="stat-label">Bolsos Despachados este Mes</div>
+              <div class="stat-number">1,840 Pares</div>
+              <div class="stat-label">Despachados en Cali & Colombia</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon-badge">📱</div>
+            <div>
+              <div class="stat-number">10 Líneas</div>
+              <div class="stat-label">WhatsApp Round-Robin Activas</div>
             </div>
           </div>
         </div>
 
-        <!-- Panel de Soporte & Gestión de Clientes (Anti-Pérdida de Información) -->
-        <div class="table-container-card" style="margin-bottom: 24px; border: 1.5px solid rgba(227, 194, 116, 0.35); background: linear-gradient(180deg, rgba(227, 194, 116, 0.05) 0%, rgba(14, 17, 23, 0.95) 100%);">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
-            <div>
-              <h3 style="font-size: 16px; font-weight: 800; color: var(--primary-gold); display: flex; align-items: center; gap: 8px;">
-                <span>🛡️ Centro de Control de Boutiques Clientes (CRM Ghost / Bastion)</span>
-              </h3>
-              <span style="font-size: 12px; color: var(--text-secondary);">Si el cliente olvida su clave o necesita soporte, puedes restablecerla o ingresar a su panel con 1 clic:</span>
-            </div>
-          </div>
-          
-          <div class="table-responsive-box">
-            <table class="mls-data-table">
-              <thead>
-                <tr>
-                  <th>Boutique Cliente</th>
-                  <th>Correo de Acceso</th>
-                  <th>Contraseña Actual</th>
-                  <th>WhatsApp Comercial</th>
-                  <th>Ubicación</th>
-                  <th>Acciones de Soporte</th>
-                </tr>
-              </thead>
-              <tbody id="saas-admin-clients-table">
-                <!-- Renderizado dinámico de clientes -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Herramienta Rápida de Importación desde WhatsApp -->
-        <div class="table-container-card" style="margin-bottom: 24px; border: 1px solid rgba(37, 211, 102, 0.35); background: linear-gradient(180deg, rgba(37, 211, 102, 0.05) 0%, rgba(16, 19, 26, 0.95) 100%);">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
-            <div>
-              <h3 style="font-size: 16px; font-weight: 800; color: #25d366; display: flex; align-items: center; gap: 8px;">
-                <span>⚡ Importador Rápido desde WhatsApp Mayoristas</span>
-              </h3>
-              <span style="font-size: 12px; color: var(--text-secondary);">Pega el texto del grupo de WhatsApp y se creará el bolso automáticamente:</span>
-            </div>
-          </div>
-          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 14px;">
-            <div>
-              <textarea id="wa-import-textarea" class="form-textarea" rows="3" placeholder="Pega aquí el texto... Ej:
-Más colección de amor y amistad 🤯
-NUEVO BOLSO IMPORTADO $68.000 🔝
-🖤 Disponible en 5 colores
-🖤 Importado calidad superior
-🖤 Un compartimento con cierre
-Medidas 16 alto x 20 ancho"></textarea>
-            </div>
-            <div style="display: flex; flex-direction: column; justify-content: center; gap: 8px;">
-              <button type="button" id="btn-parse-wa-text" class="btn-primary" style="background: #25d366; color: #000; font-weight: 900; justify-content: center;">
-                <span>✨ Auto-Detectar & Publicar</span>
-              </button>
-              <div style="font-size: 11px; color: var(--text-muted); text-align: center;">Calcula PVP (+80% margen) y extrae medidas en 1 clic.</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Tabla del Catálogo Maestro de Referencias -->
-        <div class="table-container-card" style="margin-bottom: 24px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-            <h3 style="font-size: 16px; font-weight: 800; color: #fff;">📦 Catálogo Maestro de Bodega (Referencias Reales)</h3>
-            <span style="font-size: 12px; color: var(--text-muted);">Stock físico central disponible para toda la red</span>
+        <!-- Tabla de Pedidos B2B Entrantes -->
+        <div class="table-container-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+            <h2 style="font-size: 16px; font-weight: 800; color: var(--text-primary);">Últimos Pedidos y Reposiciones B2B</h2>
+            <span style="font-size: 12px; color: var(--primary-red); font-weight: 700;">🟢 Sincronizado en Tiempo Real</span>
           </div>
           <div class="table-responsive-box">
             <table class="mls-data-table">
               <thead>
                 <tr>
-                  <th>Bolso / Referencia</th>
-                  <th>SKU</th>
-                  <th>Categoría</th>
-                  <th>Costo Bodega</th>
-                  <th>PVP Sugerido</th>
-                  <th>Medidas (cm)</th>
-                  <th>Variantes</th>
+                  <th>ID Orden</th>
+                  <th>Fecha</th>
+                  <th>Tienda Solicitante</th>
+                  <th>Modelo & Color</th>
+                  <th>Talla</th>
+                  <th>Pares</th>
+                  <th>Total Bodega</th>
+                  <th>Estado</th>
                 </tr>
               </thead>
-              <tbody id="supplier-products-table">
+              <tbody id="supplier-orders-table">
                 <!-- Renderizado dinámico -->
               </tbody>
             </table>
@@ -430,509 +355,319 @@ Medidas 16 alto x 20 ancho"></textarea>
     </main>
 
     <!-- =========================================================================
-         VISTA 4: DIRECTORIO DE BOUTIQUES & SIMULADOR ROI
+         VISTA 4: DIRECTORIO DE TIENDAS Y SIMULADOR ROI
          ========================================================================= -->
     <main id="view-directory" class="view-panel" style="display: none;">
-      <div class="main-wrapper" style="padding-top: 30px;">
-        <div class="admin-top-bar">
-          <div>
-            <span class="category-tag">📍 Ecosistema Mayorista BAGS WORLD</span>
-            <h1 class="admin-heading-title">Red de Boutiques & Simulación de Ganancias</h1>
-            <p style="font-size: 13px; color: var(--text-secondary);">
-              Descubre cómo <strong>BolsosCOL</strong> y <strong>Calibolsos 2026</strong> escalan sus ingresos mensuales sin inmovilizar capital en inventario.
-            </p>
-          </div>
-        </div>
-
-        <!-- Calculadora ROI de Escala Comercial -->
-        <div class="roi-calc-box">
+      <div class="main-wrapper">
+        <!-- Calculadora de Retorno ROI -->
+        <section class="roi-calc-box">
           <div class="roi-calc-header">
             <div>
-              <span class="category-tag" style="background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); border-color: rgba(16, 185, 129, 0.3);">📈 Proyección Financiera Revendedora</span>
-              <h3 style="font-size: 18px; font-weight: 800; color: #fff; margin-top: 4px;">Calculadora de Utilidad Mensual para tu Boutique</h3>
+              <span class="badge-verified">Modelo Done-For-You + RMM</span>
+              <h2 style="font-size: 20px; font-weight: 900; color: var(--text-primary); margin-top: 4px;">Calculadora de Retorno para Proveedores de Calzado</h2>
+              <p style="color: var(--text-secondary); font-size: 13px;">Simula cuánto ganas implementando la red SNEAKER WORLD MLS para tu bodega:</p>
             </div>
-            <div style="font-size: 12px; color: var(--text-muted);">Basado en ventas por WhatsApp, Instagram y TikTok</div>
+            <div style="text-align: right;">
+              <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Ganancia Mensual Proyectada</div>
+              <div style="font-size: 24px; font-weight: 900; color: var(--primary-red);" id="roi-profit-display">$18.200.000 COP</div>
+            </div>
           </div>
 
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; align-items: center;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 16px;">
             <div>
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <label style="font-size: 13px; font-weight: 700; color: #fff;">Bolsos vendidos al mes:</label>
-                <span id="roi-pairs-label" style="font-size: 18px; font-weight: 900; color: var(--primary-gold);">45 bolsos</span>
-              </div>
-              <input type="range" id="roi-slider-pairs" min="10" max="200" value="45" step="5" class="roi-range-slider" style="width: 100%;">
-              <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-top: 4px;">
-                <span>10 bolsos</span>
-                <span>100 bolsos</span>
-                <span>200 bolsos</span>
-              </div>
-
-              <div style="margin-top: 16px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                  <label style="font-size: 13px; font-weight: 700; color: #fff;">Margen de ganancia promedio / bolso:</label>
-                  <span id="roi-margin-label" style="font-size: 18px; font-weight: 900; color: var(--accent-emerald);">$57.000 COP</span>
-                </div>
-                <input type="range" id="roi-slider-margin" min="25000" max="90000" value="57000" step="2000" class="roi-range-slider" style="width: 100%;">
-              </div>
+              <label class="form-label">Número de Revendedores / Tiendas Conectadas: <strong id="roi-resellers-val" style="color: var(--primary-red);">15</strong></label>
+              <input type="range" id="roi-resellers-slider" class="roi-range-slider" min="3" max="50" value="15" style="width: 100%;">
             </div>
-
-            <div style="background: rgba(0, 0, 0, 0.5); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
-              <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Utilidad Neta Estimada / Mes:</div>
-              <div id="roi-total-profit" style="font-size: 32px; font-weight: 900; color: var(--accent-emerald); margin: 6px 0;">$2.565.000 COP</div>
-              <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.4;">
-                ✨ <strong>Cero riesgo de inventario:</strong> Tu boutique publica con fotos reales en Instagram/TikTok y BAGS WORLD despacha por contraentrega en toda Colombia.
-              </div>
+            <div>
+              <label class="form-label">Pares Promedio Vendidos por Tienda / Mes: <strong id="roi-pairs-val" style="color: var(--primary-red);">20</strong></label>
+              <input type="range" id="roi-pairs-slider" class="roi-range-slider" min="5" max="60" value="20" style="width: 100%;">
             </div>
           </div>
-        </div>
+        </section>
 
-        <!-- Directorio de Boutiques Activas -->
-        <div class="directory-grid-layout" id="directory-stores-grid">
-          <!-- Renderizado dinámico -->
+        <!-- Directorio de Tiendas Activas -->
+        <div>
+          <h2 style="font-size: 18px; font-weight: 800; color: var(--text-primary); margin-bottom: 16px;">Vitrinas Conectadas a la Red Cali</h2>
+          <div class="directory-grid-layout" id="directory-stores-grid">
+            <!-- Renderizado dinámico -->
+          </div>
         </div>
       </div>
     </main>
-  </div>
 
-  <!-- =========================================================================
-       MODAL DE AUTENTICACIÓN / LOGIN (CRM BASTION / CRM GHOST STYLE)
-       ========================================================================= -->
-  <div class="modal-backdrop" id="modal-auth-login" role="dialog" aria-modal="true">
-    <div class="modal-dialog" style="max-width: 480px;">
-      <div class="modal-header">
-        <div>
-          <span style="font-size: 11px; font-weight: 800; color: var(--primary-gold); background: rgba(227, 194, 116, 0.15); padding: 3px 8px; border-radius: var(--radius-full);">BASTION AI AUTH SYSTEM</span>
-          <h3 style="margin-top: 4px;">🔐 Iniciar Sesión / Selector de Cuenta</h3>
-        </div>
-        <button class="btn-close-modal" data-close="modal-auth-login">&times;</button>
-      </div>
+    <!-- =========================================================================
+         MODAL 1: AUTENTICACIÓN / PROTECCIÓN POR PIN (ROLES ADMINISTRATIVOS)
+         ========================================================================= -->
+    <div class="modal-backdrop" id="modal-auth-pin" role="dialog" aria-modal="true">
+      <div class="modal-dialog" style="max-width: 420px; text-align: center;">
+        <div style="font-size: 36px; margin-bottom: 10px;">🔐</div>
+        <h3 style="font-size: 20px; font-weight: 900; color: var(--text-primary); margin-bottom: 6px;" id="auth-modal-title">Acceso Protegido</h3>
+        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px;" id="auth-modal-desc">Ingresa el PIN de seguridad para acceder a los costos mayoristas y gestión de inventario.</p>
 
-      <!-- Accesos Rápidos Demo de 1 Clic -->
-      <div style="margin-bottom: 20px;">
-        <label class="form-label" style="color: #fff; font-weight: 800;">⚡ Accesos Rápidos para Demostración:</label>
-        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
-          <!-- Opción 1: BolsosCOL -->
-          <button type="button" class="quick-auth-btn" data-auth-id="store-bolsoscol">
-            <div style="display: flex; align-items: center; gap: 10px;">
-              <span class="auth-card-avatar" style="background: rgba(230, 25, 46, 0.2); color: var(--primary-red); border-color: var(--primary-red);">👜</span>
-              <div style="text-align: left;">
-                <div style="font-weight: 800; font-size: 13px; color: #fff;">BolsosCOL <span style="font-size: 10px; color: var(--primary-gold); background: rgba(227, 194, 116, 0.15); padding: 2px 6px; border-radius: 4px;">Cliente Clave</span></div>
-                <div style="font-size: 11px; color: var(--text-muted);">contacto@bolsoscol.com · Clave: BolsosCOL2026*</div>
-              </div>
-            </div>
-            <span style="font-size: 12px; color: var(--primary-gold);">Entrar →</span>
-          </button>
-
-          <!-- Opción 2: Calibolsos2026 -->
-          <button type="button" class="quick-auth-btn" data-auth-id="store-calibolsos">
-            <div style="display: flex; align-items: center; gap: 10px;">
-              <span class="auth-card-avatar" style="background: rgba(56, 189, 248, 0.2); color: var(--accent-blue); border-color: var(--accent-blue);">👠</span>
-              <div style="text-align: left;">
-                <div style="font-weight: 800; font-size: 13px; color: #fff;">Calibolsos 2026 <span style="font-size: 10px; color: var(--accent-blue); background: rgba(56, 189, 248, 0.15); padding: 2px 6px; border-radius: 4px;">Boutique Cali</span></div>
-                <div style="font-size: 11px; color: var(--text-muted);">ventas@calibolsos.com · Clave: Cali2026*</div>
-              </div>
-            </div>
-            <span style="font-size: 12px; color: var(--accent-blue);">Entrar →</span>
-          </button>
-
-          <!-- Opción 3: SuperAdmin Dueño SaaS -->
-          <button type="button" class="quick-auth-btn" data-auth-id="store-bagsworld-admin">
-            <div style="display: flex; align-items: center; gap: 10px;">
-              <span class="auth-card-avatar" style="background: rgba(227, 194, 116, 0.2); color: var(--primary-gold); border-color: var(--primary-gold);">👑</span>
-              <div style="text-align: left;">
-                <div style="font-weight: 800; font-size: 13px; color: #fff;">BAGS WORLD (SuperAdmin) <span style="font-size: 10px; color: var(--accent-emerald); background: rgba(16, 185, 129, 0.15); padding: 2px 6px; border-radius: 4px;">Dueño SaaS</span></div>
-                <div style="font-size: 11px; color: var(--text-muted);">admin@bagsworld.com · Clave: BastionSaaS2026*</div>
-              </div>
-            </div>
-            <span style="font-size: 12px; color: var(--accent-emerald);">Entrar →</span>
-          </button>
-        </div>
-      </div>
-
-      <div style="display: flex; align-items: center; gap: 10px; margin: 16px 0;">
-        <hr style="flex: 1; border: 0; border-top: 1px solid var(--border-subtle);">
-        <span style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">O ingresa con credenciales</span>
-        <hr style="flex: 1; border: 0; border-top: 1px solid var(--border-subtle);">
-      </div>
-
-      <!-- Formulario Clásico de Login -->
-      <form id="form-auth-login">
-        <div class="form-group">
-          <label class="form-label">Correo Electrónico *</label>
-          <input type="email" id="auth-input-email" class="form-input" required placeholder="ej: contacto@bolsoscol.com">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Contraseña *</label>
-          <input type="password" id="auth-input-password" class="form-input" required placeholder="Ingresa tu contraseña">
-        </div>
-        <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; padding: 12px;">
-          Ingresar al Panel
-        </button>
-      </form>
-
-      <div style="margin-top: 16px; padding: 10px 14px; background: rgba(0, 0, 0, 0.4); border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); font-size: 11px; color: var(--text-secondary); line-height: 1.4;">
-        🛡️ <strong>Privacidad & Respaldo Garantizado:</strong> Toda tu información está resguardada. Si olvidas tu clave, el soporte maestro SaaS te asiste sin perder nunca tus productos ni tus pedidos.
-      </div>
-    </div>
-  </div>
-
-  <!-- =========================================================================
-       MODAL DE PRIVACIDAD & SEGURIDAD (CAMBIO DE CLAVE / CORREO)
-       ========================================================================= -->
-  <div class="modal-backdrop" id="modal-privacy-settings" role="dialog" aria-modal="true">
-    <div class="modal-dialog" style="max-width: 460px;">
-      <div class="modal-header">
-        <h3>🔒 Seguridad & Privacidad de Cuenta</h3>
-        <button class="btn-close-modal" data-close="modal-privacy-settings">&times;</button>
-      </div>
-      <form id="form-privacy-settings">
-        <div class="form-group">
-          <label class="form-label">Correo de Acceso</label>
-          <input type="email" id="privacy-email" class="form-input" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Contraseña Actual *</label>
-          <input type="password" id="privacy-current-pass" class="form-input" required placeholder="Ingresa tu clave actual">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Nueva Contraseña (Opcional)</label>
-          <input type="password" id="privacy-new-pass" class="form-input" placeholder="Mínimo 4 caracteres">
-        </div>
-        <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; padding: 12px; margin-top: 10px;">
-          Actualizar Seguridad
-        </button>
-      </form>
-    </div>
-  </div>
-
-  <!-- =========================================================================
-       MODAL 1: FICHA DETALLADA DE PRODUCTO & COLORWAY SELECTOR
-       ========================================================================= -->
-  <div class="modal-backdrop" id="modal-product-detail" role="dialog" aria-modal="true">
-    <div class="modal-dialog">
-      <div class="modal-header">
-        <h3 id="modal-prod-title">Detalle del Bolso</h3>
-        <button class="btn-close-modal" data-close="modal-product-detail">&times;</button>
-      </div>
-      <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px;">
-        <div style="flex: 1; min-width: 220px;">
-          <img id="modal-prod-img" src="" alt="Bolso" style="width: 100%; height: 260px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); object-fit: cover;">
-        </div>
-        <div style="flex: 1.2; min-width: 240px; display: flex; flex-direction: column;">
-          <span class="category-tag" id="modal-prod-cat" style="align-self: flex-start; margin-bottom: 8px;">Totes & Handbags</span>
-          <h2 id="modal-prod-name" style="font-size: 20px; font-weight: 800; line-height: 1.3; margin-bottom: 6px;">Nombre</h2>
-          <div style="font-size: 11px; color: var(--text-muted); font-family: monospace; margin-bottom: 10px;" id="modal-prod-sku">SKU: ---</div>
-          <p id="modal-prod-desc" style="font-size: 13px; color: var(--text-secondary); line-height: 1.45; margin-bottom: 14px;">Descripción</p>
+        <form id="form-auth-pin">
+          <input type="hidden" id="auth-target-role" value="supplier">
+          <div class="form-group">
+            <input type="password" id="auth-pin-input" class="form-input" placeholder="Ingresa tu PIN (ej. 8820)" maxlength="8" style="text-align: center; font-size: 20px; letter-spacing: 4px; font-weight: 800;" autofocus required>
+          </div>
+          <div id="auth-error-msg" style="color: #ef4444; font-size: 12px; font-weight: 700; margin-bottom: 14px; display: none;">PIN incorrecto. Intenta de nuevo.</div>
           
-          <div style="padding: 10px 14px; background: rgba(227, 194, 116, 0.08); border-radius: var(--radius-sm); border: 1px solid rgba(227, 194, 116, 0.25); margin-bottom: 12px;">
-            <div style="font-size: 11px; color: var(--primary-gold); font-weight: 700;">📐 Medidas & Capacidad:</div>
-            <div id="modal-prod-dim" style="font-size: 13px; color: #fff; font-weight: 800; margin-top: 2px;">16 cm (Alto) x 20 cm (Ancho) x 8 cm (Prof.)</div>
+          <div style="display: flex; gap: 10px; justify-content: center;">
+            <button type="button" class="btn-secondary" id="btn-cancel-auth">Cancelar</button>
+            <button type="submit" class="btn-primary">Verificar PIN</button>
           </div>
 
-          <div style="margin-top: auto; padding: 12px; background: var(--bg-surface-elevated); border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
-            <div style="font-size: 11px; color: var(--text-muted);">Precio al Público:</div>
-            <div id="modal-prod-price" style="font-size: 22px; font-weight: 900; color: #ffffff;">$0 COP</div>
+          <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border-subtle);">
+            <button type="button" id="btn-quick-demo-access" style="background: none; border: none; color: var(--primary-red); font-size: 12px; font-weight: 700; cursor: pointer; text-decoration: underline;">
+              🔓 Entrar en Modo Demo de Venta (PIN automático)
+            </button>
           </div>
-        </div>
-      </div>
-
-      <!-- Selector de Colorway -->
-      <div id="modal-colorway-group" style="margin-bottom: 16px;">
-        <label class="form-label" style="font-weight: 700; color: #ffffff;">Selecciona el Color Deseado:</label>
-        <div class="colorway-chips-row" id="modal-colorway-selector">
-          <!-- Colorways dinámicos -->
-        </div>
-      </div>
-
-      <!-- Selector de Cantidad -->
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; padding: 10px 14px; background: var(--bg-surface-elevated); border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
-        <label style="font-size: 13px; font-weight: 700; color: #fff;">Cantidad de Unidades:</label>
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <button type="button" id="modal-qty-minus" class="btn-action-sm" style="width: 32px; height: 32px; padding: 0; font-size: 16px; font-weight: 800;">-</button>
-          <span id="modal-qty-val" style="font-size: 15px; font-weight: 900; color: #fff; min-width: 20px; text-align: center;">1</span>
-          <button type="button" id="modal-qty-plus" class="btn-action-sm" style="width: 32px; height: 32px; padding: 0; font-size: 16px; font-weight: 800;">+</button>
-        </div>
-      </div>
-
-      <!-- Botones de Acción: Agregar al Carrito o Pedir Directo -->
-      <div style="display: flex; flex-direction: column; gap: 10px;">
-        <button type="button" id="modal-btn-add-cart" class="btn-primary" style="width: 100%; justify-content: center; font-size: 15px; padding: 12px;">
-          <span>🛍️ Agregar al Pedido / Carrito</span>
-        </button>
-
-        <a href="#" id="modal-btn-wa-order" target="_blank" rel="noopener" class="btn-wa-header" style="width: 100%; justify-content: center; font-size: 13px; padding: 10px; background: rgba(37, 211, 102, 0.15); border: 1px solid rgba(37, 211, 102, 0.4); color: #25d366;">
-          <span>⚡ Pedir Solo Este Bolso Directo por WhatsApp</span>
-        </a>
-      </div>
-      <div style="text-align: center; margin-top: 10px; font-size: 11px; color: var(--text-muted);">
-        ✨ Puedes sumar varios bolsos y colores a tu carrito para despacharlos en un solo envío.
+        </form>
       </div>
     </div>
-  </div>
 
-  <!-- =========================================================================
-       MODAL 2: CARRITO FLOTANTE & CHECKOUT CONSOLIDADO MULTI-BOLSO
-       ========================================================================= -->
-  <div class="modal-backdrop" id="modal-cart-drawer" role="dialog" aria-modal="true">
-    <div class="modal-dialog" style="max-width: 540px;">
-      <div class="modal-header">
-        <div>
-          <span style="font-size: 11px; font-weight: 700; color: var(--primary-gold); background: rgba(227, 194, 116, 0.15); padding: 3px 8px; border-radius: var(--radius-full);">Checkout Consolidado Colombia</span>
-          <h3 style="margin-top: 4px;">🛍️ Mi Pedido de Bolsos (<span id="cart-drawer-count">0</span> items)</h3>
+    <!-- =========================================================================
+         MODAL 2: SELECCIÓN DE TALLA, COLOR Y PEDIDO DE PRODUCTO
+         ========================================================================= -->
+    <div class="modal-backdrop" id="modal-product-detail" role="dialog" aria-modal="true">
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <h3 id="modal-product-title">Seleccionar Talla y Color</h3>
+          <button class="btn-close-modal" id="btn-close-product-modal" aria-label="Cerrar Modal">&times;</button>
         </div>
-        <button class="btn-close-modal" data-close="modal-cart-drawer">&times;</button>
+        <div id="modal-product-body">
+          <!-- Renderizado dinámico -->
+        </div>
       </div>
+    </div>
 
-      <!-- Temporizador Anti-Apartados Fantasma -->
-      <div class="reservation-timer-box">
-        <span>⏳</span>
-        <span>Reserva activa por <strong><span id="cart-timer-countdown">20:00</span> min</strong> en bodega.</span>
+    <!-- =========================================================================
+         MODAL 3: AGREGAR NUEVA REFERENCIA (BODEGA CENTRAL)
+         ========================================================================= -->
+    <div class="modal-backdrop" id="modal-add-product" role="dialog" aria-modal="true">
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <h3>Publicar Nueva Referencia en Bodega</h3>
+          <button class="btn-close-modal" id="btn-close-add-modal">&times;</button>
+        </div>
+        <form id="form-add-product">
+          <div class="form-group">
+            <label class="form-label">Nombre del Modelo:</label>
+            <input type="text" id="add-prod-name" class="form-input" placeholder="ej. Nike Shox Supreme Black Edition" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Categoría:</label>
+            <select id="add-prod-cat" class="form-select">
+              <option value="Running & Tech">Running & Tech</option>
+              <option value="Urbano Retro">Urbano Retro</option>
+              <option value="Skate & Casual">Skate & Casual</option>
+              <option value="Chunky & Moda">Chunky & Moda</option>
+            </select>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group">
+              <label class="form-label">Precio Mayorista (Bodega):</label>
+              <input type="number" id="add-prod-wholesale" class="form-input" placeholder="115000" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Precio Sugerido Venta:</label>
+              <input type="number" id="add-prod-retail" class="form-input" placeholder="185000" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tallas Disponibles (separadas por coma):</label>
+            <input type="text" id="add-prod-sizes" class="form-input" value="37, 38, 39, 40, 41, 42" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Descripción / Detalles:</label>
+            <textarea id="add-prod-desc" class="form-textarea" rows="2" placeholder="Material, amortiguación y detalles de confección..."></textarea>
+          </div>
+          <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+            <button type="button" class="btn-secondary" id="btn-cancel-add-product">Cancelar</button>
+            <button type="submit" class="btn-primary">Publicar a Todas las Tiendas</button>
+          </div>
+        </form>
       </div>
+    </div>
 
-      <!-- Lista de Items en el Carrito -->
-      <div class="cart-items-container" id="cart-drawer-items">
-        <!-- Renderizado dinámico de bolsos agregados -->
+    <!-- =========================================================================
+         BARRA FLOTANTE Y CAJÓN DEL CARRITO MULTI-PAR (BOLSA DE PEDIDOS)
+         ========================================================================= -->
+    <div class="floating-cart-bar" id="floating-cart-bar" role="button" aria-label="Abrir Bolsa de Pedidos">
+      <div class="cart-pill-icon">🛍️</div>
+      <div class="cart-pill-details">
+        <span class="cart-pill-count" id="floating-cart-count">1 Par Seleccionado</span>
+        <span class="cart-pill-total" id="floating-cart-total">$185.000</span>
       </div>
+      <div class="cart-pill-btn-action">Ver Pedido</div>
+    </div>
 
-      <!-- Formulario de Destino y Despacho -->
-      <div style="background: var(--bg-surface-elevated); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); margin: 16px 0;">
-        <div style="font-weight: 800; font-size: 14px; color: #fff; margin-bottom: 12px;">📍 Datos de Envío & Despacho:</div>
-        
-        <div class="form-group" style="margin-bottom: 10px;">
-          <label class="form-label">Tu Nombre Completo *</label>
-          <input type="text" id="cart-client-name" class="form-input" placeholder="Ej: Marcela Gómez" required>
+    <!-- MODAL DRAWER DEL CARRITO MULTI-PAR -->
+    <div class="modal-backdrop" id="modal-cart-drawer" role="dialog" aria-modal="true">
+      <div class="modal-dialog" style="max-width: 520px;">
+        <div class="modal-header">
+          <h3>Bolsa de Pedidos (<span id="cart-drawer-count">0</span>)</h3>
+          <button class="btn-close-modal" id="btn-close-cart-drawer">&times;</button>
         </div>
 
-        <div class="form-group" style="margin-bottom: 10px;">
-          <label class="form-label">Tu Número de WhatsApp *</label>
-          <input type="tel" id="cart-client-phone" class="form-input" placeholder="Ej: 315 555 1234" required>
+        <div class="reservation-timer-box">
+          <span>⏱️</span>
+          <span>Inventario reservado por: <strong id="cart-timer-countdown">20:00</strong> min</span>
         </div>
 
-        <div class="form-group" style="margin-bottom: 10px;">
-          <label class="form-label">Ciudad / Destino en Colombia *</label>
-          <select id="cart-neighborhood-select" class="form-select">
-            <!-- Opciones dinámicas de zonas de envío -->
+        <!-- Lista de Items en Carrito -->
+        <div class="cart-items-container" id="cart-items-list">
+          <!-- Items renderizados dinámicamente -->
+        </div>
+
+        <!-- Selector de Barrio y Flete de Cali -->
+        <div class="form-group" style="margin-top: 14px;">
+          <label class="form-label">🛵 Destino en Cali / Área Metropolitana (Flete con Motorizado):</label>
+          <select id="cart-shipping-select" class="form-select">
+            <!-- Renderizado dinámico de barrios -->
           </select>
         </div>
 
-        <div class="form-group" style="margin-bottom: 10px;">
-          <label class="form-label">Dirección Exacta y Barrio / Referencia *</label>
-          <input type="text" id="cart-client-address" class="form-input" placeholder="Ej: Cra 66 # 13B-40, Apto 502 (Barrio Limonar)" required>
+        <!-- Datos del Comprador -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+          <div>
+            <label class="form-label">Tu Nombre:</label>
+            <input type="text" id="cart-client-name" class="form-input" placeholder="ej. Andrés / Carolina">
+          </div>
+          <div>
+            <label class="form-label">Dirección / Punto de Entrega:</label>
+            <input type="text" id="cart-client-address" class="form-input" placeholder="ej. Calle 5 # 38-20">
+          </div>
         </div>
 
-        <!-- Modalidad de Despacho (Anti-Devoluciones) -->
+        <!-- Modalidad de Despacho -->
+        <label class="form-label">Modalidad de Despacho:</label>
         <div class="dispatch-mode-radio-group">
-          <label class="dispatch-radio-card selected" id="label-dispatch-secured">
-            <input type="radio" name="cart-dispatch-mode" value="secured" checked>
+          <label class="dispatch-radio-card selected">
+            <input type="radio" name="dispatch-mode" value="secured" checked>
             <div>
-              <div style="font-weight: 800; font-size: 13px; color: var(--primary-gold);">🛡️ Despacho Asegurado (Recomendado)</div>
-              <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">
-                Aseguras tus bolsos abonando el flete (<span id="cart-flete-preview">$14.000 COP</span>) por Nequi/Daviplata. Pagas los bolsos al recibir en puerta.
-              </div>
+              <strong style="color: var(--text-primary); font-size: 13px;">🛡️ Despacho Asegurado (Recomendado)</strong>
+              <p style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">Abonas el flete por Nequi/Daviplata antes de salir el motorizado y pagas el calzado en mano al recibir.</p>
             </div>
           </label>
-
-          <label class="dispatch-radio-card" id="label-dispatch-cod">
-            <input type="radio" name="cart-dispatch-mode" value="cod">
+          <label class="dispatch-radio-card">
+            <input type="radio" name="dispatch-mode" value="cod">
             <div>
-              <div style="font-weight: 700; font-size: 13px; color: #ffffff;">🛵 100% Contraentrega al Recibir</div>
-              <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">
-                Pagas todo en efectivo/Nequi al repartidor al recibir en tu puerta. Sujeto a llamada de confirmación previa.
-              </div>
+              <strong style="color: var(--text-primary); font-size: 13px;">🛵 100% Contraentrega</strong>
+              <p style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">Pagas la totalidad en efectivo al mensajero en la puerta.</p>
             </div>
           </label>
         </div>
-      </div>
 
-      <!-- Resumen de Liquidación -->
-      <div style="padding: 14px; background: rgba(0, 0, 0, 0.45); border-radius: var(--radius-md); border: 1px solid var(--border-subtle); margin-bottom: 16px;">
-        <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px;">
-          <span style="color: var(--text-muted);">Bolsos (<span id="cart-summary-qty">0</span> unds):</span>
-          <strong id="cart-summary-shoes" style="color: #fff;">$0 COP</strong>
+        <!-- Liquidación de Totales -->
+        <div style="background: var(--bg-surface-elevated); padding: 14px; border-radius: var(--radius-md); margin: 16px 0; border: 1px solid var(--border-subtle);">
+          <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-secondary); margin-bottom: 6px;">
+            <span>Subtotal Calzado:</span>
+            <strong id="cart-summary-subtotal" style="color: var(--text-primary);">$0</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-secondary); margin-bottom: 6px;">
+            <span>Flete Domicilio Motorizado:</span>
+            <strong id="cart-summary-shipping" style="color: var(--text-primary);">$10.000</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 16px; font-weight: 900; color: var(--primary-red); padding-top: 8px; border-top: 1px solid var(--border-subtle);">
+            <span>Total a Cobrar:</span>
+            <span id="cart-summary-grandtotal">$0</span>
+          </div>
         </div>
-        <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px;">
-          <span style="color: var(--text-muted);">Flete Domicilio:</span>
-          <strong id="cart-summary-shipping" style="color: var(--primary-gold);">$14.000 COP</strong>
-        </div>
-        <div style="display: flex; justify-content: space-between; font-size: 16px; font-weight: 900; padding-top: 8px; border-top: 1px solid var(--border-subtle);">
-          <span style="color: #fff;">Gran Total:</span>
-          <span id="cart-summary-total" style="color: var(--accent-emerald); font-size: 20px;">$0 COP</span>
-        </div>
-      </div>
 
-      <!-- Botón de Envío Consolidado a WhatsApp -->
-      <button type="button" id="cart-btn-send-whatsapp" class="btn-primary" style="width: 100%; justify-content: center; font-size: 15px; padding: 14px; background: #25d366; color: #000; font-weight: 900;">
-        <span>💬 Enviar Pedido Completo por WhatsApp (90s)</span>
-      </button>
-      <div style="text-align: center; margin-top: 8px; font-size: 11px; color: var(--text-muted);">
-        ⚡ El pedido llega con foto, colorway y liquidación a la asesora para despacho inmediato.
-      </div>
-    </div>
-  </div>
-
-  <!-- =========================================================================
-       MODAL 3: CARGAR NUEVA REFERENCIA DE BOLSO (BODEGA)
-       ========================================================================= -->
-  <div class="modal-backdrop" id="modal-new-product" role="dialog" aria-modal="true">
-    <div class="modal-dialog">
-      <div class="modal-header">
-        <h3>➕ Cargar Nueva Referencia de Bolso</h3>
-        <button class="btn-close-modal" data-close="modal-new-product">&times;</button>
-      </div>
-      <form id="form-new-master-product">
-        <div class="form-group">
-          <label class="form-label">Nombre del Bolso / Referencia *</label>
-          <input type="text" id="new-prod-name" class="form-input" required placeholder="Ej: Bolso Satchel Padlock 'Milano Chic'">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Código de Estilo / SKU *</label>
-          <input type="text" id="new-prod-sku" class="form-input" required placeholder="Ej: BW-STCH-01">
-        </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-          <div class="form-group">
-            <label class="form-label">Categoría</label>
-            <select id="new-prod-category" class="form-select">
-              <option value="Totes & Handbags">Totes & Handbags</option>
-              <option value="Crossbody & Flap">Crossbody & Flap</option>
-              <option value="Satchel & Estructurados">Satchel & Estructurados</option>
-              <option value="Morrales & Mochilas">Morrales & Mochilas</option>
-              <option value="Billeteras & Clutches">Billeteras & Clutches</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Fotografía Real de Bodega</label>
-            <select id="new-prod-image" class="form-select">
-              <option value="assets/images/bags/tote_horse_charm_cream.jpg">Tote Horse Charm Crema</option>
-              <option value="assets/images/bags/tous_crossbody_black.jpg">TOUS Pop Crossbody Negro</option>
-              <option value="assets/images/bags/satchel_padlock_olive.jpg">Satchel Padlock Verde Oliva</option>
-              <option value="assets/images/bags/satchel_padlock_multi.jpg">Satchel Padlock 6 Colores</option>
-              <option value="assets/images/bags/backpack_strass_black.jpg">Mini Morral Strass Negro</option>
-              <option value="assets/images/bags/guess_wallet_red.jpg">Billetera GUESS Rojo</option>
-              <option value="assets/images/bags/guess_wallet_black.jpg">Billetera GUESS Negro</option>
-              <option value="assets/images/bags/chloe_wallet_canvas.jpg">Billetera Chloé Lona</option>
-            </select>
-          </div>
-        </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-          <div class="form-group">
-            <label class="form-label">Costo Mayorista ($ COP) *</label>
-            <input type="number" id="new-prod-wholesale" class="form-input" required value="68000" step="1000">
-          </div>
-          <div class="form-group">
-            <label class="form-label">PVP Sugerido ($ COP)</label>
-            <input type="number" id="new-prod-suggested" class="form-input" required value="125000" step="1000">
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Medidas Exactas (Alto x Ancho x Profundidad)</label>
-          <input type="text" id="new-prod-dim" class="form-input" value="18 cm (Alto) x 22 cm (Ancho) x 8 cm (Profundidad)">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Descripción & Especificaciones</label>
-          <textarea id="new-prod-desc" class="form-textarea" rows="2" placeholder="Materiales, cierres, forro, correa ajustable, etc."></textarea>
-        </div>
-        <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; padding: 12px; margin-top: 10px;">
-          Publicar al Catálogo Maestro BAGS WORLD
+        <button id="btn-send-cart-whatsapp" class="btn-primary" style="width: 100%; justify-content: center; font-size: 14px; padding: 12px; background: #25d366; color: #ffffff; box-shadow: var(--shadow-glow-wa);">
+          <span>💬 Enviar Pedido Completo por WhatsApp</span>
         </button>
-      </form>
-    </div>
-  </div>
-
-  <!-- =========================================================================
-       MODAL 4: CONFIGURACIÓN DE LA BOUTIQUE
-       ========================================================================= -->
-  <div class="modal-backdrop" id="modal-store-settings" role="dialog" aria-modal="true">
-    <div class="modal-dialog">
-      <div class="modal-header">
-        <h3>⚙️ Configuración de Mi Boutique</h3>
-        <button class="btn-close-modal" data-close="modal-store-settings">&times;</button>
       </div>
-      <form id="form-store-settings">
-        <div class="form-group">
-          <label class="form-label">Nombre de tu Boutique / Tienda *</label>
-          <input type="text" id="setting-store-name" class="form-input" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Eslogan / Subtítulo</label>
-          <input type="text" id="setting-store-tagline" class="form-input">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Número de WhatsApp (con código 57) *</label>
-          <input type="text" id="setting-store-phone" class="form-input" required placeholder="573165558899">
-          <small style="color: var(--text-muted); font-size: 11px;">A este número te llegarán los pedidos con los bolsos y colores seleccionados.</small>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Ciudad / Ubicación</label>
-          <input type="text" id="setting-store-location" class="form-input" placeholder="Ej: Bogotá D.C. & Cobertura Nacional">
-        </div>
-        <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; padding: 12px; margin-top: 10px;">
-          Guardar Cambios
-        </button>
-      </form>
     </div>
-  </div>
 
-  <!-- =========================================================================
-       MODAL 5: SOLICITAR REPOSICIÓN B2B (BOUTIQUE -> BODEGA)
-       ========================================================================= -->
-  <div class="modal-backdrop" id="modal-restock" role="dialog" aria-modal="true">
-    <div class="modal-dialog">
-      <div class="modal-header">
-        <h3>📦 Pedido de Reposición a Bodega</h3>
-        <button class="btn-close-modal" data-close="modal-restock">&times;</button>
+    <!-- =========================================================================
+         MODAL 4: CONFIGURACIÓN DE CUENTA, SEGURIDAD & PREVENCIÓN DE PÉRDIDA DE DATOS
+         ========================================================================= -->
+    <div class="modal-backdrop" id="modal-account-settings" role="dialog" aria-modal="true">
+      <div class="modal-dialog" style="max-width: 480px;">
+        <div class="modal-header">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 20px;">⚙️</span>
+            <div>
+              <h3 style="margin: 0; font-size: 17px;">Seguridad & Mi Cuenta Privada</h3>
+              <span style="font-size: 11px; color: var(--text-muted);" id="modal-account-tenant-badge">Aislamiento Privado Multi-Tenant</span>
+            </div>
+          </div>
+          <button class="btn-close-modal" id="btn-close-account-modal">&times;</button>
+        </div>
+
+        <form id="form-account-settings" style="margin-top: 14px;">
+          <input type="hidden" id="account-key" value="vanessa">
+
+          <div class="form-group">
+            <label class="form-label">Nombre del Negocio / Titular:</label>
+            <input type="text" id="account-name" class="form-input" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Correo Electrónico de Inicio de Sesión:</label>
+            <input type="email" id="account-email" class="form-input" required>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="form-group">
+              <label class="form-label">Contraseña Privada:</label>
+              <input type="text" id="account-password" class="form-input" placeholder="Calishoes2026" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">PIN Rápido:</label>
+              <input type="text" id="account-pin" class="form-input" maxlength="6" placeholder="8820" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Teléfono de Despachos WhatsApp:</label>
+            <input type="text" id="account-phone" class="form-input" placeholder="573505337256" required>
+          </div>
+
+          <!-- Nota de Seguridad y Respaldo SaaS (CRM Bastion / Ghost) -->
+          <div style="background: #f8fafc; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 12px; margin-bottom: 16px; font-size: 11px; color: var(--text-secondary); line-height: 1.4;">
+            <strong style="color: var(--text-primary); display: block; margin-bottom: 2px;">🛡️ Respaldo en la Nube GHOST / Bastion CRM:</strong>
+            Tu data e inventario están protegidos. Si modificas tu contraseña y la olvidas, el soporte del SaaS puede ayudarte a recuperar tu cuenta sin perder ningún producto ni historial.
+          </div>
+
+          <div style="display: flex; gap: 10px; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+            <button type="button" class="btn-secondary" id="btn-export-backup-json" style="font-size: 11px; padding: 8px 12px;">
+              📥 Exportar Copia de Seguridad JSON
+            </button>
+            <button type="submit" class="btn-primary" style="font-size: 13px; padding: 8px 18px;">
+              Guardar Cambios
+            </button>
+          </div>
+        </form>
       </div>
-      <form id="form-restock-order">
-        <input type="hidden" id="restock-prod-id">
-        <div style="margin-bottom: 16px;">
-          <h4 id="restock-prod-title" style="font-size: 16px; font-weight: 700; color: #fff;">Nombre del Bolso</h4>
-          <div id="restock-supplier-name" style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">BAGS WORLD Colombia</div>
-          <div id="restock-wholesale-price" style="font-size: 14px; color: var(--primary-gold); font-weight: 700; margin-top: 6px;">Costo Mayorista: $0 COP</div>
-        </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-          <div class="form-group">
-            <label class="form-label">Colorway a Solicitar</label>
-            <select id="restock-size-select" class="form-select">
-              <!-- Colorways -->
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Cantidad de Bolsos</label>
-            <input type="number" id="restock-units-input" class="form-input" value="6" min="1" max="100">
-          </div>
-        </div>
-        <div style="margin: 14px 0; padding: 12px; background: rgba(16, 185, 129, 0.1); border-radius: var(--radius-sm); border: 1px solid rgba(16, 185, 129, 0.2);">
-          <div style="font-size: 11px; color: var(--text-secondary);">Total Mayorista Estimado:</div>
-          <div id="restock-total-calc" style="font-size: 18px; font-weight: 800; color: var(--accent-emerald);">$0 COP</div>
-        </div>
-        <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; padding: 12px;">
-          Generar Orden y Notificar a Bodega
-        </button>
-      </form>
     </div>
+
+    <!-- TOAST CONTAINER -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- FOOTER MULTI-TENANT CON ACCESO A PORTAL DE PROVEEDORES -->
+    <footer style="text-align: center; padding: 36px 20px 80px; color: var(--text-muted); font-size: 12px; border-top: 1px solid var(--border-subtle); margin-top: 60px; background: #ffffff;">
+      <div style="max-width: 1240px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+        <div>
+          <strong style="color: var(--text-primary);">SNEAKER WORLD MLS</strong> — Red Matriz de Calzado & Vitrinas Cali (San Andresito de la 38)
+        </div>
+        <div style="display: flex; gap: 12px; align-items: center;">
+          <a href="admin.html" class="btn-action-sm" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-weight: 700;">
+            🔐 Portal Privado Proveedores & Revendedores
+          </a>
+        </div>
+      </div>
+    </footer>
   </div>
 
-  <!-- Barra Flotante de Carrito / Pedido Rápido -->
-  <div class="floating-cart-bar" id="floating-cart-bar" role="button" aria-label="Abrir Carrito">
-    <div class="cart-pill-icon">🛍️</div>
-    <div class="cart-pill-details">
-      <div class="cart-pill-count"><span id="floating-cart-count">1</span> bolso(s) en tu pedido</div>
-      <div class="cart-pill-total" id="floating-cart-total">$0 COP</div>
-    </div>
-    <div class="cart-pill-btn-action">
-      Ver Pedido →
-    </div>
-  </div>
-
-  <!-- Contenedor de Toasts de Notificación -->
-  <div class="toast-container" id="toast-container"></div>
-
-  <!-- WATERMARK OFICIAL DE BASTION AI (MANDATORIO POR REGLA) -->
+  <!-- BASTION AI OFFICIAL WATERMARK (MANDATORY RULE) -->
   <div class="bastion-watermark">
     <span>Made by <strong>BASTION AI</strong></span>
     <span class="sparkle">✨</span>
   </div>
 
-  <!-- Scripts de la Aplicación -->
+  <!-- Scripts -->
   <script src="js/mockData.js"></script>
   <script src="js/store.js"></script>
   <script src="js/app.js"></script>
