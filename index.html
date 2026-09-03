@@ -50,48 +50,60 @@
     <!-- =========================================================================
          HUD SUPERIOR DE CONTROL MULTI-ROL & AUTH (CRM BASTION / CRM GHOST STYLE)
          ========================================================================= -->
-    <header class="top-demo-hud">
+        <!-- 1. BARRA SUPREMA DE CONTROL (SOLO DUEÑO DEL SAAS / SUPER-ADMIN O ?demo=true) -->
+    <header class="top-demo-hud" id="master-admin-hud" style="display: none; background: #0b0f19; border-bottom: 2px solid var(--primary-gold); color: #fff;">
       <div class="hud-container">
         <div class="hud-brand">
           <img src="assets/images/bags_world_logo_transparent.png" alt="BAGS WORLD Colombia" class="hud-logo-img">
           <div>
-            <div class="hud-title">BAGS WORLD <span>MLS</span></div>
-            <div style="font-size: 10px; color: var(--text-muted); letter-spacing: 0.5px;">Bolsa Mayorista de Bolsos Colombia</div>
+            <div class="hud-title" style="color: #fff;">BAGS WORLD <span style="color: var(--primary-gold);">MLS</span></div>
+            <div style="font-size: 10px; color: var(--primary-gold); font-weight: 800; letter-spacing: 0.8px;">⚡ PANEL SUPREMO ADMIN</div>
           </div>
         </div>
 
-        <!-- Pestañas de Navegación de Rol -->
-        <nav class="role-switcher-tabs" aria-label="Selector de Rol de Usuario">
-          <button class="role-tab-btn active" data-view="storefront" id="tab-storefront">
-            🛒 Tu Tienda
+        <nav class="role-switcher-tabs" aria-label="Cambio de Rol" style="background: rgba(255,255,255,0.06); border-color: rgba(227, 194, 116, 0.25);">
+          <button class="role-tab-btn active" data-view="storefront" id="tab-storefront" style="color: #fff;">
+            🛒 Vitrina Pública
           </button>
-          <button class="role-tab-btn" data-view="store-admin" id="tab-store-admin">
-            🏪 Panel de Mi Tienda
+          <button class="role-tab-btn" data-view="store-admin" id="tab-store-admin" style="color: #fff;">
+            🏪 Panel Mi Boutique
           </button>
-          <button class="role-tab-btn" data-view="supplier" id="tab-supplier">
-            📦 Panel Bodega / Mayorista
+          <button class="role-tab-btn" data-view="supplier" id="tab-supplier" style="color: #fff;">
+            📦 Panel Bodega Matriz
           </button>
-          <button class="role-tab-btn" data-view="directory" id="tab-directory">
-            📍 Directorio Boutiques
+          <button class="role-tab-btn" data-view="directory" id="tab-directory" style="color: #fff;">
+            📍 Directorio & ROI
           </button>
         </nav>
 
-        <!-- Acciones de Cuenta & Sesión -->
         <div class="hud-actions">
-          <!-- Botón de Login / Sesión Activa -->
-          <button id="btn-open-auth-modal" class="auth-session-btn" title="Iniciar sesión o cambiar cuenta">
-            <span class="auth-icon-badge">🔐</span>
-            <span id="hud-user-name">BolsosCOL</span>
-            <span class="auth-role-pill" id="hud-user-role">VIP</span>
-          </button>
-
-          <!-- Selector de Vitrina Activa en Modo Demostración -->
-          <div class="store-selector-wrapper" id="store-selector-box">
-            <select id="hud-store-select" class="hud-select" aria-label="Seleccionar Tienda Activa">
+          <div class="store-selector-wrapper" id="store-selector-box" style="background: rgba(255,255,255,0.08); border-color: rgba(227, 194, 116, 0.3);">
+            <span style="font-size: 11px; color: #cbd5e1;">Boutique:</span>
+            <select id="hud-store-select" class="hud-select" aria-label="Seleccionar Tienda Activa" style="background: transparent; color: #fff; border: none;">
               <!-- Renderizado dinámico de tiendas -->
             </select>
           </div>
+          <button id="btn-open-privacy-modal" class="btn-action-sm" title="Configurar Cuenta & Seguridad" style="font-size: 11px; padding: 5px 12px; font-weight: 700; background: rgba(227, 194, 116, 0.15); color: var(--primary-gold); border-color: rgba(227, 194, 116, 0.4);">⚙️ Seguridad</button>
+          <button id="btn-logout-hud" class="btn-action-sm" style="font-size: 11px; padding: 5px 12px; text-decoration: none; font-weight: 700; color: #f87171; border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.1);">🚪 Salir</button>
           <button id="btn-reset-demo" class="btn-reset-demo" title="Restaurar datos oficiales">↺ Reset</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- 2. BARRA PRIVADA DE CLIENTE AUTENTICADO (BODEGA MATRIZ O BOUTIQUE PARTNER) -->
+    <header class="client-auth-hud" id="client-auth-hud" style="display: none;">
+      <div class="client-auth-container">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 18px;" id="client-role-icon">👜</span>
+          <div>
+            <div style="font-size: 13px; font-weight: 800; color: var(--text-primary);" id="client-hud-title">BolsosCOL (Boutique Partner)</div>
+            <div style="font-size: 11px; color: var(--primary-gold); font-weight: 700;" id="client-hud-subtitle">🟢 Sesión Privada y Segura Activa</div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <button id="btn-client-toggle-view" class="btn-action-sm" style="font-size: 11px; padding: 6px 14px; font-weight: 700;">🛒 Ver Mi Vitrina</button>
+          <button id="btn-client-open-account" class="btn-action-sm" style="font-size: 11px; padding: 6px 14px; font-weight: 700;">⚙️ Mi Cuenta</button>
+          <button id="btn-client-logout" class="btn-action-sm" style="font-size: 11px; padding: 6px 14px; font-weight: 700; color: #f87171; border-color: rgba(239,68,68,0.3);">🚪 Cerrar Sesión</button>
         </div>
       </div>
     </header>
@@ -221,6 +233,9 @@
             </p>
           </div>
           <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button class="btn-primary" id="btn-save-store-prices" style="background: var(--accent-emerald); border-color: var(--accent-emerald); font-weight: 800;">💾 Guardar Precios</button>
+            <button class="btn-secondary" id="btn-open-quote-modal-partner" style="border-color: rgba(227, 194, 116, 0.4); color: var(--primary-gold); font-weight: 700;">📝 Cotizador VIP Cliente</button>
+            <button class="btn-secondary" id="btn-open-store-reports" style="border-color: rgba(56, 189, 248, 0.4); color: var(--accent-blue); font-weight: 700;">📊 Mi Contabilidad & Excel</button>
             <button class="btn-secondary" id="btn-open-store-settings">⚙️ Configurar Boutique</button>
             <button class="btn-secondary" id="btn-export-store-backup" style="border-color: rgba(56, 189, 248, 0.4); color: var(--accent-blue);">💾 Respaldar Data Privada</button>
           </div>
@@ -281,6 +296,7 @@
                   <th>Costo Mayorista</th>
                   <th>Tu Precio Venta (PVP)</th>
                   <th>Margen Ganancia</th>
+                  <th>Stock Bodega</th>
                   <th>Dimensiones</th>
                   <th>En Vitrina</th>
                   <th>Acciones</th>
@@ -312,6 +328,8 @@
             </p>
           </div>
           <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button class="btn-primary" id="btn-open-quote-modal" style="background: var(--primary-gold); color: #000; font-weight: 800;">📝 Cotizador VIP</button>
+            <button class="btn-primary" id="btn-open-supplier-reports" style="background: var(--accent-emerald); border-color: var(--accent-emerald); color: #fff; font-weight: 800;">📊 Centro Contable & Excel/PDF</button>
             <button class="btn-primary" id="btn-open-new-product-modal">➕ Cargar Nueva Referencia</button>
             <button class="btn-secondary" id="btn-export-full-saas-backup" style="border-color: rgba(227, 194, 116, 0.4); color: var(--primary-gold);">📦 Exportar Master Backup SaaS</button>
           </div>
@@ -403,24 +421,62 @@ Medidas 16 alto x 20 ancho"></textarea>
 
         <!-- Tabla del Catálogo Maestro de Referencias -->
         <div class="table-container-card" style="margin-bottom: 24px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-            <h3 style="font-size: 16px; font-weight: 800; color: #fff;">📦 Catálogo Maestro de Bodega (Referencias Reales)</h3>
-            <span style="font-size: 12px; color: var(--text-muted);">Stock físico central disponible para toda la red</span>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+            <div>
+              <h3 style="font-size: 16px; font-weight: 800; color: #fff; margin: 0;">📦 Catálogo Maestro de Bodega & Precios en Caliente</h3>
+              <span style="font-size: 12px; color: var(--text-muted);">Ajusta costos mayoristas, precios sugeridos, campañas y stock central</span>
+            </div>
+            <button class="btn-primary" id="btn-save-all-supplier-prices" style="background: var(--primary-gold); color: #000; font-weight: 800; font-size: 12px; padding: 6px 14px;">
+              💾 Guardar Todos los Precios
+            </button>
           </div>
           <div class="table-responsive-box">
             <table class="mls-data-table">
               <thead>
                 <tr>
-                  <th>Bolso / Referencia</th>
-                  <th>SKU</th>
+                  <th>Referencia de Bolso</th>
                   <th>Categoría</th>
-                  <th>Costo Bodega</th>
-                  <th>PVP Sugerido</th>
-                  <th>Medidas (cm)</th>
-                  <th>Variantes</th>
+                  <th>Costo Mayorista Bodega</th>
+                  <th>Precio Sugerido (PVP)</th>
+                  <th>Campaña Activa</th>
+                  <th>Stock Bodega</th>
+                  <th>Variantes de Color</th>
+                  <th>Acciones</th>
                 </tr>
               </thead>
               <tbody id="supplier-products-table">
+                <!-- Renderizado dinámico -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tabla de Pedidos B2B con Cambio de Estado en Vivo & Gestión de Retornos -->
+        <div class="table-container-card" style="margin-bottom: 24px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+            <div>
+              <h3 style="font-size: 16px; font-weight: 800; color: #fff; margin: 0;">📦 Últimos Pedidos B2B Entrantes</h3>
+              <span style="font-size: 12px; color: var(--text-muted);">Seguimiento logístico, cobro contraentrega y garantías</span>
+            </div>
+            <button type="button" class="btn-action-sm btn-quick-export-orders" style="font-size: 11px; padding: 4px 10px; font-weight: 700; color: #15803d; background: #f0fdf4; border-color: #86efac; border-radius: 6px; cursor: pointer;">
+              📥 Exportar Órdenes a Excel
+            </button>
+          </div>
+          <div class="table-responsive-box">
+            <table class="mls-data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Fecha</th>
+                  <th>Boutique Solicitante</th>
+                  <th>Bolso & Colorway</th>
+                  <th>Bolsos</th>
+                  <th>Costo Mayorista</th>
+                  <th>Estado del Despacho</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="supplier-orders-table">
                 <!-- Renderizado dinámico -->
               </tbody>
             </table>
@@ -444,43 +500,64 @@ Medidas 16 alto x 20 ancho"></textarea>
           </div>
         </div>
 
+        <!-- Barra de Filtros por Rol y Búsqueda en Vivo -->
+        <div style="display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; justify-content: space-between; background: var(--bg-surface); padding: 12px 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button class="btn-filter-role active" data-filter="all">Todos (3)</button>
+            <button class="btn-filter-role" data-filter="supplier">🏢 Bodegas Matrices (1)</button>
+            <button class="btn-filter-role" data-filter="partner">🏪 Boutiques Partners (2)</button>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <input type="text" id="dir-search-input" placeholder="🔍 Buscar por nombre, barrio o ciudad..." style="background: var(--bg-surface-elevated); border: 1px solid var(--border-subtle); color: #fff; padding: 7px 16px; border-radius: 999px; font-size: 12px; min-width: 260px;">
+          </div>
+        </div>
+
         <!-- Calculadora ROI de Escala Comercial -->
         <div class="roi-calc-box">
           <div class="roi-calc-header">
             <div>
-              <span class="category-tag" style="background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); border-color: rgba(16, 185, 129, 0.3);">📈 Proyección Financiera Revendedora</span>
-              <h3 style="font-size: 18px; font-weight: 800; color: #fff; margin-top: 4px;">Calculadora de Utilidad Mensual para tu Boutique</h3>
+              <span class="category-tag" style="background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); border-color: rgba(16, 185, 129, 0.3);">📈 Proyección Financiera a Gran Escala</span>
+              <h3 style="font-size: 18px; font-weight: 800; color: #fff; margin-top: 4px;">Simulador de Ganancias de Red para Bodega & Boutiques</h3>
             </div>
-            <div style="font-size: 12px; color: var(--text-muted);">Basado en ventas por WhatsApp, Instagram y TikTok</div>
+            <div style="font-size: 12px; color: var(--text-muted);">Modelo Multi-Tenant Mayorista con Sincronización Automática</div>
           </div>
 
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; align-items: center;">
             <div>
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <label style="font-size: 13px; font-weight: 700; color: #fff;">Bolsos vendidos al mes:</label>
-                <span id="roi-pairs-label" style="font-size: 18px; font-weight: 900; color: var(--primary-gold);">45 bolsos</span>
-              </div>
-              <input type="range" id="roi-slider-pairs" min="10" max="200" value="45" step="5" class="roi-range-slider" style="width: 100%;">
-              <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-top: 4px;">
-                <span>10 bolsos</span>
-                <span>100 bolsos</span>
-                <span>200 bolsos</span>
+              <!-- Slider 1: Boutiques conectadas -->
+              <div style="margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <label style="font-size: 13px; font-weight: 700; color: #fff;">Boutiques / Partners Conectadas:</label>
+                  <span id="roi-resellers-val" style="font-size: 18px; font-weight: 900; color: var(--primary-gold);">25 tiendas</span>
+                </div>
+                <input type="range" id="roi-resellers-slider" min="1" max="250" value="25" step="1" class="roi-range-slider" style="width: 100%;">
+                <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-top: 4px;">
+                  <span>1 tienda</span>
+                  <span>100 tiendas</span>
+                  <span>250 tiendas</span>
+                </div>
               </div>
 
-              <div style="margin-top: 16px;">
+              <!-- Slider 2: Bolsos vendidos por tienda -->
+              <div style="margin-bottom: 16px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                  <label style="font-size: 13px; font-weight: 700; color: #fff;">Margen de ganancia promedio / bolso:</label>
-                  <span id="roi-margin-label" style="font-size: 18px; font-weight: 900; color: var(--accent-emerald);">$57.000 COP</span>
+                  <label style="font-size: 13px; font-weight: 700; color: #fff;">Bolsos promedio vendidos / tienda / mes:</label>
+                  <span id="roi-pairs-val" style="font-size: 18px; font-weight: 900; color: var(--accent-emerald);">120 bolsos</span>
                 </div>
-                <input type="range" id="roi-slider-margin" min="25000" max="90000" value="57000" step="2000" class="roi-range-slider" style="width: 100%;">
+                <input type="range" id="roi-pairs-slider" min="10" max="1000" value="120" step="5" class="roi-range-slider" style="width: 100%;">
+                <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-top: 4px;">
+                  <span>10 bolsos</span>
+                  <span>500 bolsos</span>
+                  <span>1.000 bolsos</span>
+                </div>
               </div>
             </div>
 
-            <div style="background: rgba(0, 0, 0, 0.5); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
-              <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Utilidad Neta Estimada / Mes:</div>
-              <div id="roi-total-profit" style="font-size: 32px; font-weight: 900; color: var(--accent-emerald); margin: 6px 0;">$2.565.000 COP</div>
-              <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.4;">
-                ✨ <strong>Cero riesgo de inventario:</strong> Tu boutique publica con fotos reales en Instagram/TikTok y BAGS WORLD despacha por contraentrega en toda Colombia.
+            <div style="background: rgba(0, 0, 0, 0.6); padding: 22px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+              <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Utilidad Mensual Estimada para Bodega:</div>
+              <div id="roi-profit-display" style="font-size: 32px; font-weight: 900; color: var(--accent-emerald); margin: 8px 0;">$78.750.000 COP</div>
+              <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.5;">
+                ✨ <strong>Margen Bodega ($25.000/bolso) + Mensualidades SaaS ($150.000/boutique):</strong> Las tiendas venden en Instagram, TikTok y locales físicos mientras BAGS WORLD Colombia centraliza los despachos a nivel nacional.
               </div>
             </div>
           </div>
@@ -910,6 +987,450 @@ Medidas 16 alto x 20 ancho"></textarea>
       </form>
     </div>
   </div>
+
+  
+  <!-- =========================================================================
+       MODAL 6: COTIZADOR PERSONALIZADO VIP CLIENTE
+       ========================================================================= -->
+  <div class="modal-backdrop" id="modal-quote-generator" role="dialog" aria-modal="true">
+    <div class="modal-dialog" style="max-width: 640px;">
+      <div class="modal-header">
+        <div>
+          <span style="font-size: 10px; font-weight: 800; color: var(--primary-gold); background: rgba(227, 194, 116, 0.15); padding: 2px 8px; border-radius: 999px;">DOCUMENTO COMERCIAL EXCLUSIVO</span>
+          <h3 style="margin-top: 4px; font-size: 18px;">Cotizador Personalizado VIP</h3>
+        </div>
+        <button class="btn-close-modal" id="btn-close-quote-modal">&times;</button>
+      </div>
+
+      <div style="padding: 16px 20px;">
+        <!-- Datos del Cliente -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+          <div>
+            <label class="form-label">Nombre del Cliente / Boutique:</label>
+            <input type="text" id="quote-client-name" class="form-input" placeholder="ej. Dra. Marcela Gómez" value="Marcela Gómez (Cliente VIP)">
+          </div>
+          <div>
+            <label class="form-label">WhatsApp (con código país):</label>
+            <input type="tel" id="quote-client-phone" class="form-input" placeholder="ej. 573155551234" value="573155551234">
+          </div>
+        </div>
+
+        <!-- Selector de Referencia para Añadir -->
+        <div style="background: var(--bg-surface-elevated); padding: 12px; border-radius: 10px; border: 1px solid var(--border-subtle); margin-bottom: 14px;">
+          <div style="font-size: 12px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px;">➕ Agregar Bolso a la Cotización:</div>
+          <div style="display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 8px; align-items: flex-end;">
+            <div>
+              <label style="font-size: 11px; font-weight: 700; color: var(--text-secondary);">Modelo / Bolso:</label>
+              <select id="quote-prod-select" class="form-select" style="font-size: 12px; padding: 6px 8px;">
+                <!-- Se llena dinámicamente -->
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 11px; font-weight: 700; color: var(--text-secondary);">Color / Tono:</label>
+              <select id="quote-size-select" class="form-select" style="font-size: 12px; padding: 6px 8px;">
+                <!-- Colorways dinámicos -->
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 11px; font-weight: 700; color: var(--text-secondary);">Cant:</label>
+              <input type="number" id="quote-qty-input" class="form-input" value="1" min="1" max="50" style="font-size: 12px; padding: 6px 8px;">
+            </div>
+            <div>
+              <button type="button" id="btn-add-quote-item" class="btn-primary" style="font-size: 12px; padding: 7px 12px;">
+                Agregar
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lista de Items en la Cotización -->
+        <div style="margin-bottom: 14px;">
+          <div style="font-size: 12px; font-weight: 800; color: var(--text-primary); margin-bottom: 6px;">Bolsos Seleccionados en esta Propuesta:</div>
+          <div id="quote-items-list" style="max-height: 140px; overflow-y: auto; border: 1px solid var(--border-subtle); border-radius: 8px; background: var(--bg-surface); padding: 6px 10px;">
+            <!-- Items dinámicos -->
+          </div>
+        </div>
+
+        <!-- Configuración de Descuento Personalizado -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; background: rgba(227, 194, 116, 0.08); padding: 12px; border-radius: 8px; border: 1px solid rgba(227, 194, 116, 0.25);">
+          <div>
+            <label class="form-label">Descuento Especial (COP):</label>
+            <input type="number" id="quote-discount-amount" class="form-input" value="25000" step="5000">
+          </div>
+          <div>
+            <label class="form-label">Motivo del Descuento / Razón:</label>
+            <input type="text" id="quote-discount-reason" class="form-input" value="Beneficio Cliente VIP">
+          </div>
+        </div>
+
+        <!-- Flete y Vigencia -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+          <div>
+            <label class="form-label">Flete / Zona de Entrega:</label>
+            <select id="quote-shipping-select" class="form-select">
+              <option value="0">🛵 Envío GRATIS (Cortesía Bodega)</option>
+              <option value="12000" selected>🛵 Bogotá / Cobertura Local ($12.000 COP)</option>
+              <option value="14000">🛵 Cali Urbano ($14.000 COP)</option>
+              <option value="16000">🛵 Medellín / Valle de Aburrá ($16.000 COP)</option>
+              <option value="18000">📦 Envío Nacional Interrapidísimo ($18.000 COP)</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Vigencia de la Cotización:</label>
+            <select id="quote-validity-select" class="form-select">
+              <option value="48 Horas">⏱️ Válido por 48 Horas</option>
+              <option value="24 Horas">⏱️ Válido por 24 Horas (Hoy)</option>
+              <option value="7 Días">⏱️ Válido por 7 Días</option>
+              <option value="Hasta agotar stock">⏱️ Hasta agotar stock de bodega</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Resumen de Liquidación Formal -->
+        <div style="background: var(--bg-surface-elevated); padding: 12px 16px; border-radius: 10px; border: 1px solid var(--border-subtle); margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; color: var(--text-secondary);">
+            <span>Subtotal Precio Regular:</span>
+            <strong id="quote-subtotal-display" style="color: var(--text-primary);">$0 COP</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; color: var(--accent-emerald);">
+            <span id="quote-discount-label">Descuento Especial Aplicado:</span>
+            <strong id="quote-discount-display">-$0 COP</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; color: var(--text-secondary);">
+            <span>Flete Logístico:</span>
+            <strong id="quote-shipping-display">$12.000 COP</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 15px; font-weight: 900; color: var(--text-primary); padding-top: 8px; border-top: 1px solid var(--border-subtle);">
+            <span>TOTAL COTIZACIÓN VIP:</span>
+            <span id="quote-total-display" style="color: var(--primary-gold); font-size: 17px;">$0 COP</span>
+          </div>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <button type="button" id="btn-send-quote-wa" class="btn-primary" style="flex: 2; min-width: 200px; justify-content: center; background: #25D366; border-color: #22c55e;">
+            <span>📲 Enviar Cotización por WhatsApp</span>
+          </button>
+          <button type="button" id="btn-copy-quote-text" class="btn-secondary" style="flex: 1; min-width: 120px; justify-content: center;">
+            <span>📋 Copiar Texto</span>
+          </button>
+          <button type="button" id="btn-preview-quote-card" class="btn-secondary" style="flex: 1; min-width: 120px; justify-content: center;">
+            <span>📄 Ver Ficha Formal</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 7: VISTA PREVIA FICHA OFICIAL DE COTIZACIÓN VIP (IMPRIMIBLE & PDF)
+       ========================================================================= -->
+  <div class="modal-backdrop" id="modal-quote-preview" role="dialog" aria-modal="true">
+    <div class="modal-dialog" style="max-width: 600px; background: #ffffff; color: #0f172a;">
+      <div class="modal-header" style="border-bottom: none; padding-bottom: 0;">
+        <div></div>
+        <button class="btn-close-modal" id="btn-close-preview-modal" style="color: #0f172a;">&times;</button>
+      </div>
+      <div style="padding: 10px 24px 24px;" id="printable-quote-content">
+        <!-- Renderizado dinámico de la Ficha Membretada -->
+      </div>
+      <div style="padding: 0 24px 20px; display: flex; justify-content: flex-end; gap: 10px;">
+        <button type="button" class="btn-secondary" id="btn-print-quote" onclick="window.print()" style="color: #0f172a; border-color: #cbd5e1;">
+          🖨️ Imprimir / Guardar PDF
+        </button>
+        <button type="button" class="btn-primary" id="btn-close-preview-btn">
+          Entendido
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 8: MATRIZ DE INVENTARIO Y STOCK POR COLORWAY / VARIANTE
+       ========================================================================= -->
+  <div class="modal-backdrop" id="modal-inventory-matrix" role="dialog" aria-modal="true">
+    <div class="modal-dialog" style="max-width: 780px;">
+      <div class="modal-header">
+        <div>
+          <span style="font-size: 10px; font-weight: 800; color: #16a34a; background: rgba(16, 185, 129, 0.15); padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(16, 185, 129, 0.3);">INVENTARIO BODEGA EN TIEMPO REAL</span>
+          <h3 style="margin-top: 4px; font-size: 18px;" id="matrix-modal-title">Control de Stock por Colorway / Variante</h3>
+        </div>
+        <button class="btn-close-modal" id="btn-close-stock-modal">&times;</button>
+      </div>
+
+      <div style="padding: 16px 20px;">
+        <!-- Cabecera del Producto Seleccionado -->
+        <div style="display: flex; gap: 14px; align-items: center; background: var(--bg-surface-elevated); padding: 12px; border-radius: 10px; border: 1px solid var(--border-subtle); margin-bottom: 16px;">
+          <img id="matrix-prod-img" src="" alt="" style="width: 54px; height: 54px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-subtle);">
+          <div style="flex: 1;">
+            <h4 id="matrix-prod-name" style="margin: 0; font-size: 15px; font-weight: 800; color: var(--text-primary);"></h4>
+            <div id="matrix-prod-sku" style="font-size: 11px; color: var(--text-muted); font-family: monospace;"></div>
+          </div>
+          <div style="text-align: right;">
+            <span style="font-size: 11px; color: var(--text-secondary);">Total en Bodega:</span>
+            <div id="matrix-grand-total-badge" style="font-size: 20px; font-weight: 900; color: var(--primary-gold);">0 bolsos</div>
+          </div>
+        </div>
+
+        <!-- Botones de Acción Rápida -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <span style="font-size: 12px; color: var(--text-muted);">Ajusta las cantidades por colorway o aplica un lote rápido:</span>
+          <div style="display: flex; gap: 6px;">
+            <button type="button" class="btn-action-sm" id="btn-stock-quick-add-all" style="font-size: 11px; padding: 4px 8px;">
+              ➕ Lote (+5 a todos los tonos)
+            </button>
+            <button type="button" class="btn-action-sm" id="btn-stock-quick-clear-all" style="font-size: 11px; padding: 4px 8px; color: #ef4444;">
+              🧹 Limpiar Todo (0)
+            </button>
+          </div>
+        </div>
+
+        <!-- Tabla Matriz Interactiva -->
+        <div style="overflow-x: auto; border: 1px solid var(--border-subtle); border-radius: 8px; margin-bottom: 16px; background: var(--bg-surface);">
+          <table class="mls-data-table" id="matrix-stock-table" style="font-size: 12px; margin: 0;">
+            <!-- Filas de colorways renderizadas dinámicamente -->
+          </table>
+        </div>
+
+        <!-- Nota de Automatización de Ventas -->
+        <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; font-size: 11px; color: var(--accent-emerald); line-height: 1.4;">
+          <strong>⚡ Descuento Automático en Tiempo Real:</strong> Cada vez que un cliente o boutique confirme un pedido por WhatsApp o carrito, el sistema descuenta automáticamente los bolsos del stock de ese colorway.
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+          <button type="button" class="btn-secondary" id="btn-cancel-stock-modal">Cancelar</button>
+          <button type="button" class="btn-primary" id="btn-save-stock-matrix">
+            💾 Guardar Inventario de este Modelo
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 9: CENTRO DE REPORTES CONTABLES & FACTURACIÓN (EXCEL / PDF)
+       ========================================================================= -->
+  <div class="modal-backdrop" id="modal-accounting-reports" role="dialog" aria-modal="true">
+    <div class="modal-dialog" style="max-width: 920px; width: 95%;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 12px;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 22px;">📊</span>
+            <h3 style="font-size: 18px; font-weight: 900; color: var(--text-primary); margin: 0;" id="reports-modal-header-title">Centro Contable & Liquidación Financiera</h3>
+            <span class="badge-verified" style="background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); border-color: rgba(16, 185, 129, 0.3); font-size: 10px;">TIEMPO REAL</span>
+          </div>
+          <p style="font-size: 12px; color: var(--text-secondary); margin: 4px 0 0;">
+            Consolidado de ventas de bolsos, costos de bodega mayorista, utilidades netas y control de despachos.
+          </p>
+        </div>
+        <button type="button" class="btn-close-modal" id="btn-close-reports-modal" style="font-size: 24px; background: none; border: none; cursor: pointer; color: var(--text-muted); line-height: 1;">&times;</button>
+      </div>
+
+      <!-- Selector de Período Contable -->
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; background: var(--bg-surface); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border-subtle);">
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;" id="reports-period-buttons">
+          <button type="button" class="btn-report-period active" data-period="day" style="padding: 5px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer;">
+            📅 Hoy (Diario)
+          </button>
+          <button type="button" class="btn-report-period" data-period="week" style="padding: 5px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer;">
+            🗓️ Semana (7 Días)
+          </button>
+          <button type="button" class="btn-report-period" data-period="month" style="padding: 5px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer;">
+            📆 Mes en Curso
+          </button>
+          <button type="button" class="btn-report-period" data-period="year" style="padding: 5px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer;">
+            📈 Anual / Histórico
+          </button>
+        </div>
+        <div style="font-size: 11px; color: var(--text-secondary);" id="reports-date-range-label">
+          Periodo: <strong>Hoy</strong>
+        </div>
+      </div>
+
+      <!-- Tarjetas de Resumen Financiero -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px;">
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 12px 14px; border-left: 4px solid #2563eb;">
+          <div style="font-size: 11px; color: var(--text-secondary); font-weight: 600;">Facturación Bruta (Público)</div>
+          <div id="report-kpi-gross-sales" style="font-size: 18px; font-weight: 900; color: var(--accent-blue); margin-top: 4px;">$ 0 COP</div>
+        </div>
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 12px 14px; border-left: 4px solid var(--primary-gold);">
+          <div style="font-size: 11px; color: var(--text-secondary); font-weight: 600;">Costo Mercancía (Bodega)</div>
+          <div id="report-kpi-wholesale-cost" style="font-size: 18px; font-weight: 900; color: var(--primary-gold); margin-top: 4px;">$ 0 COP</div>
+        </div>
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 12px 14px; border-left: 4px solid #16a34a;">
+          <div style="font-size: 11px; color: var(--text-secondary); font-weight: 600;">Utilidad Neta Generada</div>
+          <div id="report-kpi-net-profit" style="font-size: 18px; font-weight: 900; color: var(--accent-emerald); margin-top: 4px;">$ 0 COP</div>
+        </div>
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 12px 14px; border-left: 4px solid var(--primary-red);">
+          <div style="font-size: 11px; color: var(--text-secondary); font-weight: 600;">Total Bolsos Despachados</div>
+          <div id="report-kpi-pairs-count" style="font-size: 18px; font-weight: 900; color: var(--primary-red); margin-top: 4px;">0 bolsos</div>
+        </div>
+      </div>
+
+      <!-- Tabla Detallada de Órdenes del Período -->
+      <div style="max-height: 260px; overflow-y: auto; border: 1px solid var(--border-subtle); border-radius: 8px; margin-bottom: 20px; background: var(--bg-surface);">
+        <table class="mls-data-table" id="report-orders-table" style="font-size: 11px; margin: 0;">
+          <thead>
+            <tr style="position: sticky; top: 0; z-index: 1;">
+              <th>ID</th>
+              <th>Fecha</th>
+              <th>Boutique / Partner</th>
+              <th>Bolso & Colorway</th>
+              <th style="text-align: center;">Bolsos</th>
+              <th>Venta Sug.</th>
+              <th>Costo Bodega</th>
+              <th>Margen Neto</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody id="report-orders-tbody">
+            <!-- Renderizado dinámico -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Acciones de Exportación -->
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; border-top: 1px solid var(--border-subtle); padding-top: 16px;">
+        <div style="font-size: 11px; color: var(--text-muted);">
+          Datos exportables en formato oficial auditado.
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <button type="button" class="btn-secondary" id="btn-export-reports-excel" style="display: inline-flex; align-items: center; gap: 6px; font-weight: 700; color: #15803d; border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.1); cursor: pointer;">
+            <span>📥 Descargar Excel (.CSV)</span>
+          </button>
+          <button type="button" class="btn-primary" id="btn-export-reports-pdf" style="display: inline-flex; align-items: center; gap: 6px; font-weight: 700; cursor: pointer;">
+            <span>🖨️ Generar Informe PDF / Imprimir</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 10: GESTIÓN DE CAMBIOS, GARANTÍAS & DEVOLUCIONES
+       ========================================================================= -->
+  <div class="modal-backdrop" id="modal-return-exchange" role="dialog" aria-modal="true">
+    <div class="modal-dialog" style="max-width: 640px; width: 95%;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 12px;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 22px;">🔄</span>
+            <h3 style="font-size: 18px; font-weight: 900; color: var(--text-primary); margin: 0;">Gestión de Cambios, Garantías & Retornos</h3>
+          </div>
+          <p style="font-size: 12px; color: var(--text-secondary); margin: 4px 0 0;">
+            Ajuste automático de inventario en Bodega Central y generación de comanda WhatsApp para logística.
+          </p>
+        </div>
+        <button type="button" class="btn-close-modal" id="btn-close-exchange-modal" style="font-size: 24px; background: none; border: none; cursor: pointer; color: var(--text-muted); line-height: 1;">&times;</button>
+      </div>
+
+      <!-- Banner de la Orden Seleccionada -->
+      <div style="background: var(--bg-surface-elevated); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 12px; margin-bottom: 16px; display: flex; gap: 12px; align-items: center;">
+        <div style="font-size: 28px;">👜</div>
+        <div style="flex: 1;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <strong style="font-size: 13px; color: var(--text-primary);" id="exchange-order-product-name">Cargando...</strong>
+            <span style="font-family: monospace; font-weight: 800; color: var(--primary-gold); font-size: 12px;" id="exchange-order-id">#ORD-0000</span>
+          </div>
+          <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">
+            Boutique: <span id="exchange-order-store" style="font-weight: 600;">-</span> • Colorway Original: <span id="exchange-order-colorway" style="font-weight: 700; color: var(--primary-gold);">-</span>
+          </div>
+        </div>
+      </div>
+
+      <form id="form-return-exchange">
+        <!-- 1. Tipo de Transacción (Detal vs Mayorista) -->
+        <div class="form-group" style="margin-bottom: 14px;">
+          <label class="form-label" style="font-size: 12px; font-weight: 700;">Canal / Tipo de Operación:</label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <label style="display: flex; align-items: center; gap: 8px; background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;">
+              <input type="radio" name="exchange-channel" value="retail" checked>
+              <span>🛍️ Venta al Detal (Cliente Final)</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;">
+              <input type="radio" name="exchange-channel" value="wholesale">
+              <span>📦 Mayorista (Boutique Partner)</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- 2. Motivo de la Gestión -->
+        <div class="form-group" style="margin-bottom: 14px;">
+          <label class="form-label" style="font-size: 12px; font-weight: 700;">Motivo de la Incidencia:</label>
+          <select class="form-select" id="exchange-action-type" style="font-size: 12px; padding: 8px; font-weight: 700;">
+            <option value="color_exchange">👜 Cambio de Colorway / Tono (Cliente)</option>
+            <option value="warranty">🛡️ Garantía de Fábrica (Herrajes, Cremallera o Costura)</option>
+            <option value="stock_rotation">📦 Rotación de Inventario Frío (Boutique a Bodega)</option>
+            <option value="refund_return">❌ Devolución Definitiva (Reingreso de Bolsos a Stock)</option>
+          </select>
+        </div>
+
+        <!-- 3. Grilla de Colores (Intercambio) -->
+        <div id="exchange-sizes-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+          <div>
+            <label class="form-label" style="font-size: 11px; font-weight: 700; color: #f87171;">📥 Colorway que REINGRESA a Bodega:</label>
+            <select class="form-select" id="exchange-return-size" style="font-size: 12px; padding: 7px; font-weight: 700;">
+              <!-- Se llena con los tonos del bolso -->
+            </select>
+          </div>
+          <div>
+            <label class="form-label" style="font-size: 11px; font-weight: 700; color: #4ade80;">📤 Nuevo Colorway que SALE de Bodega:</label>
+            <select class="form-select" id="exchange-new-size" style="font-size: 12px; padding: 7px; font-weight: 700;">
+              <!-- Se llena con los tonos del bolso -->
+            </select>
+          </div>
+        </div>
+
+        <!-- 4. Flete y Logística -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+          <div>
+            <label class="form-label" style="font-size: 11px; font-weight: 700;">🛵 Logística / Flete:</label>
+            <select class="form-select" id="exchange-shipping-mode" style="font-size: 11px; padding: 7px; font-weight: 600;">
+              <option value="12000_cliente">Flete $12.000 COP (Cobra al Cliente)</option>
+              <option value="0_tienda">Garantía / Asumido 100% Bodega ($0 COP)</option>
+              <option value="0_bodega">Cambio presencial en Bodega Central ($0)</option>
+              <option value="18000_nacional">Envío Nacional Interrapidísimo ($18.000)</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label" style="font-size: 11px; font-weight: 700;">Bolsos a Gestionar:</label>
+            <input type="number" min="1" max="50" value="1" class="form-input" id="exchange-units" style="font-size: 12px; padding: 6px; font-weight: 800; text-align: center;">
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 14px;">
+          <label class="form-label" style="font-size: 11px; font-weight: 700;">Dirección de Recogida / Entrega:</label>
+          <input type="text" class="form-input" id="exchange-address" placeholder="Ej: Calle 127 # 15-40, Bogotá D.C." style="font-size: 12px; padding: 7px;">
+        </div>
+
+        <!-- Impacto en Inventario en Vivo -->
+        <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 10px 14px; margin-bottom: 18px; font-size: 11px; color: var(--accent-emerald); line-height: 1.4;">
+          <strong>⚡ Impacto Inmediato en Bodega:</strong> <span id="exchange-stock-impact-text">El color reingresado sumará +1 bolso al inventario y el nuevo color restará -1 bolso.</span>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+          <button type="button" class="btn-secondary" id="btn-cancel-exchange-modal">Cancelar</button>
+          <button type="submit" class="btn-primary" id="btn-submit-exchange" style="background: var(--primary-gold); color: #000; font-weight: 800; cursor: pointer;">
+            ✅ Procesar Gestión & Actualizar Stock
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+    <!-- FOOTER MULTI-TENANT CON ACCESO A PORTAL DE CLIENTES -->
+  <footer style="text-align: center; padding: 36px 20px 80px; color: var(--text-muted); font-size: 12px; border-top: 1px solid var(--border-subtle); margin-top: 60px; background: var(--bg-surface);">
+    <div style="max-width: 1240px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+      <div>
+        <strong style="color: #ffffff;">BAGS WORLD MLS</strong> — Red Matriz de Bolsos, Carteras & Marroquinería Colombia
+      </div>
+      <div style="display: flex; gap: 12px; align-items: center;">
+        <a href="admin.html" class="btn-action-sm" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-weight: 700; color: var(--primary-gold); border-color: rgba(227, 194, 116, 0.4); background: rgba(227, 194, 116, 0.1);">
+          🔐 Portal Privado Proveedores & Boutiques Partners
+        </a>
+      </div>
+    </div>
+  </footer>
 
   <!-- Barra Flotante de Carrito / Pedido Rápido -->
   <div class="floating-cart-bar" id="floating-cart-bar" role="button" aria-label="Abrir Carrito">

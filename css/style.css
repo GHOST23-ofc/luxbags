@@ -1484,3 +1484,98 @@ input:checked + .slider-round:before {
 @media print {
   .bastion-watermark { display: none !important; }
 }
+
+/* ==========================================================================
+   BARRA DE CLIENTE B2B PRIVADO (BAGS WORLD / BOUTIQUE PARTNER)
+   ========================================================================== */
+.client-auth-hud {
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+  position: sticky;
+  top: 0;
+  z-index: 99;
+  padding: 8px 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.client-auth-container {
+  max-width: 1300px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* ==========================================================================
+   CORNER TAGS & DIRECTORY FILTERING (BASTION AI SAAS - LUXURY DARK)
+   ========================================================================== */
+.corner-tag {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  z-index: 2;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+.corner-tag-partner {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.4);
+}
+.corner-tag-supplier {
+  background: rgba(227, 194, 116, 0.15);
+  color: #e3c274;
+  border: 1px solid rgba(227, 194, 116, 0.45);
+}
+
+.btn-filter-role {
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface-elevated);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-filter-role.active {
+  background: var(--primary-gold) !important;
+  color: #000000 !important;
+  border-color: var(--primary-gold) !important;
+  font-weight: 800;
+  box-shadow: 0 0 12px rgba(227, 194, 116, 0.4);
+}
+
+.btn-report-period {
+  transition: all 0.2s ease;
+  background: var(--bg-surface-elevated);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+}
+.btn-report-period.active {
+  background: var(--primary-gold) !important;
+  color: #000000 !important;
+  border-color: var(--primary-gold) !important;
+  font-weight: 800;
+  box-shadow: 0 0 12px rgba(227, 194, 116, 0.35);
+}
+
+.campaign-badge-pill {
+  background: linear-gradient(135deg, #e6192e, #b91c1c);
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(230, 25, 46, 0.35);
+}

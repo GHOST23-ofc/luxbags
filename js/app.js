@@ -9,6 +9,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let selectedColor = "all";
   let searchQuery = "";
   let currentSort = "default";
+  let directoryRoleFilter = "all";
+  let directorySearchQuery = "";
 
   // Estado del modal de producto activo
   let activeModalProduct = null;
@@ -36,6 +38,14 @@ document.addEventListener("DOMContentLoaded", () => {
     setupPrivacyAndBackups();
     startReservationTimer();
     initBlackHoleCanvas();
+
+    // Nuevos módulos avanzados (BASTION AI SAAS v11)
+    setupHeadersAndRoleIsolation();
+    setupDirectoryFilters();
+    setupQuoteGenerator();
+    setupInventoryStockMatrix();
+    setupAccountingReports();
+    setupReturnExchangeModal();
 
     // Renderizar vista inicial
     renderCurrentView();
@@ -97,6 +107,115 @@ document.addEventListener("DOMContentLoaded", () => {
   // =========================================================================
   // NAVEGACIÓN ENTRE ROLES (HUD TABS)
   // =========================================================================
+  
+  // =========================================================================
+  // AISLAMIENTO DE ROLES & SEGURIDAD MULTI-TENANT (BASTION AI SAAS)
+  // =========================================================================
+  function setupHeadersAndRoleIsolation() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const paramDemo = urlParams.get("demo");
+    const paramRole = urlParams.get("role");
+    const paramView = urlParams.get("view");
+
+    // Auto-login con query params demo
+    if (paramDemo === "bolsoscol") {
+      db.quickLogin("store-bolsoscol");
+    } else if (paramDemo === "calibolsos") {
+      db.quickLogin("store-calibolsos");
+    } else if (paramDemo === "bagsworld" || paramDemo === "ghost" || paramRole === "super_admin" || paramDemo === "true") {
+      db.quickLogin("store-bagsworld-admin");
+    }
+
+    const session = db.getAuthSession();
+    const currentStore = db.getCurrentStore();
+    const masterHud = document.getElementById("master-admin-hud");
+    const clientHud = document.getElementById("client-auth-hud");
+
+    const isSuperAdmin = session.role === "super_admin" || currentStore.isSupplierStore || paramDemo === "true" || paramRole === "super_admin";
+
+    if (masterHud) masterHud.style.display = "none";
+    if (clientHud) clientHud.style.display = "none";
+
+    if (isSuperAdmin) {
+      if (masterHud) masterHud.style.display = "block";
+    } else if (session.authenticated || currentStore) {
+      if (clientHud) {
+        clientHud.style.display = "block";
+        const titleEl = document.getElementById("client-hud-title");
+        const subtitleEl = document.getElementById("client-hud-subtitle");
+        const iconEl = document.getElementById("client-role-icon");
+        const toggleBtn = document.getElementById("btn-client-toggle-view");
+
+        if (currentStore.isSupplierStore) {
+          if (iconEl) iconEl.textContent = "📦";
+          if (titleEl) titleEl.textContent = currentStore.name + " (Bodega Matriz)";
+          if (subtitleEl) subtitleEl.textContent = "🟢 Panel Privado B2B • Inventario Central & Boutiques";
+          if (toggleBtn) toggleBtn.textContent = currentView === "storefront" ? "📦 Volver al Panel Bodega" : "🛒 Ver Mi Vitrina Pública";
+        } else {
+          if (iconEl) iconEl.textContent = "👜";
+          if (titleEl) titleEl.textContent = currentStore.name + " (Boutique Partner)";
+          if (subtitleEl) subtitleEl.textContent = "🟢 Margen Propio & Catálogo Sincronizado";
+          if (toggleBtn) toggleBtn.textContent = currentView === "storefront" ? "🏪 Volver a Mi Panel Tienda" : "🛒 Ver Mi Vitrina con Margen";
+        }
+
+        if (toggleBtn) {
+          toggleBtn.onclick = () => {
+            if (currentView === "storefront") {
+              switchRoleTab(currentStore.isSupplierStore ? "supplier" : "store-admin");
+            } else {
+              switchRoleTab("storefront");
+            }
+          };
+        }
+
+        const clientAccountBtn = document.getElementById("btn-client-open-account");
+        if (clientAccountBtn) {
+          clientAccountBtn.onclick = () => {
+            openModal("modal-privacy-settings");
+          };
+        }
+
+        const clientLogoutBtn = document.getElementById("btn-client-logout");
+        if (clientLogoutBtn) {
+          clientLogoutBtn.onclick = () => {
+            if (confirm("¿Deseas cerrar tu sesión segura?")) {
+              db.logout();
+              window.location.href = "index.html?view=storefront";
+            }
+          };
+        }
+      }
+    }
+
+    // Copiar link de partner en bodega
+    const btnCopyPartner = document.getElementById("btn-copy-partner-link");
+    if (btnCopyPartner) {
+      btnCopyPartner.onclick = () => {
+        const link = window.location.origin + window.location.pathname.replace('index.html', '') + "admin.html?partner=bagsworld";
+        navigator.clipboard?.writeText(link).then(() => {
+          showToast("🔗 Enlace de invitación copiado: " + link);
+        }).catch(() => {
+          prompt("Copia este enlace de invitación para tu nueva Boutique Partner:", link);
+        });
+      };
+    }
+
+    // Logout en Master HUD
+    const btnLogoutHud = document.getElementById("btn-logout-hud");
+    if (btnLogoutHud) {
+      btnLogoutHud.onclick = () => {
+        if (confirm("¿Cerrar sesión de SuperAdmin?")) {
+          db.logout();
+          window.location.href = "index.html?view=storefront";
+        }
+      };
+    }
+
+    if (paramView) {
+      switchRoleTab(paramView);
+    }
+  }
+
   function setupRoleSwitcher() {
     const tabs = document.querySelectorAll(".role-tab-btn");
     tabs.forEach(tab => {
@@ -424,12 +543,16 @@ document.addEventListener("DOMContentLoaded", () => {
         <article class="product-card" data-id="${prod.id}">
           <div class="product-image-box">
             <img src="${prod.image}" alt="${prod.name}" class="product-image" loading="lazy">
-            <div class="product-badges">
-              <span class="category-tag">${prod.category}</span>
-              <span class="category-tag" style="background: rgba(230, 25, 46, 0.85); color: #fff; border-color: var(--primary-red);">
-                🎨 ${colorwaysCount} Colores
-              </span>
-            </div>
+            ${(() => {
+              const totalStock = db.getProductTotalStock(prod.id);
+              const stockBadge = totalStock === 0
+                ? '<span class="category-tag" style="background: rgba(239, 68, 68, 0.2); color: #f87171; border-color: rgba(239, 68, 68, 0.4);">🔴 Agotado</span>'
+                : (totalStock <= 4
+                    ? '<span class="category-tag" style="background: rgba(227, 194, 116, 0.2); color: var(--primary-gold); border-color: rgba(227, 194, 116, 0.4);">⚡ ¡Últimos ' + totalStock + '!</span>'
+                    : '<span class="category-tag" style="background: rgba(16, 185, 129, 0.2); color: var(--accent-emerald); border-color: rgba(16, 185, 129, 0.4);">🟢 ' + totalStock + ' en stock</span>');
+              const campaignPill = prod.campaignBadge ? '<span class="campaign-badge-pill" style="margin-left: 4px;">' + prod.campaignBadge + '</span>' : '';
+              return '<div class="product-badges"><span class="category-tag">' + prod.category + '</span><span class="category-tag" style="background: rgba(230, 25, 46, 0.85); color: #fff; border-color: var(--primary-red);">🎨 ' + colorwaysCount + ' Colores</span>' + stockBadge + campaignPill + '</div>';
+            })()}
           </div>
           <div class="product-body">
             <h3 class="product-name">${prod.name}</h3>
@@ -508,6 +631,11 @@ document.addEventListener("DOMContentLoaded", () => {
               +${db.formatCOP(margin)}
             </span>
           </td>
+          <td>
+            <button type="button" class="btn-action-sm btn-open-stock-modal" data-prod-id="${mp.id}" style="font-size: 11px; padding: 4px 8px; font-weight: 800; color: #15803d; background: #f0fdf4; border-color: #86efac; border-radius: 6px; white-space: nowrap; cursor: pointer;">
+              📊 ${db.getProductTotalStock(mp.id)} bolsos
+            </button>
+          </td>
           <td style="font-size: 11px; color: var(--text-muted);">${mp.dimensions || 'Estándar'}</td>
           <td>
             <label class="switch-toggle">
@@ -529,6 +657,20 @@ document.addEventListener("DOMContentLoaded", () => {
     const avgMargin = activeCount > 0 ? Math.round(totalMargin / activeCount) : 0;
     document.getElementById("stat-avg-margin").textContent = db.formatCOP(avgMargin);
     document.getElementById("stat-phone-preview").textContent = store.phone ? `+${store.phone}` : "No configurado";
+
+    // Botón Guardar Todos los Precios de Boutique
+    const btnSaveStorePrices = document.getElementById("btn-save-store-prices");
+    if (btnSaveStorePrices) {
+      btnSaveStorePrices.onclick = () => {
+        tbody.querySelectorAll(".store-price-input").forEach(input => {
+          const prodId = input.dataset.id;
+          const newPrice = parseInt(input.value, 10);
+          db.updateStorePrice(store.id, prodId, newPrice);
+        });
+        showToast("✅ Precios de venta guardados correctamente para tu boutique.");
+        renderStoreAdmin();
+      };
+    }
 
     // Listeners de cambio de precio
     tbody.querySelectorAll(".store-price-input").forEach(input => {
@@ -577,31 +719,155 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!tbody) return;
 
     tbody.innerHTML = masterProducts.map(mp => {
-      const variantsCount = mp.colorways ? mp.colorways.length : 1;
+      const campaign = mp.campaignBadge || "";
       return `
         <tr>
           <td>
             <div class="td-product-cell">
               <img src="${mp.image}" alt="${mp.name}" class="td-product-thumb">
               <div>
-                <div class="td-product-name">${mp.name}</div>
-                <div class="td-product-sku">${mp.tagline || ''}</div>
+                <div class="td-product-name" style="font-weight: 800;">${mp.name}</div>
+                <div class="td-product-sku" style="font-size: 10px; color: var(--text-muted); font-family: monospace;">SKU: ${mp.sku}</div>
               </div>
             </div>
           </td>
-          <td style="font-family: monospace; font-size: 11px; color: var(--text-muted);">${mp.sku}</td>
           <td><span class="category-tag">${mp.category}</span></td>
-          <td style="font-weight: 800; color: var(--primary-gold);">${db.formatCOP(mp.wholesalePrice)}</td>
-          <td style="color: #fff;">${db.formatCOP(mp.suggestedRetailPrice)}</td>
-          <td style="font-size: 11px; color: var(--text-muted);">${mp.dimensions || 'Estándar'}</td>
+          <td>
+            <div style="display: flex; align-items: center; gap: 4px;">
+              <span style="font-size: 11px; color: var(--text-muted);">$</span>
+              <input type="number" class="form-input supplier-wholesale-input" data-prod-id="${mp.id}" value="${mp.wholesalePrice}" style="width: 100px; padding: 4px 6px; font-weight: 700; font-size: 12px;" step="1000">
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; align-items: center; gap: 4px;">
+              <span style="font-size: 11px; color: var(--text-muted);">$</span>
+              <input type="number" class="form-input supplier-retail-input" data-prod-id="${mp.id}" value="${mp.suggestedRetailPrice}" style="width: 100px; padding: 4px 6px; font-weight: 800; color: var(--primary-gold); font-size: 12px;" step="1000">
+            </div>
+          </td>
+          <td>
+            <select class="form-select supplier-campaign-select" data-prod-id="${mp.id}" style="font-size: 11px; padding: 4px 8px; font-weight: 700; max-width: 140px;">
+              <option value="" ${campaign === "" ? "selected" : ""}>Precio Regular</option>
+              <option value="🔥 Promo Amor y Amistad" ${campaign.includes("Amor") || campaign.includes("Promo") ? "selected" : ""}>🔥 Promo Amor y Amistad</option>
+              <option value="⚡ Liquidación Lotes" ${campaign.includes("Liquidación") ? "selected" : ""}>⚡ Liquidación Lotes</option>
+              <option value="🌟 Nuevo Drop 2026" ${campaign.includes("Drop") ? "selected" : ""}>🌟 Nuevo Drop 2026</option>
+              <option value="👑 Más Vendido" ${campaign.includes("Vendido") ? "selected" : ""}>👑 Más Vendido</option>
+            </select>
+          </td>
+          <td>
+            <button type="button" class="btn-action-sm btn-open-stock-modal" data-prod-id="${mp.id}" style="font-size: 11px; padding: 4px 8px; font-weight: 800; color: #15803d; background: #f0fdf4; border-color: #86efac; border-radius: 6px; white-space: nowrap; cursor: pointer;" title="Ver y Editar Stock por Colorway">
+              📊 ${db.getProductTotalStock(mp.id)} bolsos
+            </button>
+          </td>
           <td>
             <span class="category-tag" style="background: rgba(56, 189, 248, 0.15); color: var(--accent-blue); border-color: rgba(56, 189, 248, 0.3);">
-              🎨 ${variantsCount} Colores
+              🎨 ${(mp.colorways || []).length} Colores
             </span>
+          </td>
+          <td>
+            <button type="button" class="btn-action-sm btn-save-single-master" data-prod-id="${mp.id}" style="font-size: 11px; padding: 5px 10px; font-weight: 700; color: #16a34a; border-color: #86efac; background: #f0fdf4;" title="Guardar Cambios">
+              💾 Guardar
+            </button>
           </td>
         </tr>
       `;
     }).join("");
+
+    // Guardar Individual
+    tbody.querySelectorAll(".btn-save-single-master").forEach(btn => {
+      btn.onclick = () => {
+        const prodId = btn.dataset.prodId;
+        const wholesale = Number(tbody.querySelector(`.supplier-wholesale-input[data-prod-id="${prodId}"]`)?.value) || 68000;
+        const retail = Number(tbody.querySelector(`.supplier-retail-input[data-prod-id="${prodId}"]`)?.value) || 125000;
+        const campaign = tbody.querySelector(`.supplier-campaign-select[data-prod-id="${prodId}"]`)?.value || "";
+
+        db.updateMasterProduct(prodId, {
+          wholesalePrice: wholesale,
+          suggestedRetailPrice: retail,
+          campaignBadge: campaign
+        });
+
+        showToast("✅ Referencia actualizada en tiempo real.");
+      };
+    });
+
+    // Botón Guardar Todos los Precios en Lote
+    const btnSaveAll = document.getElementById("btn-save-all-supplier-prices");
+    if (btnSaveAll) {
+      btnSaveAll.onclick = () => {
+        const rows = tbody.querySelectorAll("tr");
+        rows.forEach(tr => {
+          const wholesaleInput = tr.querySelector(".supplier-wholesale-input");
+          const retailInput = tr.querySelector(".supplier-retail-input");
+          const campaignSelect = tr.querySelector(".supplier-campaign-select");
+
+          if (wholesaleInput && retailInput) {
+            const prodId = wholesaleInput.dataset.prodId;
+            db.updateMasterProduct(prodId, {
+              wholesalePrice: Number(wholesaleInput.value),
+              suggestedRetailPrice: Number(retailInput.value),
+              campaignBadge: campaignSelect?.value || ""
+            });
+          }
+        });
+        showToast("✅ Todos los precios y campañas guardados para la red BAGS WORLD.");
+      };
+    }
+
+    // Renderizar Tabla de Pedidos B2B Entrantes
+    renderSupplierOrdersTable();
+  }
+
+  
+  function renderSupplierOrdersTable() {
+    const ordersTbody = document.getElementById("supplier-orders-table");
+    if (!ordersTbody) return;
+    const orders = db.getOrders();
+
+    ordersTbody.innerHTML = orders.map(ord => {
+      return `
+        <tr>
+          <td style="font-family: monospace; font-weight: 700; color: var(--primary-gold);">#${ord.id}</td>
+          <td>${ord.date}</td>
+          <td style="font-weight: 700; color: #fff;">${ord.storeName}</td>
+          <td>
+            <div style="font-weight: 700; font-size: 12px; color: #fff;">${ord.productName}</div>
+            <div style="font-size: 10px; color: var(--text-muted);">${ord.colorway || 'Estándar'}</div>
+          </td>
+          <td style="font-weight: 800; text-align: center;">${ord.units} bolsos</td>
+          <td style="font-weight: 800; color: var(--primary-gold);">${db.formatCOP(ord.totalWholesale)}</td>
+          <td>
+            <select class="form-select order-status-select" data-order-id="${ord.id}" style="font-size: 11px; padding: 4px 6px; font-weight: 700; border-radius: 6px; ${ord.status === 'Entregado y Cobrado' ? 'background: rgba(16, 185, 129, 0.15); color: #4ade80; border-color: rgba(16, 185, 129, 0.4);' : ''}">
+              <option value="En Alistamiento" ${ord.status === 'En Alistamiento' ? 'selected' : ''}>📦 En Alistamiento</option>
+              <option value="Despachado en Coordinadora" ${ord.status.includes('Despachado') ? 'selected' : ''}>🛵 Despachado en Coordinadora/Moto</option>
+              <option value="Entregado y Cobrado" ${ord.status === 'Entregado y Cobrado' ? 'selected' : ''}>✅ Entregado y Cobrado</option>
+              <option value="Cancelado" ${ord.status === 'Cancelado' ? 'selected' : ''}>❌ Cancelado</option>
+            </select>
+          </td>
+          <td>
+            <button type="button" class="btn-action-sm btn-open-exchange-modal" data-order-id="${ord.id}" style="font-size: 11px; padding: 4px 8px; font-weight: 700; color: #f59e0b; background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.3); border-radius: 6px; cursor: pointer; white-space: nowrap;" title="Gestionar Cambio de Color, Garantía o Retorno">
+              🔄 Cambio / Retorno
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join("");
+
+    ordersTbody.querySelectorAll(".order-status-select").forEach(sel => {
+      sel.addEventListener("change", () => {
+        const ordId = sel.dataset.orderId;
+        const newStatus = sel.value;
+        db.updateOrderStatus(ordId, newStatus);
+        showToast(`⚡ Pedido #${ordId} actualizado a: ${newStatus}`);
+        renderSupplierAdmin();
+      });
+    });
+
+    const btnQuickExport = document.querySelector(".btn-quick-export-orders");
+    if (btnQuickExport) {
+      btnQuickExport.onclick = () => {
+        exportOrdersToCSV(db.getOrders(), "Historico_Completo");
+      };
+    }
   }
 
   function renderSaasAdminClientsTable() {
@@ -681,13 +947,43 @@ document.addEventListener("DOMContentLoaded", () => {
   // VISTA 4: DIRECTORIO DE TIENDAS & CALCULADORA ROI
   // =========================================================================
   function renderDirectory() {
-    const stores = db.getStores();
+    let stores = db.getStores();
     const grid = document.getElementById("directory-stores-grid");
     if (!grid) return;
 
+    // Filtro por Rol
+    if (directoryRoleFilter === "supplier") {
+      stores = stores.filter(s => s.isSupplierStore);
+    } else if (directoryRoleFilter === "partner") {
+      stores = stores.filter(s => !s.isSupplierStore);
+    }
+
+    // Filtro por Búsqueda
+    if (directorySearchQuery && directorySearchQuery.trim() !== "") {
+      const q = directorySearchQuery.toLowerCase();
+      stores = stores.filter(s => 
+        s.name.toLowerCase().includes(q) || 
+        (s.neighborhood && s.neighborhood.toLowerCase().includes(q)) ||
+        (s.tagline && s.tagline.toLowerCase().includes(q))
+      );
+    }
+
+    if (stores.length === 0) {
+      grid.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px; background: var(--bg-surface); border-radius: var(--radius-md); border: 1px dashed var(--border-subtle);">
+          <div style="font-size: 28px; margin-bottom: 6px;">📍</div>
+          <div style="color: var(--text-secondary); font-size: 13px;">No se encontraron entidades que coincidan con la búsqueda.</div>
+        </div>
+      `;
+      return;
+    }
+
     grid.innerHTML = stores.map(s => {
       return `
-        <div class="store-directory-card">
+        <div class="store-directory-card" style="position: relative;">
+          <div class="corner-tag ${s.isSupplierStore ? 'corner-tag-supplier' : 'corner-tag-partner'}">
+            ${s.isSupplierStore ? '🏢 BODEGA MATRIZ' : '🏪 BOUTIQUE PARTNER'}
+          </div>
           <div class="store-card-header">
             <div class="store-card-avatar">${s.isSupplierStore ? '👑' : '👜'}</div>
             <div>
@@ -709,32 +1005,61 @@ document.addEventListener("DOMContentLoaded", () => {
       btn.addEventListener("click", () => {
         db.setCurrentStoreId(btn.dataset.id);
         updateAuthHUD();
+        setupHeadersAndRoleIsolation();
         switchRoleTab("storefront");
       });
     });
   }
 
+  function setupDirectoryFilters() {
+    const filterButtons = document.querySelectorAll(".btn-filter-role");
+    filterButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        filterButtons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        directoryRoleFilter = btn.dataset.filter;
+        renderDirectory();
+      });
+    });
+
+    const searchInput = document.getElementById("dir-search-input");
+    if (searchInput) {
+      searchInput.addEventListener("input", (e) => {
+        directorySearchQuery = e.target.value.trim();
+        renderDirectory();
+      });
+    }
+  }
+
   function setupROISimulator() {
-    const sliderPairs = document.getElementById("roi-slider-pairs");
-    const sliderMargin = document.getElementById("roi-slider-margin");
-    const labelPairs = document.getElementById("roi-pairs-label");
-    const labelMargin = document.getElementById("roi-margin-label");
-    const labelTotal = document.getElementById("roi-total-profit");
+    const resellersSlider = document.getElementById("roi-resellers-slider");
+    const pairsSlider = document.getElementById("roi-pairs-slider");
+    const resellersVal = document.getElementById("roi-resellers-val");
+    const pairsVal = document.getElementById("roi-pairs-val");
+    const profitDisplay = document.getElementById("roi-profit-display");
 
-    function updateROI() {
-      if (!sliderPairs || !sliderMargin) return;
-      const pairs = parseInt(sliderPairs.value, 10);
-      const margin = parseInt(sliderMargin.value, 10);
-      const total = pairs * margin;
+    function calculateRoi() {
+      if (!resellersSlider || !pairsSlider) return;
+      const resellers = parseInt(resellersSlider.value, 10) || 25;
+      const pairs = parseInt(pairsSlider.value, 10) || 120;
+      if (resellersVal) resellersVal.textContent = `${resellers} tiendas`;
+      if (pairsVal) pairsVal.textContent = `${pairs} bolsos`;
 
-      if (labelPairs) labelPairs.textContent = `${pairs} bolsos`;
-      if (labelMargin) labelMargin.textContent = db.formatCOP(margin);
-      if (labelTotal) labelTotal.textContent = `${db.formatCOP(total)} COP`;
+      // Ganancia Bodega: $25.000 COP margen mayorista por bolso + $150.000 COP mensualidad SaaS
+      const pairProfits = resellers * pairs * 25000;
+      const saasProfits = resellers * 150000;
+      const totalMonthly = pairProfits + saasProfits;
+
+      if (profitDisplay) {
+        profitDisplay.textContent = db.formatCOP(totalMonthly) + " COP";
+      }
     }
 
-    if (sliderPairs) sliderPairs.addEventListener("input", updateROI);
-    if (sliderMargin) sliderMargin.addEventListener("input", updateROI);
-    updateROI();
+    if (resellersSlider && pairsSlider) {
+      resellersSlider.addEventListener("input", calculateRoi);
+      pairsSlider.addEventListener("input", calculateRoi);
+      calculateRoi();
+    }
   }
 
   // =========================================================================
@@ -842,9 +1167,40 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function updateSingleWhatsAppButton() {
     const waBtn = document.getElementById("modal-btn-wa-order");
-    if (!waBtn || !activeModalProduct) return;
+    const btnAddCart = document.getElementById("modal-btn-add-cart");
+    if (!activeModalProduct || !activeModalColorway) return;
+
+    const stock = db.getProductStock(activeModalProduct.id, activeModalColorway.name);
     const store = db.getCurrentStore();
-    waBtn.href = db.buildSingleProductWhatsAppUrl(store, activeModalProduct, activeModalColorway);
+
+    if (stock <= 0) {
+      if (waBtn) {
+        waBtn.style.opacity = "0.5";
+        waBtn.style.pointerEvents = "none";
+        waBtn.innerHTML = "<span>🔴 Tono Agotado en Bodega</span>";
+      }
+      if (btnAddCart) {
+        btnAddCart.disabled = true;
+        btnAddCart.textContent = "Agotado";
+        btnAddCart.style.opacity = "0.5";
+      }
+    } else {
+      if (waBtn) {
+        waBtn.style.opacity = "1";
+        waBtn.style.pointerEvents = "auto";
+        waBtn.innerHTML = "<span>Pedir " + activeModalColorway.name + " por WhatsApp</span> ➔";
+        waBtn.href = db.buildSingleProductWhatsAppUrl(store, activeModalProduct, activeModalColorway);
+        waBtn.onclick = () => {
+          db.decrementStock(activeModalProduct.id, activeModalColorway.name, activeModalQuantity || 1);
+          renderStorefront();
+        };
+      }
+      if (btnAddCart) {
+        btnAddCart.disabled = false;
+        btnAddCart.textContent = "Agregar al Pedido";
+        btnAddCart.style.opacity = "1";
+      }
+    }
   }
 
   // =========================================================================
@@ -910,6 +1266,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const customerData = { name, phone, address };
         const waUrl = db.buildConsolidatedCartWhatsAppUrl(store, cartItems, customerData, cartSelectedZone, cartDispatchMode);
 
+        cartItems.forEach(item => {
+          db.decrementStock(item.productId, item.colorway, item.quantity);
+        });
+        renderStorefront();
         window.open(waUrl, "_blank");
         showToast("Pedido consolidado enviado a WhatsApp.");
       });
@@ -1305,3 +1665,923 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 3200);
   }
 });
+
+
+  // =========================================================================
+  // MODAL 6 & 7: COTIZADOR PERSONALIZADO VIP (DIGITAL & IMPRIMIBLE)
+  // =========================================================================
+  function setupQuoteGenerator() {
+    const modal = document.getElementById("modal-quote-generator");
+    const previewModal = document.getElementById("modal-quote-preview");
+    const btnOpenSupplier = document.getElementById("btn-open-quote-modal");
+    const btnOpenPartner = document.getElementById("btn-open-quote-modal-partner");
+    const btnClose = document.getElementById("btn-close-quote-modal");
+    const btnClosePreview = document.getElementById("btn-close-preview-modal");
+    const btnClosePreviewBtn = document.getElementById("btn-close-preview-btn");
+
+    if (!modal) return;
+
+    let quoteItems = [];
+
+    const openModal = () => {
+      populateProductSelect();
+      if (quoteItems.length === 0) {
+        const prods = db.getMasterProducts();
+        if (prods.length >= 2) {
+          const cw0 = (prods[0].colorways && prods[0].colorways[0]) ? prods[0].colorways[0].name : "Color Original";
+          const cw1 = (prods[1].colorways && prods[1].colorways[0]) ? prods[1].colorways[0].name : "Color Original";
+          quoteItems = [
+            { id: prods[0].id, name: prods[0].name, sku: prods[0].sku, colorway: cw0, price: prods[0].suggestedRetailPrice, qty: 1, image: prods[0].image },
+            { id: prods[1].id, name: prods[1].name, sku: prods[1].sku, colorway: cw1, price: prods[1].suggestedRetailPrice, qty: 1, image: prods[1].image }
+          ];
+        }
+      }
+      renderQuoteItems();
+      modal.classList.add("open");
+    };
+
+    if (btnOpenSupplier) btnOpenSupplier.onclick = openModal;
+    if (btnOpenPartner) btnOpenPartner.onclick = openModal;
+    if (btnClose) btnClose.onclick = () => modal.classList.remove("open");
+    if (btnClosePreview) btnClosePreview.onclick = () => previewModal.classList.remove("open");
+    if (btnClosePreviewBtn) btnClosePreviewBtn.onclick = () => previewModal.classList.remove("open");
+
+    function populateProductSelect() {
+      const select = document.getElementById("quote-prod-select");
+      if (!select) return;
+      const prods = db.getMasterProducts();
+      select.innerHTML = prods.map(p => `
+        <option value="${p.id}" data-price="${p.suggestedRetailPrice}">
+          ${p.name} — ${db.formatCOP(p.suggestedRetailPrice)}
+        </option>
+      `).join("");
+
+      updateColorwaySelect();
+      select.onchange = updateColorwaySelect;
+    }
+
+    function updateColorwaySelect() {
+      const prodSelect = document.getElementById("quote-prod-select");
+      const sizeSelect = document.getElementById("quote-size-select");
+      if (!prodSelect || !sizeSelect) return;
+
+      const prods = db.getMasterProducts();
+      const prod = prods.find(p => p.id === prodSelect.value);
+      if (!prod) return;
+
+      const colorways = prod.colorways || [{ name: "Color Original" }];
+      sizeSelect.innerHTML = colorways.map(cw => `<option value="${cw.name}">${cw.name}</option>`).join("");
+    }
+
+    function renderQuoteItems() {
+      const container = document.getElementById("quote-items-list");
+      if (!container) return;
+
+      if (quoteItems.length === 0) {
+        container.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 11px; padding: 14px;">No hay bolsos agregados aún. Selecciona arriba y pulsa "Agregar".</div>`;
+      } else {
+        container.innerHTML = quoteItems.map((item, idx) => `
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px dashed var(--border-subtle); font-size: 12px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-weight: 800; color: var(--primary-gold);">${item.qty}x</span>
+              <div>
+                <strong style="color: var(--text-primary); font-size: 12px;">${item.name}</strong>
+                <span style="font-size: 11px; color: var(--text-muted); margin-left: 4px;">(${item.colorway})</span>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-weight: 700; color: var(--text-primary);">${db.formatCOP(item.price * item.qty)}</span>
+              <button type="button" class="btn-remove-quote-item" data-idx="${idx}" style="background: none; border: none; color: #ef4444; font-size: 13px; cursor: pointer; padding: 0 4px;" title="Quitar">✕</button>
+            </div>
+          </div>
+        `).join("");
+
+        container.querySelectorAll(".btn-remove-quote-item").forEach(btn => {
+          btn.onclick = () => {
+            const idx = parseInt(btn.dataset.idx, 10);
+            quoteItems.splice(idx, 1);
+            renderQuoteItems();
+          };
+        });
+      }
+
+      recalculateTotals();
+    }
+
+    const btnAdd = document.getElementById("btn-add-quote-item");
+    if (btnAdd) {
+      btnAdd.onclick = () => {
+        const prodSelect = document.getElementById("quote-prod-select");
+        const sizeSelect = document.getElementById("quote-size-select");
+        const qtyInput = document.getElementById("quote-qty-input");
+
+        const prods = db.getMasterProducts();
+        const prod = prods.find(p => p.id === prodSelect.value);
+        if (!prod) return;
+
+        const colorway = sizeSelect.value;
+        const qty = parseInt(qtyInput.value, 10) || 1;
+
+        quoteItems.push({
+          id: prod.id,
+          name: prod.name,
+          sku: prod.sku,
+          colorway,
+          price: prod.suggestedRetailPrice,
+          qty,
+          image: prod.image
+        });
+
+        renderQuoteItems();
+        showToast(`Agregado: ${qty}x ${prod.name} (${colorway})`);
+      };
+    }
+
+    function recalculateTotals() {
+      const subtotal = quoteItems.reduce((acc, it) => acc + (it.price * it.qty), 0);
+      const discount = Number(document.getElementById("quote-discount-amount")?.value) || 0;
+      const shipping = Number(document.getElementById("quote-shipping-select")?.value) || 0;
+      const reason = document.getElementById("quote-discount-reason")?.value.trim() || "Descuento Especial";
+
+      const total = Math.max(0, subtotal - discount + shipping);
+
+      const subtotalEl = document.getElementById("quote-subtotal-display");
+      const discountEl = document.getElementById("quote-discount-display");
+      const discountLabelEl = document.getElementById("quote-discount-label");
+      const shippingEl = document.getElementById("quote-shipping-display");
+      const totalEl = document.getElementById("quote-total-display");
+
+      if (subtotalEl) subtotalEl.textContent = db.formatCOP(subtotal) + " COP";
+      if (discountEl) discountEl.textContent = `-${db.formatCOP(discount)} COP`;
+      if (discountLabelEl) discountLabelEl.textContent = `Descuento Especial (${reason}):`;
+      if (shippingEl) shippingEl.textContent = shipping === 0 ? "¡GRATIS! (Cortesía)" : db.formatCOP(shipping) + " COP";
+      if (totalEl) totalEl.textContent = db.formatCOP(total) + " COP";
+
+      return { subtotal, discount, shipping, total, reason };
+    }
+
+    ["quote-discount-amount", "quote-discount-reason", "quote-shipping-select"].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener("input", recalculateTotals);
+      if (el) el.addEventListener("change", recalculateTotals);
+    });
+
+    function generateWhatsAppMessage() {
+      const clientName = document.getElementById("quote-client-name")?.value.trim() || "Cliente VIP";
+      const store = db.getCurrentStore();
+      const { subtotal, discount, shipping, total, reason } = recalculateTotals();
+      const validity = document.getElementById("quote-validity-select")?.value || "48 Horas";
+      const quoteNum = Math.floor(1000 + Math.random() * 9000);
+
+      const itemsText = quoteItems.map(it => 
+        `• *${it.qty}x ${it.name}*\n  - Color/Tono: ${it.colorway} | Ref: ${it.sku}\n  - Precio Regular: ${db.formatCOP(it.price * it.qty)} COP`
+      ).join("\n\n");
+
+      return `📋 *COTIZACIÓN ESPECIAL PERSONALIZADA*
+🏢 *${store.name}*
+📍 *Ubicación:* ${store.neighborhood}
+📅 *Fecha:* ${new Date().toLocaleDateString('es-CO')} | *Cotización #COT-${quoteNum}*
+👤 *Cliente VIP:* ${clientName}
+
+👜 *BOLSOS SELECCIONADOS EN ESTA PROPUESTA:*
+${itemsText}
+
+-------------------------------------------
+💵 *Subtotal Regular:* ${db.formatCOP(subtotal)} COP
+🎁 *${reason}:* -${db.formatCOP(discount)} COP
+🛵 *Flete Despacho:* ${shipping === 0 ? 'GRATIS (Cortesía Bodega)' : db.formatCOP(shipping) + ' COP'}
+-------------------------------------------
+⭐ *TOTAL FINAL A PAGAR: ${db.formatCOP(total)} COP*
+-------------------------------------------
+⏱️ *Vigencia:* Propuesta reservada ${validity}.
+📦 *Despacho:* Entrega hoy mismo con motorizado o despacho nacional con transportadora asegurada.
+
+💬 *Para confirmar tu pedido con este precio especial, por favor respóndeme con un "CONFIRMO PEDIDO" y tu dirección exacta de despacho.*
+✨ *Engineered by BASTION AI*`;
+    }
+
+    const btnSendWA = document.getElementById("btn-send-quote-wa");
+    if (btnSendWA) {
+      btnSendWA.onclick = () => {
+        if (quoteItems.length === 0) {
+          alert("Agrega al menos un bolso a la cotización.");
+          return;
+        }
+        const msg = generateWhatsAppMessage();
+        const clientPhone = (document.getElementById("quote-client-phone")?.value || "").replace(/\D/g, "");
+        const store = db.getCurrentStore();
+        const cleanPhone = clientPhone.length >= 10 ? (clientPhone.startsWith("57") ? clientPhone : "57" + clientPhone) : (store.phone || "573165558899");
+        const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
+        window.open(url, "_blank");
+        showToast("📲 Abriendo WhatsApp con la cotización formateada...");
+      };
+    }
+
+    const btnCopy = document.getElementById("btn-copy-quote-text");
+    if (btnCopy) {
+      btnCopy.onclick = () => {
+        if (quoteItems.length === 0) {
+          alert("Agrega al menos un bolso a la cotización.");
+          return;
+        }
+        const msg = generateWhatsAppMessage();
+        navigator.clipboard?.writeText(msg).then(() => {
+          showToast("📋 ¡Cotización formal copiada al portapapeles!");
+        }).catch(() => {
+          prompt("Copia el texto de la cotización:", msg);
+        });
+      };
+    }
+
+    const btnPreview = document.getElementById("btn-preview-quote-card");
+    if (btnPreview) {
+      btnPreview.onclick = () => {
+        if (quoteItems.length === 0) {
+          alert("Agrega al menos un bolso a la cotización.");
+          return;
+        }
+        const clientName = document.getElementById("quote-client-name")?.value.trim() || "Cliente VIP";
+        const store = db.getCurrentStore();
+        const { subtotal, discount, shipping, total, reason } = recalculateTotals();
+        const validity = document.getElementById("quote-validity-select")?.value || "48 Horas";
+        const quoteNum = Math.floor(1000 + Math.random() * 9000);
+
+        const rowsHtml = quoteItems.map(it => `
+          <tr style="border-bottom: 1px solid #e2e8f0;">
+            <td style="padding: 8px 6px;">
+              <strong style="color: #0f172a; font-size: 12px;">${it.name}</strong><br>
+              <span style="color: #64748b; font-size: 10px;">SKU: ${it.sku}</span>
+            </td>
+            <td style="padding: 8px 6px; text-align: center;"><span style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-weight: 800; font-size: 11px;">${it.colorway}</span></td>
+            <td style="padding: 8px 6px; text-align: center; font-weight: 700;">${it.qty}</td>
+            <td style="padding: 8px 6px; text-align: right; font-weight: 700;">${db.formatCOP(it.price)}</td>
+            <td style="padding: 8px 6px; text-align: right; font-weight: 800; color: #0f172a;">${db.formatCOP(it.price * it.qty)}</td>
+          </tr>
+        `).join("");
+
+        const previewContainer = document.getElementById("printable-quote-content");
+        if (previewContainer) {
+          previewContainer.innerHTML = `
+            <div style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; background: #ffffff; color: #0f172a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+              <!-- Header Membretado -->
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #e6192e; padding-bottom: 14px; margin-bottom: 16px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <img src="assets/images/bags_world_logo_transparent.png" alt="Logo" style="width: 44px; height: 44px; border-radius: 50%; border: 2px solid #e6192e;">
+                  <div>
+                    <h2 style="margin: 0; font-size: 16px; font-weight: 900; color: #0f172a;">${store.name}</h2>
+                    <div style="font-size: 11px; color: #64748b;">${store.neighborhood}</div>
+                    <div style="font-size: 11px; color: #64748b;">WhatsApp Oficial: +${store.phone}</div>
+                  </div>
+                </div>
+                <div style="text-align: right;">
+                  <span style="font-size: 10px; font-weight: 800; background: #fff0f1; color: #e6192e; padding: 3px 8px; border-radius: 999px; border: 1px solid rgba(230,25,46,0.2);">PROPUESTA COMERCIAL VIP</span>
+                  <div style="font-size: 15px; font-weight: 900; color: #0f172a; margin-top: 4px;">#COT-${quoteNum}</div>
+                  <div style="font-size: 10px; color: #64748b;">${new Date().toLocaleDateString('es-CO', { year: 'numeric', month: 'short', day: 'numeric' })}</div>
+                </div>
+              </div>
+
+              <!-- Info Cliente VIP -->
+              <div style="background: #f8fafc; border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                <div>
+                  <span style="font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase;">Dirigido A:</span>
+                  <div style="font-size: 13px; font-weight: 800; color: #0f172a;">${clientName}</div>
+                </div>
+                <div>
+                  <span style="font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase;">Validez de la Oferta:</span>
+                  <div style="font-size: 12px; font-weight: 800; color: #e6192e;">⏱️ ${validity}</div>
+                </div>
+              </div>
+
+              <!-- Tabla de Productos -->
+              <table style="width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 16px;">
+                <thead>
+                  <tr style="background: #f1f5f9; color: #475569; text-transform: uppercase; font-size: 10px;">
+                    <th style="padding: 6px; text-align: left;">Bolso / Referencia</th>
+                    <th style="padding: 6px; text-align: center;">Colorway</th>
+                    <th style="padding: 6px; text-align: center;">Cant.</th>
+                    <th style="padding: 6px; text-align: right;">Unitario</th>
+                    <th style="padding: 6px; text-align: right;">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${rowsHtml}
+                </tbody>
+              </table>
+
+              <!-- Resumen Financiero -->
+              <div style="margin-left: auto; width: 260px; font-size: 12px; line-height: 1.6;">
+                <div style="display: flex; justify-content: space-between; color: #64748b;">
+                  <span>Subtotal Regular:</span>
+                  <strong style="color: #0f172a;">${db.formatCOP(subtotal)}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; color: #16a34a; font-weight: 700;">
+                  <span>${reason}:</span>
+                  <span>-${db.formatCOP(discount)}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; color: #64748b;">
+                  <span>Flete Despacho:</span>
+                  <strong style="color: #0f172a;">${shipping === 0 ? 'GRATIS' : db.formatCOP(shipping)}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 15px; font-weight: 900; color: #e6192e; border-top: 2px solid #0f172a; padding-top: 6px; margin-top: 4px;">
+                  <span>TOTAL A PAGAR:</span>
+                  <span>${db.formatCOP(total)}</span>
+                </div>
+              </div>
+
+              <!-- Pie de Cotización y Watermark -->
+              <div style="margin-top: 20px; padding-top: 12px; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: #64748b;">
+                <div>✨ Despachos asegurados a nivel nacional por contraentrega con transportadora aliada.</div>
+                <div style="font-weight: 800; color: #0f172a;">Engineered by <strong>BASTION AI</strong></div>
+              </div>
+            </div>
+          `;
+        }
+
+        previewModal.classList.add("open");
+      };
+    }
+  }
+
+  // =========================================================================
+  // MODAL 8: MATRIZ DE INVENTARIO POR COLORWAY & VARIANTE
+  // =========================================================================
+  function setupInventoryStockMatrix() {
+    const modal = document.getElementById("modal-inventory-matrix");
+    const btnClose = document.getElementById("btn-close-stock-modal");
+    const btnCancel = document.getElementById("btn-cancel-stock-modal");
+    const btnSave = document.getElementById("btn-save-stock-matrix");
+    const btnQuickAdd = document.getElementById("btn-stock-quick-add-all");
+    const btnQuickClear = document.getElementById("btn-stock-quick-clear-all");
+
+    if (!modal) return;
+
+    let currentProdId = null;
+
+    document.addEventListener("click", (e) => {
+      const btn = e.target.closest(".btn-open-stock-modal");
+      if (!btn) return;
+
+      const prodId = btn.dataset.prodId;
+      openStockMatrixModal(prodId);
+    });
+
+    if (btnClose) btnClose.onclick = () => modal.classList.remove("open");
+    if (btnCancel) btnCancel.onclick = () => modal.classList.remove("open");
+
+    function openStockMatrixModal(productId) {
+      currentProdId = productId;
+      const products = db.getMasterProducts();
+      const prod = products.find(p => p.id === productId);
+      if (!prod) return;
+
+      document.getElementById("matrix-prod-img").src = prod.image;
+      document.getElementById("matrix-prod-name").textContent = prod.name;
+      document.getElementById("matrix-prod-sku").textContent = `SKU: ${prod.sku} • ${prod.category}`;
+
+      renderMatrixTable(prod);
+      modal.classList.add("open");
+    }
+
+    function renderMatrixTable(prod) {
+      const table = document.getElementById("matrix-stock-table");
+      const matrix = db.getProductStockMatrix(prod.id);
+      const colorways = prod.colorways && prod.colorways.length > 0 ? prod.colorways : [{ name: "Color Único", image: prod.image }];
+
+      const rowsHtml = colorways.map(cw => {
+        const val = matrix[cw.name] !== undefined ? matrix[cw.name] : 6;
+        const statusBadge = val === 0 
+          ? `<span style="background: rgba(239,68,68,0.15); color: #f87171; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 800;">🔴 Agotado</span>`
+          : (val <= 4 
+              ? `<span style="background: rgba(227,194,116,0.15); color: var(--primary-gold); padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 800;">⚡ Últimas unds</span>`
+              : `<span style="background: rgba(16,185,129,0.15); color: var(--accent-emerald); padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 800;">🟢 En Stock</span>`);
+
+        return `
+          <tr>
+            <td style="padding: 10px 12px;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <img src="${cw.image || prod.image}" alt="${cw.name}" style="width: 38px; height: 38px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border-subtle);">
+                <div>
+                  <strong style="font-size: 13px; color: #fff;">${cw.name}</strong>
+                  <div style="font-size: 10px; color: var(--text-muted); font-family: monospace;">${cw.sku || prod.sku}</div>
+                </div>
+              </div>
+            </td>
+            <td style="padding: 10px 12px; font-size: 12px; color: var(--text-secondary);">${prod.dimensions || 'Estándar'}</td>
+            <td style="padding: 10px 12px; text-align: center;">
+              <input type="number" min="0" max="999" class="form-input matrix-cell-input" 
+                     data-color="${cw.name}" value="${val}" 
+                     style="width: 70px; text-align: center; padding: 6px; font-weight: 800; font-size: 14px; margin: 0 auto;">
+            </td>
+            <td style="padding: 10px 12px; text-align: center;">
+              ${statusBadge}
+            </td>
+          </tr>
+        `;
+      }).join("");
+
+      table.innerHTML = `
+        <thead>
+          <tr style="background: var(--bg-surface-elevated);">
+            <th style="padding: 10px 12px; text-align: left;">Colorway / Variante</th>
+            <th style="padding: 10px 12px; text-align: left;">Dimensiones</th>
+            <th style="text-align: center; padding: 10px 12px;">Stock Bodega (Unidades)</th>
+            <th style="text-align: center; padding: 10px 12px;">Disponibilidad</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rowsHtml}
+        </tbody>
+      `;
+
+      updateGrandTotalBadge();
+
+      table.querySelectorAll(".matrix-cell-input").forEach(input => {
+        input.addEventListener("input", updateGrandTotalBadge);
+      });
+    }
+
+    function updateGrandTotalBadge() {
+      const inputs = document.querySelectorAll("#matrix-stock-table .matrix-cell-input");
+      let grandTotal = 0;
+      inputs.forEach(inp => {
+        grandTotal += (parseInt(inp.value, 10) || 0);
+      });
+      const badge = document.getElementById("matrix-grand-total-badge");
+      if (badge) badge.textContent = `${grandTotal} bolsos`;
+    }
+
+    if (btnQuickAdd) {
+      btnQuickAdd.onclick = () => {
+        document.querySelectorAll("#matrix-stock-table .matrix-cell-input").forEach(inp => {
+          inp.value = (parseInt(inp.value, 10) || 0) + 5;
+        });
+        updateGrandTotalBadge();
+        showToast("➕ Se sumaron +5 bolsos a todos los tonos.");
+      };
+    }
+
+    if (btnQuickClear) {
+      btnQuickClear.onclick = () => {
+        if (confirm("¿Establecer inventario en 0 para todos los tonos de este bolso?")) {
+          document.querySelectorAll("#matrix-stock-table .matrix-cell-input").forEach(inp => {
+            inp.value = 0;
+          });
+          updateGrandTotalBadge();
+        }
+      };
+    }
+
+    if (btnSave) {
+      btnSave.onclick = () => {
+        if (!currentProdId) return;
+        const newMatrix = {};
+        document.querySelectorAll("#matrix-stock-table .matrix-cell-input").forEach(inp => {
+          newMatrix[inp.dataset.color] = Math.max(0, parseInt(inp.value, 10) || 0);
+        });
+
+        db.saveProductStockMatrix(currentProdId, newMatrix);
+        modal.classList.remove("open");
+        showToast("💾 Inventario por colorway guardado correctamente.");
+
+        renderCurrentView();
+      };
+    }
+  }
+
+  // =========================================================================
+  // MODAL 9: CENTRO CONTABLE & REPORTES FINANCIEROS (EXCEL / PDF)
+  // =========================================================================
+  function setupAccountingReports() {
+    const modal = document.getElementById("modal-accounting-reports");
+    const btnOpenSupplier = document.getElementById("btn-open-supplier-reports");
+    const btnOpenStore = document.getElementById("btn-open-store-reports");
+    const btnClose = document.getElementById("btn-close-reports-modal");
+    const periodButtons = document.querySelectorAll(".btn-report-period");
+    const btnExportExcel = document.getElementById("btn-export-reports-excel");
+    const btnExportPdf = document.getElementById("btn-export-reports-pdf");
+
+    if (!modal) return;
+
+    let activePeriod = "month";
+    let activeStoreFilter = null;
+
+    function openReports(storeFilter = null) {
+      activeStoreFilter = storeFilter;
+      const headerTitle = document.getElementById("reports-modal-header-title");
+      if (headerTitle) {
+        headerTitle.textContent = storeFilter 
+          ? `Reporte Contable — ${storeFilter}` 
+          : `Centro Contable & Liquidación Financiera (Red BAGS WORLD)`;
+      }
+      renderReportData();
+      modal.classList.add("open");
+    }
+
+    if (btnOpenSupplier) btnOpenSupplier.onclick = () => openReports(null);
+    if (btnOpenStore) {
+      btnOpenStore.onclick = () => {
+        const store = db.getCurrentStore();
+        openReports(store.isSupplierStore ? null : store.name);
+      };
+    }
+    if (btnClose) btnClose.onclick = () => modal.classList.remove("open");
+
+    periodButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        periodButtons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        activePeriod = btn.dataset.period;
+        renderReportData();
+      });
+    });
+
+    function renderReportData() {
+      const summary = db.getFinancialSummary(activePeriod, activeStoreFilter);
+      
+      const periodLabels = {
+        day: "Hoy (24 Horas)",
+        week: "Últimos 7 Días",
+        month: "Mes en Curso (30 Días)",
+        year: "Acumulado Anual / Histórico"
+      };
+      const labelEl = document.getElementById("reports-date-range-label");
+      if (labelEl) {
+        labelEl.innerHTML = `Periodo Seleccionado: <strong>${periodLabels[activePeriod] || activePeriod}</strong>`;
+      }
+
+      document.getElementById("report-kpi-gross-sales").textContent = db.formatCOP(summary.totalGross);
+      document.getElementById("report-kpi-wholesale-cost").textContent = db.formatCOP(summary.totalWholesale);
+      document.getElementById("report-kpi-net-profit").textContent = db.formatCOP(summary.netProfit);
+      document.getElementById("report-kpi-pairs-count").textContent = `${summary.totalBags} bolsos (${summary.totalOrders} pedidos)`;
+
+      const tbody = document.getElementById("report-orders-tbody");
+      if (tbody) {
+        if (summary.orders.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="9" style="text-align: center; padding: 24px; color: var(--text-muted);">
+                No hay pedidos registrados en este período.
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        tbody.innerHTML = summary.orders.map(o => {
+          const wholesale = Number(o.totalWholesale) || (o.units * 68000);
+          const retail = Number(o.totalRetail) || (wholesale * 1.8);
+          const margin = retail - wholesale;
+          return `
+            <tr>
+              <td style="font-family: monospace; font-weight: 700; color: var(--primary-gold);">#${o.id}</td>
+              <td style="color: var(--text-muted);">${o.date}</td>
+              <td style="font-weight: 700;">${o.storeName}</td>
+              <td>${o.productName} <span style="font-size: 10px; color: var(--text-muted);">(${o.colorway || 'Estándar'})</span></td>
+              <td style="text-align: center; font-weight: 800;">${o.units}</td>
+              <td style="font-weight: 700;">${db.formatCOP(retail)}</td>
+              <td style="font-weight: 700; color: var(--primary-gold);">${db.formatCOP(wholesale)}</td>
+              <td style="font-weight: 800; color: var(--accent-emerald);">+${db.formatCOP(margin)}</td>
+              <td>
+                <span class="category-tag" style="${o.status === 'Entregado y Cobrado' ? 'background: rgba(16,185,129,0.15); color: var(--accent-emerald); border-color: rgba(16,185,129,0.3);' : ''} font-size: 10px;">
+                  ${o.status || 'En Alistamiento'}
+                </span>
+              </td>
+            </tr>
+          `;
+        }).join("");
+      }
+    }
+
+    if (btnExportExcel) {
+      btnExportExcel.onclick = () => {
+        const summary = db.getFinancialSummary(activePeriod, activeStoreFilter);
+        exportOrdersToCSV(summary.orders, activePeriod);
+      };
+    }
+
+    if (btnExportPdf) {
+      btnExportPdf.onclick = () => {
+        const summary = db.getFinancialSummary(activePeriod, activeStoreFilter);
+        generatePDFReport(summary, activePeriod, activeStoreFilter);
+      };
+    }
+  }
+
+  function exportOrdersToCSV(orders, periodName = "periodo") {
+    if (!orders || orders.length === 0) {
+      alert("No hay órdenes disponibles para exportar.");
+      return;
+    }
+
+    const bom = "\uFEFF";
+    const headers = [
+      "ID Pedido",
+      "Fecha",
+      "Boutique / Partner",
+      "Bolso / Referencia",
+      "Colorway / Tono",
+      "Unidades",
+      "Costo Mayorista COP",
+      "Precio Venta Sugerido COP",
+      "Utilidad Neta COP",
+      "Estado Logístico",
+      "Bodega Matriz"
+    ];
+
+    const rows = orders.map(o => {
+      const wholesale = Number(o.totalWholesale) || (o.units * 68000);
+      const retail = Number(o.totalRetail) || (wholesale * 1.8);
+      const margin = retail - wholesale;
+
+      return [
+        `"${o.id}"`,
+        `"${o.date}"`,
+        `"${o.storeName}"`,
+        `"${(o.productName || '').replace(/"/g, '""')}"`,
+        `"${o.colorway || 'Estándar'}"`,
+        o.units,
+        wholesale,
+        retail,
+        margin,
+        `"${o.status || 'En Alistamiento'}"`,
+        `"${o.supplierName || 'BAGS WORLD Colombia'}"`
+      ].join(";");
+    });
+
+    const csvContent = bom + [headers.join(";"), ...rows].join("\r\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const dateStamp = new Date().toISOString().slice(0, 10);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `Reporte_Contable_BagsWorld_${periodName}_${dateStamp}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    showToast("📥 ¡Archivo Excel (.CSV) descargado con éxito!");
+  }
+
+  function generatePDFReport(summary, periodName, storeFilter) {
+    const periodTitles = {
+      day: "INFORME DIARIO DE VENTAS Y DESPACHOS DE BOLSOS",
+      week: "INFORME SEMANAL DE LIQUIDACIÓN COMERCIAL",
+      month: "INFORME MENSUAL DE RESULTADOS & UTILIDADES",
+      year: "INFORME CONSOLIDADO HISTÓRICO Y ANUAL"
+    };
+
+    const title = periodTitles[periodName] || "INFORME CONTABLE";
+    const now = new Date();
+    const formattedDate = now.toLocaleDateString("es-CO", { year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" });
+
+    const rowsHtml = summary.orders.map(o => {
+      const wholesale = Number(o.totalWholesale) || (o.units * 68000);
+      const retail = Number(o.totalRetail) || (wholesale * 1.8);
+      const margin = retail - wholesale;
+      return `
+        <tr style="border-bottom: 1px solid #e2e8f0; font-size: 11px;">
+          <td style="padding: 6px 8px; font-weight: bold; color: #b45309;">#${o.id}</td>
+          <td style="padding: 6px 8px; color: #64748b;">${o.date}</td>
+          <td style="padding: 6px 8px; font-weight: 600;">${o.storeName}</td>
+          <td style="padding: 6px 8px;">${o.productName} (${o.colorway || 'Estándar'})</td>
+          <td style="padding: 6px 8px; text-align: center; font-weight: bold;">${o.units}</td>
+          <td style="padding: 6px 8px; text-align: right;">${db.formatCOP(retail)}</td>
+          <td style="padding: 6px 8px; text-align: right; color: #b45309;">${db.formatCOP(wholesale)}</td>
+          <td style="padding: 6px 8px; text-align: right; font-weight: bold; color: #15803d;">+${db.formatCOP(margin)}</td>
+          <td style="padding: 6px 8px; text-align: center;">${o.status || 'En Alistamiento'}</td>
+        </tr>
+      `;
+    }).join("");
+
+    const printWindow = window.open("", "_blank", "width=900,height=800");
+    if (!printWindow) {
+      alert("Por favor permite las ventanas emergentes para generar el informe PDF.");
+      return;
+    }
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html lang="es">
+      <head>
+        <meta charset="UTF-8">
+        <title>Reporte Contable - BAGS WORLD MLS</title>
+        <style>
+          body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #0f172a; margin: 30px; }
+          .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0f172a; padding-bottom: 16px; margin-bottom: 20px; }
+          .title { font-size: 20px; font-weight: 900; color: #0f172a; margin: 0; }
+          .subtitle { font-size: 12px; color: #64748b; margin-top: 4px; }
+          .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+          .kpi-card { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; }
+          .kpi-label { font-size: 10px; color: #64748b; font-weight: bold; text-transform: uppercase; }
+          .kpi-val { font-size: 16px; font-weight: 900; margin-top: 4px; }
+          table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+          th { background: #0f172a; color: #ffffff; font-size: 10px; text-align: left; padding: 8px; text-transform: uppercase; }
+          .footer { margin-top: 30px; border-top: 1px solid #cbd5e1; padding-top: 12px; display: flex; justify-content: space-between; font-size: 10px; color: #64748b; }
+          @media print {
+            .no-print { display: none !important; }
+            body { margin: 10mm; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="no-print" style="margin-bottom: 16px; display: flex; justify-content: flex-end; gap: 10px;">
+          <button onclick="window.print()" style="padding: 8px 16px; background: #0f172a; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">
+            🖨️ Imprimir / Guardar como PDF
+          </button>
+          <button onclick="window.close()" style="padding: 8px 16px; background: #e2e8f0; border: none; border-radius: 6px; cursor: pointer;">
+            Cerrar
+          </button>
+        </div>
+
+        <div class="header">
+          <div>
+            <div style="font-size: 11px; font-weight: 900; color: #e6192e; letter-spacing: 1px;">BAGS WORLD MLS • BASTION AI</div>
+            <h1 class="title">${title}</h1>
+            <div class="subtitle">${storeFilter ? 'Entidad: <strong>' + storeFilter + '</strong>' : 'Consolidado Red Nacional (Bodega Matriz & Boutiques Partners)'}</div>
+          </div>
+          <div style="text-align: right; font-size: 11px;">
+            <div>Fecha de Emisión: <strong>${formattedDate}</strong></div>
+            <div style="color: #16a34a; font-weight: bold; margin-top: 2px;">🟢 Estado: Contabilidad Auditada</div>
+          </div>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi-card" style="border-left: 4px solid #2563eb;">
+            <div class="kpi-label">Facturación Bruta</div>
+            <div class="kpi-val" style="color: #1e3a8a;">${db.formatCOP(summary.totalGross)}</div>
+          </div>
+          <div class="kpi-card" style="border-left: 4px solid #f59e0b;">
+            <div class="kpi-label">Costo Bodega Mayorista</div>
+            <div class="kpi-val" style="color: #b45309;">${db.formatCOP(summary.totalWholesale)}</div>
+          </div>
+          <div class="kpi-card" style="border-left: 4px solid #16a34a;">
+            <div class="kpi-label">Utilidad Neta Red</div>
+            <div class="kpi-val" style="color: #15803d;">${db.formatCOP(summary.netProfit)}</div>
+          </div>
+          <div class="kpi-card" style="border-left: 4px solid #e6192e;">
+            <div class="kpi-label">Bolsos Despachados</div>
+            <div class="kpi-val" style="color: #e6192e;">${summary.totalBags} bolsos</div>
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Fecha</th>
+              <th>Boutique / Partner</th>
+              <th>Referencia & Colorway</th>
+              <th style="text-align: center;">Bolsos</th>
+              <th style="text-align: right;">Venta</th>
+              <th style="text-align: right;">Costo Bodega</th>
+              <th style="text-align: right;">Utilidad</th>
+              <th style="text-align: center;">Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rowsHtml}
+          </tbody>
+        </table>
+
+        <div class="footer">
+          <div>Documento auditado por el motor contable de <strong>BASTION AI</strong> — BAGS WORLD Colombia.</div>
+          <div>Página 1 de 1</div>
+        </div>
+      </body>
+      </html>
+    `);
+    printWindow.document.close();
+  }
+
+  // =========================================================================
+  // MODAL 10: GESTIÓN DE CAMBIOS DE COLOR, GARANTÍAS Y DEVOLUCIONES
+  // =========================================================================
+  function setupReturnExchangeModal() {
+    const modal = document.getElementById("modal-return-exchange");
+    const btnClose = document.getElementById("btn-close-exchange-modal");
+    const btnCancel = document.getElementById("btn-cancel-exchange-modal");
+    const form = document.getElementById("form-return-exchange");
+    const actionSelect = document.getElementById("exchange-action-type");
+    const returnSizeSelect = document.getElementById("exchange-return-size");
+    const newSizeSelect = document.getElementById("exchange-new-size");
+    const unitsInput = document.getElementById("exchange-units");
+    const impactText = document.getElementById("exchange-stock-impact-text");
+    const sizesRow = document.getElementById("exchange-sizes-row");
+
+    if (!modal || !form) return;
+
+    let currentOrderId = null;
+    let currentOrder = null;
+
+    document.addEventListener("click", (e) => {
+      const btn = e.target.closest(".btn-open-exchange-modal");
+      if (!btn) return;
+
+      currentOrderId = btn.dataset.orderId;
+      const orders = db.getOrders();
+      currentOrder = orders.find(o => o.id === currentOrderId);
+      if (!currentOrder) return;
+
+      openExchangeModal(currentOrder);
+    });
+
+    if (btnClose) btnClose.onclick = () => modal.classList.remove("open");
+    if (btnCancel) btnCancel.onclick = () => modal.classList.remove("open");
+
+    function openExchangeModal(ord) {
+      document.getElementById("exchange-order-product-name").textContent = ord.productName;
+      document.getElementById("exchange-order-id").textContent = `#${ord.id}`;
+      document.getElementById("exchange-order-store").textContent = ord.storeName;
+      document.getElementById("exchange-order-colorway").textContent = ord.colorway || "Estándar";
+
+      // Llenar selects de colores basados en el bolso
+      const products = db.getMasterProducts();
+      const prod = products.find(p => p.name === ord.productName || p.id === ord.productId) || products[0];
+      const colorways = prod.colorways || [{ name: "Color Original" }];
+
+      const colorOptions = colorways.map(cw => `<option value="${cw.name}">${cw.name}</option>`).join("");
+      if (returnSizeSelect) returnSizeSelect.innerHTML = colorOptions;
+      if (newSizeSelect) newSizeSelect.innerHTML = colorOptions;
+
+      if (returnSizeSelect && ord.colorway) returnSizeSelect.value = ord.colorway;
+      if (newSizeSelect && colorways.length > 1) {
+        newSizeSelect.value = colorways[1].name;
+      }
+
+      if (unitsInput) unitsInput.value = "1";
+
+      updateImpactText();
+      modal.classList.add("open");
+    }
+
+    function updateImpactText() {
+      const action = actionSelect.value;
+      const retColor = returnSizeSelect.value;
+      const newColor = newSizeSelect.value;
+      const units = Number(unitsInput.value) || 1;
+
+      if (action === "color_exchange") {
+        sizesRow.style.display = "grid";
+        impactText.innerHTML = `Bodega sumará <strong>+${units} bolso(s) ${retColor}</strong> (reingreso) y restará <strong>-${units} bolso(s) ${newColor}</strong> (salida). No descuadra la caja.`;
+      } else if (action === "warranty") {
+        sizesRow.style.display = "grid";
+        impactText.innerHTML = `Bodega despachará <strong>-${units} bolso(s) nuevo(s) ${newColor}</strong> por garantía de herrajes/cremallera.`;
+      } else if (action === "stock_rotation") {
+        sizesRow.style.display = "grid";
+        impactText.innerHTML = `Rotación Mayorista: Reingresan <strong>+${units} bolsos ${retColor}</strong> y salen <strong>-${units} bolsos comerciales ${newColor}</strong>.`;
+      } else if (action === "refund_return") {
+        sizesRow.style.display = "none";
+        impactText.innerHTML = `Retorno a Stock: <strong>+${units} bolso(s) ${retColor}</strong> se reintegran al inventario disponible de bodega.`;
+      }
+    }
+
+    actionSelect.addEventListener("change", updateImpactText);
+    returnSizeSelect.addEventListener("change", updateImpactText);
+    newSizeSelect.addEventListener("change", updateImpactText);
+    unitsInput.addEventListener("input", updateImpactText);
+
+    form.onsubmit = (e) => {
+      e.preventDefault();
+      if (!currentOrderId || !currentOrder) return;
+
+      const channel = form.querySelector("input[name='exchange-channel']:checked")?.value || "retail";
+      const actionType = actionSelect.value;
+      const returnColor = returnSizeSelect.value;
+      const newColor = newSizeSelect.value;
+      const units = parseInt(unitsInput.value, 10) || 1;
+      const shippingVal = document.getElementById("exchange-shipping-mode").value;
+      const [shippingCostStr, shippingPayer] = shippingVal.split("_");
+      const shippingCost = parseInt(shippingCostStr, 10) || 0;
+      const clientAddress = document.getElementById("exchange-address").value.trim();
+
+      const result = db.processReturnOrExchange(currentOrderId, {
+        channel,
+        actionType,
+        returnColor,
+        newColor,
+        units,
+        shippingCost,
+        shippingPayer: shippingPayer === "cliente" ? "Cliente" : (shippingPayer === "tienda" ? "Boutique" : "Bodega Matriz"),
+        clientAddress
+      });
+
+      modal.classList.remove("open");
+      showToast("✅ Incidencia procesada e inventario actualizado en tiempo real.");
+
+      renderSupplierAdmin();
+      renderStoreAdmin();
+
+      if (result.whatsappText) {
+        const encoded = encodeURIComponent(result.whatsappText);
+        const store = db.getCurrentStore();
+        const cleanPhone = (store.phone || "573165558899").replace(/\D/g, "");
+        const waUrl = `https://wa.me/${cleanPhone}?text=${encoded}`;
+        
+        setTimeout(() => {
+          if (confirm("¿Deseas enviar la Guía de Cambio/Recogida a la línea de mensajería en WhatsApp ahora mismo?")) {
+            window.open(waUrl, "_blank");
+          }
+        }, 300);
+      }
+    };
+  }
