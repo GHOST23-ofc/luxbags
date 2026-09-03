@@ -993,7 +993,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const total = subtotal + shipping;
 
     document.getElementById("cart-summary-qty").textContent = totalCount;
-    document.getElementById("cart-summary-shoes").textContent = `${db.formatCOP(subtotal)} COP`;
+    document.getElementById("cart-summary-bags").textContent = `${db.formatCOP(subtotal)} COP`;
     document.getElementById("cart-summary-shipping").textContent = `${db.formatCOP(shipping)} COP`;
     document.getElementById("cart-summary-total").textContent = `${db.formatCOP(total)} COP`;
     const fletePreview = document.getElementById("cart-flete-preview");
