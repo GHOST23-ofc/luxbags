@@ -50,16 +50,13 @@
 }
 
 /* ==========================================================================
-   BODY & DARK GRID BACKGROUND (CUADRÍCULA OSCURA PERMANENTE)
+   BODY & DARK LUXURY BACKGROUND (SOLO PATTERN - SIN CUADRÍCULA)
    ========================================================================== */
 body {
   font-family: var(--font-main);
   background-color: var(--bg-main);
-  background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-    radial-gradient(ellipse 90% 60% at 50% -10%, rgba(230, 25, 46, 0.16), transparent 75%);
-  background-size: 32px 32px, 32px 32px, 100% 100%;
+  background-image: radial-gradient(ellipse 90% 60% at 50% -10%, rgba(230, 25, 46, 0.12), transparent 75%);
+  background-size: 100% 100%;
   background-attachment: fixed;
   color: var(--text-primary);
   line-height: 1.5;
@@ -88,7 +85,7 @@ body {
   height: 100vh;
   z-index: -1;
   pointer-events: none;
-  opacity: 0.35;
+  opacity: 0.55;
   mask-image: radial-gradient(ellipse at 50% 30%, rgba(0,0,0,1) 40%, rgba(0,0,0,0.05) 90%);
   -webkit-mask-image: radial-gradient(ellipse at 50% 30%, rgba(0,0,0,1) 40%, rgba(0,0,0,0.05) 90%);
 }
